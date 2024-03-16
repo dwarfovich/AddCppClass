@@ -13,7 +13,7 @@
                         Height="263">
 
     <Window.Resources>
-        <local:ClassData x:Key="className"/>
+        <local:ClassSettings x:Key="className"/>
     </Window.Resources>
 
     <Grid Margin="0,0,0,-6">

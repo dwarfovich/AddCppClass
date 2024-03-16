@@ -16,6 +16,10 @@ namespace Dwarfovich.AddCppClass
 
     public class ClassSettings
     {
+        public ClassSettings()
+        {
+            Style = FilenameStyle.CamelCase;
+        }
         public ClassSettings(string className, FilenameStyle style, string headerExtension)
         {
             ClassName = className;
@@ -42,43 +46,30 @@ namespace Dwarfovich.AddCppClass
         {
             return classSettings.ClassName;
         }
+
         public string GenerateSnakeCaseFilename(ClassSettings classSettings)
         {
+            Func<char,char,bool> ShouldInsertUnderline = (char previousChar, char nextChar) => {
+                return (Char.IsLower(previousChar) && Char.IsUpper(nextChar))
+                || (Char.IsDigit(previousChar) && !Char.IsDigit(nextChar));
+            };
+
             string filename = "";
             char previousChar = '\0';
             foreach (char c in classSettings.ClassName)
             {
-                if (previousChar == 0)
+                if (ShouldInsertUnderline(previousChar, c))
                 {
-                    filename += Char.ToLower(c);
+                    filename += '_';
                 }
-                else if (Char.IsLower(previousChar))
-                {
-                    if (Char.IsUpper(c))
-                    {
-                        filename += '_';
-                    }
-                    filename += Char.ToLower(c);
-                }
-                else if (Char.IsUpper(previousChar))
-                {
-                    filename += Char.ToLower(c);
-                }
-                else if (previousChar == '_')
-                {
-                    filename += Char.ToLower(c);
-                }
-                else if (Char.IsDigit(previousChar))
-                {
-                    if (!char.IsDigit(c))
-                    {
-                        filename += '_';
-                    }
-                    filename += Char.ToLower(c);
-                }
+                filename += Char.ToLower(c);
                 previousChar = c;
             }
             return filename;
+        }
+        public string GenerateLowerCaseFilename(ClassSettings classSettings)
+        {
+            return classSettings.ClassName.ToLower();
         }
         public string GenerateFilename(ClassSettings classSettings)
         {
@@ -88,6 +79,8 @@ namespace Dwarfovich.AddCppClass
                     return GenerateCamelCaseFilename(classSettings);
                 case FilenameStyle.SnakeCase:
                     return GenerateSnakeCaseFilename(classSettings);
+                case FilenameStyle.LowerCase:
+                    return GenerateLowerCaseFilename(classSettings);
                 default: throw new NotImplementedException();
             }
 
