@@ -5,10 +5,17 @@
                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                         xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
                         xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+                        xmlns:utils="clr-namespace:Dwarfovich.AddCppClass.Utils"
+                        xmlns:local="clr-namespace:Dwarfovich.AddCppClass"
                         toolkit:Themes.UseVsTheme="False"
                         mc:Ignorable="d"
                         Width="645"
                         Height="263">
+
+    <Window.Resources>
+        <local:ClassData x:Key="className"/>
+    </Window.Resources>
+
     <Grid Margin="0,0,0,-6">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -24,7 +31,7 @@
             <ColumnDefinition Width="55*"/>
             <ColumnDefinition Width="336*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,0,10,1" Grid.RowSpan="3" RenderTransformOrigin="0.456,0.492">
+        <Grid Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,0,10,10" Grid.RowSpan="3" RenderTransformOrigin="0.456,0.492">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="21*" />
                 <ColumnDefinition Width="55*" />
@@ -43,10 +50,37 @@
             <Label Content="Header extension" HorizontalAlignment="Left" Margin="105,-6,0,0" VerticalAlignment="Top" Width="104" Grid.ColumnSpan="2"/>
             <RadioButton Content=".h" GroupName="headerExtensionGroup" IsChecked="True" HorizontalAlignment="Left" Margin="105,0,0,0" Grid.Row="1" VerticalAlignment="Center" Grid.ColumnSpan="2"/>
             <RadioButton Content=".hpp" GroupName="headerExtensionGroup" HorizontalAlignment="Left" Margin="105,0,0,0" Grid.Row="2" VerticalAlignment="Center" Grid.ColumnSpan="2"/>
+            <Button Grid.Column="1" Content="Add class" HorizontalAlignment="Left" Margin="122,32,0,0" Grid.Row="4" VerticalAlignment="Top" RenderTransformOrigin="0.298,-0.332" Height="34" Width="90">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=ClassNameTextBox}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </Grid>
         <Label Grid.Column="1" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="38"/>
         <Label Grid.Column="1" Content="Label" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Center" Height="26" Width="38"/>
-        <TextBox x:Name="ClassNameTextBox" Grid.Column="1"  HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Width="200" Height="18"/>
+        <TextBox Name="ClassNameTextBox" Grid.Column="1" TextChanged="classNameChangedEventHandler" HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Width="200" Height="18">
+            <TextBox.Text>
+                <Binding
+                 Path="className"
+                 Source="{StaticResource className}"
+                 NotifyOnValidationError="True" ValidatesOnExceptions="True"
+                 UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <utils:ClassNameValidator/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
         <TextBlock IsHitTestVisible="False" Text="Class name" Grid.Column="1" Grid.Row="2" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" Height="18" Foreground="DarkGray">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}">

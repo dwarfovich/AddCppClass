@@ -14,7 +14,7 @@ namespace Dwarfovich.AddCppClass.Utils
         public Type ValidationType { get; set; }
         internal readonly Regex regex;
 
-        ClassNameValidator()
+        public ClassNameValidator()
         {
             regex = new Regex("^[_a-zA-Z][_a-zA-Z0-9]*$");
         }
