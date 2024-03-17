@@ -5,16 +5,24 @@ namespace Dwarfovich.AddCppClass
 {
     public partial class AddCppClassDialog : DialogWindow
     {
+        private ClassSettings settings;
+        private ClassGenerator generator;
         public AddCppClassDialog()
         {
             InitializeComponent();
+            settings = new ClassSettings();
+            generator = new ClassGenerator();
         }
 
         private void classNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
-            //MessageBox.Show("Changed");
-            //System.Windows.Forms.MessageBox.Show("test");77
-            VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
+            TextBox textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                settings.ClassName = textBox.Text;
+                generator.GenerateClassData(settings);
+                HeaderFilename.Text = generator.headerFileName;
+            }
         }
     }
 }
