@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Dwarfovich.AddCppClass
@@ -18,7 +19,9 @@ namespace Dwarfovich.AddCppClass
     {
         public ClassSettings()
         {
+            ClassName = "";
             Style = FilenameStyle.CamelCase;
+            HeaderExtension = "";
         }
         public ClassSettings(string className, FilenameStyle style, string headerExtension)
         {
@@ -33,14 +36,26 @@ namespace Dwarfovich.AddCppClass
     }
     public class ClassGenerator
     {
-        public string headerFileName { get; private set; }
-        public string implementationFileName { get; private set; }
+        public string headerFilename { get; private set; }
+        public string implementationFilename { get; private set; }
+        public string filename { get; private set; }
 
+        public ClassGenerator()
+        {
+            headerFilename = "";
+            implementationFilename = "";
+            filename = "";
+        }
         public void GenerateClassData(ClassSettings classSettings)
         {
-            var filename = GenerateFilename(classSettings);
-            headerFileName = filename + classSettings.HeaderExtension;
-            implementationFileName = filename + classSettings.ImplementationExtension;
+            filename = GenerateFilename(classSettings);
+            GenerateFilenames(classSettings);
+        }
+
+        public void GenerateFilenames(ClassSettings classSettings)
+        {
+            headerFilename = filename + classSettings.HeaderExtension;
+            implementationFilename = filename + classSettings.ImplementationExtension;
         }
         public string GenerateCamelCaseFilename(ClassSettings classSettings)
         {
