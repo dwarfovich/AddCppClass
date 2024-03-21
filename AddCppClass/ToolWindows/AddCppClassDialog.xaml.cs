@@ -8,13 +8,14 @@ namespace Dwarfovich.AddCppClass
     {
         private ClassSettings settings;
         private ClassGenerator generator;
+        private bool shiftEnabled = false;
         public AddCppClassDialog()
         {
             settings = new ClassSettings();
             generator = new ClassGenerator();
             InitializeComponent();
             ClassNameTextBox.PreviewKeyDown += KeyDownPreviewHandler;
-
+            ClassNameTextBox.PreviewKeyUp += KeyUpPreviewHandler;
         }
 
         private void UpdateFilenameTextBoxes()
@@ -77,16 +78,35 @@ namespace Dwarfovich.AddCppClass
                 UpdateFilenameTextBoxes();
             }
         }
-        private void KeyDownPreviewHandler(object sender, KeyEventArgs args)
+        private void KeyDownPreviewHandler(object sender, KeyEventArgs e)
         {
-            if ((args.Key >= Key.D0 && args.Key <= Key.D9) || (args.Key >= Key.A && args.Key <= Key.Z) || args.Key == Key.OemMinus)
+            if(e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
-                args.Handled = false;
+                shiftEnabled = true;
+            }
+        }
+        private void KeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if ((e.Key >= Key.D0 && e.Key <= Key.D9 && !shiftEnabled)
+                || (e.Key >= Key.A && e.Key <= Key.Z)
+                || e.Key == Key.Delete
+                || e.Key == Key.Back
+                || e.Key == Key.Left
+                || e.Key == Key.Up
+                || e.Key == Key.Right
+                || e.Key == Key.Down
+                || e.Key == Key.Home
+                || e.Key == Key.End
+                || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                || (e.Key == Key.OemMinus && shiftEnabled))
+            {
+                e.Handled = false;
             }
             else
             {
-                args.Handled = true;
+                e.Handled = true;
             }
+            shiftEnabled = false;
         }
     }
 }
