@@ -93,9 +93,9 @@ namespace Dwarfovich.AddCppClass
         private void KeyDownHandler(object sender, KeyEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            if (textBox != null) // First symbol cann't be a digit.
+            if (textBox != null)
             {
-                if (String.IsNullOrEmpty(textBox.Text))
+                if (String.IsNullOrEmpty(textBox.Text)) // First symbol cann't be a digit.
                 {
                     e.Handled = (e.Key >= Key.D0 && e.Key <= Key.D9) || e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9;
                     return;
