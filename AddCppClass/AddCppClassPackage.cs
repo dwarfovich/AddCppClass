@@ -2,6 +2,7 @@
 global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
+using Dwarfovich;
 using Dwarfovich.AddCppClass;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -17,6 +18,8 @@ namespace AddCppClass
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.RegisterCommandsAsync();
+            Logger.Initialize(this, Vsix.Name);
+            Logger.Log("efdefef");
         }
     }
 }

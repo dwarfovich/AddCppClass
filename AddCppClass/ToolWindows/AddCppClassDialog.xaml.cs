@@ -16,6 +16,7 @@ namespace Dwarfovich.AddCppClass
             InitializeComponent();
             ClassNameTextBox.PreviewKeyDown += KeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += KeyUpPreviewHandler;
+            ClassNameTextBox.KeyDown += KeyDownHandler;
         }
 
         private void UpdateFilenameTextBoxes()
@@ -80,14 +81,30 @@ namespace Dwarfovich.AddCppClass
         }
         private void KeyDownPreviewHandler(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shiftEnabled = true;
+         
+            } else if(e.Key == Key.Space)
+            {
+                e.Handled = true;
             }
         }
-        private void KeyUpPreviewHandler(object sender, KeyEventArgs e)
+        private void KeyDownHandler(object sender, KeyEventArgs e)
         {
+            TextBox textBox = sender as TextBox;
+            if (textBox != null) // First symbol cann't be a digit.
+            {
+                if (String.IsNullOrEmpty(textBox.Text))
+                {
+                    e.Handled = (e.Key >= Key.D0 && e.Key <= Key.D9) || e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9;
+                    return;
+                }
+            }
+            
             if ((e.Key >= Key.D0 && e.Key <= Key.D9 && !shiftEnabled)
+                || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                || (e.Key == Key.OemMinus && shiftEnabled)
                 || (e.Key >= Key.A && e.Key <= Key.Z)
                 || e.Key == Key.Delete
                 || e.Key == Key.Back
@@ -96,9 +113,7 @@ namespace Dwarfovich.AddCppClass
                 || e.Key == Key.Right
                 || e.Key == Key.Down
                 || e.Key == Key.Home
-                || e.Key == Key.End
-                || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
-                || (e.Key == Key.OemMinus && shiftEnabled))
+                || e.Key == Key.End)
             {
                 e.Handled = false;
             }
@@ -106,7 +121,13 @@ namespace Dwarfovich.AddCppClass
             {
                 e.Handled = true;
             }
-            shiftEnabled = false;
+        }
+        private void KeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = false;
+            }
         }
     }
 }
