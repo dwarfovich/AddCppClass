@@ -52,7 +52,7 @@
             <Label Content="Header extension" HorizontalAlignment="Left" Margin="105,-6,0,0" VerticalAlignment="Top" Width="104" Grid.ColumnSpan="2"/>
             <RadioButton Content=".h" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" IsChecked="True" HorizontalAlignment="Left" Margin="105,0,0,0" Grid.Row="1" VerticalAlignment="Center" Grid.ColumnSpan="2"/>
             <RadioButton Content=".hpp" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" HorizontalAlignment="Left" Margin="105,0,0,0" Grid.Row="2" VerticalAlignment="Center" Grid.ColumnSpan="2"/>
-            <Button Grid.Column="1" Content="Add class" HorizontalAlignment="Left" Margin="122,32,0,0" Grid.Row="4" VerticalAlignment="Top" RenderTransformOrigin="0.298,-0.332" Height="34" Width="90">
+            <Button Grid.Column="1" Name="AddClassButton"  Content="Add class" HorizontalAlignment="Left" Margin="122,32,0,0" Grid.Row="4" VerticalAlignment="Top" RenderTransformOrigin="0.298,-0.332" Height="34" Width="90">
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="IsEnabled" Value="False"/>

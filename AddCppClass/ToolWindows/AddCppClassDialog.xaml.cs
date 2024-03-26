@@ -1,6 +1,10 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
+﻿using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Dwarfovich.AddCppClass.Utils;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -17,6 +21,7 @@ namespace Dwarfovich.AddCppClass
             ClassNameTextBox.PreviewKeyDown += KeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += KeyUpPreviewHandler;
             ClassNameTextBox.KeyDown += KeyDownHandler;
+            AddClassButton.IsEnabled = false;
         }
 
         private void UpdateFilenameTextBoxes()
@@ -74,9 +79,10 @@ namespace Dwarfovich.AddCppClass
             TextBox textBox = sender as TextBox;
             if (textBox != null)
             {
-                settings.ClassName = textBox.Text;
+                settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                 generator.GenerateClassData(settings);
                 UpdateFilenameTextBoxes();
+                AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
             }
         }
         private void KeyDownPreviewHandler(object sender, KeyEventArgs e)
@@ -84,27 +90,79 @@ namespace Dwarfovich.AddCppClass
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shiftEnabled = true;
-         
-            } else if(e.Key == Key.Space)
+
+            }
+            else if (e.Key == Key.Space)
             {
                 e.Handled = true;
             }
         }
+
+        private bool IsColon(Key key)
+        {
+            return (key == Key.Oem1 || key == Key.OemSemicolon || key == Key.D6) && shiftEnabled;
+        }
+        private bool CanInsertNamespaceDelimiter(string text, int caretPos)
+        {
+            if (String.IsNullOrEmpty(text))
+            {
+                return true;
+            }
+            int previousPos = caretPos - 1;
+            int nextPos = caretPos + 1 < text.Length ? caretPos + 1 : -1;
+
+            if (previousPos < 0 || text[previousPos] != ':')
+            {
+                if (nextPos == -1 || (text[nextPos] != ':'))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsDigit(Key key)
+        {
+            return (key >= Key.D0 && key <= Key.D9 && !shiftEnabled)
+                || (key >= Key.NumPad0 && key <= Key.NumPad9 && !Utils.Keyboard.NumlockActive());
+        }
         private void KeyDownHandler(object sender, KeyEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            if (textBox != null)
+            if (textBox == null)
             {
-                if (String.IsNullOrEmpty(textBox.Text)) // First symbol cann't be a digit.
+                throw new InvalidCastException("Sender should be a TextBox");
+            }
+
+            var caretPos = textBox.CaretIndex;
+            if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0) // First symbol cann't be a digit.
+            {
+                if (IsDigit(e.Key))
                 {
-                    e.Handled = (e.Key >= Key.D0 && e.Key <= Key.D9) || e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9;
+                    e.Handled = true;
                     return;
                 }
             }
-            
-            if ((e.Key >= Key.D0 && e.Key <= Key.D9 && !shiftEnabled)
-                || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
-                || (e.Key == Key.OemMinus && shiftEnabled)
+
+            if (IsColon(e.Key))
+            {
+                var canInsert = CanInsertNamespaceDelimiter(textBox.Text, caretPos);
+                if (canInsert)
+                {
+                    textBox.Text = textBox.Text.Insert(caretPos, "::"); ;
+                    textBox.CaretIndex = caretPos + 2;
+                }
+                e.Handled = true;
+                return;
+            }
+
+            if(IsDigit(e.Key)) {
+                e.Handled = caretPos == 0 || textBox.Text[caretPos - 1] == ':';
+                return;
+            }
+
+            if ((e.Key == Key.OemMinus && shiftEnabled)
                 || (e.Key >= Key.A && e.Key <= Key.Z)
                 || e.Key == Key.Delete
                 || e.Key == Key.Back
