@@ -127,6 +127,26 @@ namespace Dwarfovich.AddCppClass
             return (key >= Key.D0 && key <= Key.D9 && !shiftEnabled)
                 || (key >= Key.NumPad0 && key <= Key.NumPad9 && !Utils.Keyboard.NumlockActive());
         }
+
+        private bool IsUnderline(Key key)
+        {
+            return key == Key.OemMinus && shiftEnabled;
+        }
+        private bool IsLetter(Key key)
+        {
+            return key >= Key.A && key <= Key.Z;
+        }
+        private bool IsNavigationOrEditKey(Key key)
+        {
+            return key == Key.Delete
+                || key == Key.Back
+                || key == Key.Left
+                || key == Key.Up
+                || key == Key.Right
+                || key == Key.Down
+                || key == Key.Home
+                || key == Key.End;
+        }
         private void KeyDownHandler(object sender, KeyEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -162,16 +182,9 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if ((e.Key == Key.OemMinus && shiftEnabled)
-                || (e.Key >= Key.A && e.Key <= Key.Z)
-                || e.Key == Key.Delete
-                || e.Key == Key.Back
-                || e.Key == Key.Left
-                || e.Key == Key.Up
-                || e.Key == Key.Right
-                || e.Key == Key.Down
-                || e.Key == Key.Home
-                || e.Key == Key.End)
+            if (IsUnderline(e.Key)
+                || IsLetter(e.Key)
+                || IsNavigationOrEditKey(e.Key))
             {
                 e.Handled = false;
             }
