@@ -1,10 +1,7 @@
-﻿using EnvDTE;
-using EnvDTE80;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿using Microsoft.VisualStudio.PlatformUI;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Dwarfovich.AddCppClass.Utils;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -21,7 +18,8 @@ namespace Dwarfovich.AddCppClass
             ClassNameTextBox.PreviewKeyDown += KeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += KeyUpPreviewHandler;
             ClassNameTextBox.KeyDown += KeyDownHandler;
-            AddClassButton.IsEnabled = false;
+            // TODO: Change to false.
+            AddClassButton.IsEnabled = true;
         }
 
         private void UpdateFilenameTextBoxes()
@@ -82,7 +80,8 @@ namespace Dwarfovich.AddCppClass
                 settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                 generator.GenerateClassData(settings);
                 UpdateFilenameTextBoxes();
-                AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
+                // TODO: uncomment.
+                //AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
             }
         }
         private void KeyDownPreviewHandler(object sender, KeyEventArgs e)
@@ -199,6 +198,11 @@ namespace Dwarfovich.AddCppClass
             {
                 shiftEnabled = false;
             }
+        }
+
+        private void AddClassButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ClassAdder.AddClass(generator, SubFolderCombo.Text);
         }
     }
 }

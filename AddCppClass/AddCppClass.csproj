@@ -46,7 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ClassGenerator.cs" />
-    <Compile Include="FileAdder.cs" />
+    <Compile Include="ClassAdder.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\AddCppClassCommand.cs" />
@@ -86,7 +86,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
