@@ -202,7 +202,16 @@ namespace Dwarfovich.AddCppClass
 
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
-            ClassAdder.AddClass(generator, SubFolderCombo.Text);
+            //ClassAdder.AddClass(generator, SubFolderCombo.Text);
+        }
+        private void UseSingleSubfolderCheckChanged(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            if(checkBox is null) {
+                return;
+            }
+        
+            ImplementationSubfolderCombo.IsEnabled = (bool)!checkBox.IsChecked;
         }
     }
 }
