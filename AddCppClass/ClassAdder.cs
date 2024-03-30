@@ -2,33 +2,7 @@
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EnvDTE;
-
-using EnvDTE80;
-
-using Microsoft;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Threading;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Web.UI.Design;
-using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -57,6 +31,26 @@ namespace Dwarfovich.AddCppClass
             ProjectItems projectItems = project.ProjectItems;
             projectItems.AddFromTemplate(file.FullName, file.Name);
         }
+
+        private static XDocument CreateFilterXmlDocument()
+        {
+            XDocument doc = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            var root = new XElement(XNamespace.Get("http://schemas.microsoft.com/developer/msbuild/2003") + "Project");
+            root.Add(new XAttribute("ToolsVersion", "4.0"));
+            doc.Add(root);
+
+            return doc;
+        }
+        private static XDocument OpenFilterXmlDocument(string filterfilePath)
+        {
+            if (File.Exists(filterfilePath)) {
+                return new XDocument(filterfilePath);
+            }
+            else
+            {
+                return CreateFilterXmlDocument();
+            }
+        }
         public static void AddClass(ClassGenerator generator, string subFolder)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -66,12 +60,14 @@ namespace Dwarfovich.AddCppClass
             string classPath = String.IsNullOrEmpty(subFolder) ? projectPath + '\\' : projectPath + '\\' + subFolder + '\\';
             Directory.CreateDirectory(classPath);
 
-            ProjectItems projectItems = project.ProjectItems;
-            //string path = folder + generator.headerFilename;
-            //string headerPath = folder + generator.headerFilename;
-            //projectItems.AddFromTemplate(classPath, generator.headerFilename);
 
-            projectItems.AddFromFile(classPath + generator.headerFilename);
+            string filterFilePath = project.FullName + ".filters";
+            Logger.Log("filterFilePath = " + filterFilePath);
+            var doc = OpenFilterXmlDocument(filterFilePath);
+
+            doc.Save(filterFilePath);
+
+            project.DTE.ExecuteCommand("Project.ReloadProject");
         }
         public static void CreateHeaderFile(ClassGenerator generator, string folder)
         {
