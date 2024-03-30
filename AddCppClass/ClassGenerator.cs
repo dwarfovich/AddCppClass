@@ -36,15 +36,15 @@ namespace Dwarfovich.AddCppClass
     }
     public class ClassGenerator
     {
-        public string headerFilename { get; private set; }
-        public string implementationFilename { get; private set; }
-        public string filename { get; private set; }
-
+        public string headerFilename { get; private set; } = "";
+        public string implementationFilename { get; private set; } = "";
+        public string filename { get; private set; } = "";
+        public string headerSubfolder { get; set; } = "";
+        public string implementationSubfolder { get; set; } = "";
+        public bool useSingleSubfolder { get; set; } = true;
+        public bool hasImplementationFile { get; set; } = true;
         public ClassGenerator()
         {
-            headerFilename = "";
-            implementationFilename = "";
-            filename = "";
         }
         public void GenerateClassData(ClassSettings classSettings)
         {
@@ -64,7 +64,8 @@ namespace Dwarfovich.AddCppClass
 
         public string GenerateSnakeCaseFilename(ClassSettings classSettings)
         {
-            Func<char,char,bool> ShouldInsertUnderline = (char previousChar, char nextChar) => {
+            Func<char, char, bool> ShouldInsertUnderline = (char previousChar, char nextChar) =>
+            {
                 return (Char.IsLower(previousChar) && Char.IsUpper(nextChar))
                 || (Char.IsDigit(previousChar) && !Char.IsDigit(nextChar));
             };

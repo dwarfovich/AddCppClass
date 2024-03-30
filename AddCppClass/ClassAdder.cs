@@ -51,7 +51,7 @@ namespace Dwarfovich.AddCppClass
                 return CreateFilterXmlDocument();
             }
         }
-        public static void AddClass(ClassGenerator generator, string subFolder)
+        public static void AddClass(ClassGenerator generator)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 

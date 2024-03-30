@@ -176,7 +176,8 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if(IsDigit(e.Key)) {
+            if (IsDigit(e.Key))
+            {
                 e.Handled = caretPos == 0 || textBox.Text[caretPos - 1] == ':';
                 return;
             }
@@ -202,15 +203,28 @@ namespace Dwarfovich.AddCppClass
 
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
-            //ClassAdder.AddClass(generator, SubFolderCombo.Text);
+            generator.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
+            generator.headerSubfolder = HeaderSubfolderCombo.Text;
+            if (generator.useSingleSubfolder)
+            {
+                generator.implementationSubfolder = generator.headerSubfolder;
+            }
+            else
+            {
+                generator.implementationSubfolder = ImplementationSubfolderCombo.Text;
+            }
+            generator.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
+
+            ClassAdder.AddClass(generator);
         }
         private void UseSingleSubfolderCheckChanged(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            if(checkBox is null) {
+            if (checkBox is null)
+            {
                 return;
             }
-        
+
             ImplementationSubfolderCombo.IsEnabled = (bool)!checkBox.IsChecked;
         }
     }
