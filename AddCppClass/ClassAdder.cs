@@ -1,7 +1,9 @@
 ﻿using AddCppClass;
+using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace Dwarfovich.AddCppClass
@@ -41,45 +43,139 @@ namespace Dwarfovich.AddCppClass
 
             return doc;
         }
-        private static XDocument OpenFilterXmlDocument(string filterfilePath)
+        private static XDocument OpenFilterXmlDocument(string filterFilePath)
         {
-            if (File.Exists(filterfilePath)) {
-                return new XDocument(filterfilePath);
+            Logger.Log("OpenFilterXmlDocument: " + filterFilePath);
+            if (File.Exists(filterFilePath))
+            {
+                return new XDocument(filterFilePath);
             }
             else
             {
                 return CreateFilterXmlDocument();
             }
         }
+        public static void CreateHeaderFile(ClassGenerator generator, string projectPath)
+        {
+            string path = Path.Combine(projectPath, generator.headerSubfolder);
+            Directory.CreateDirectory(path);
+            path = Path.Combine(path, generator.headerFilename);
+            File.Create(path);
+        }
+
+        public static void CreateImplementationFile(ClassGenerator generator, string projectPath)
+        {
+            string cppPath = "";
+            if (generator.useSingleSubfolder)
+            {
+                cppPath = Path.Combine(projectPath, generator.headerSubfolder, generator.implementationFilename);
+            }
+            else
+            {
+                cppPath = Path.Combine(projectPath, generator.implementationSubfolder, generator.implementationFilename);
+            }
+            File.Create(cppPath);
+        }
+
+        private static XElement GetFilterItemGroup(XDocument doc, XNamespace ns)
+        {
+            foreach (var element in doc.Elements(ns + "ItemGroup"))
+            {
+                if (element.Elements(ns + "Filter").Any())
+                {
+                    return element;
+                }
+            }
+
+            var filterItemGroup = new XElement("ItemGroup");
+            doc.Root.Add(filterItemGroup);
+            return filterItemGroup;
+        }
+        public static void AddFilterForHeader(XDocument doc, ClassGenerator generator)
+        {
+            var ns = doc.Root.GetDefaultNamespace();
+            XElement itemGroup = GetFilterItemGroup(doc, ns);
+
+            string filterFullPath = generator.headerSubfolder;
+            string[] filterTokens = filterFullPath.Split('\\');
+
+            string filterSubPath = "";
+            for (int i = 0; i < filterTokens.Length; ++i) {
+                filterSubPath += filterTokens[i];
+                var element = itemGroup.Descendants(ns + "Filter").Where(el => (string)el.Attribute("Include") == filterSubPath);
+                if (element is null || !element.Any())
+                {
+                    XElement filterElement = new XElement(ns + "Filter", new XAttribute("Include", filterSubPath));
+                    XElement identifierElement = new XElement(ns + "UniqueIdentifier");
+                    identifierElement.Add(Guid.NewGuid().ToString("B"));
+                    filterElement.Add(identifierElement);
+                    itemGroup.Add(filterElement);
+                }
+                filterSubPath += '\\';
+            }
+
+            XElement fileItemGroupElement = new XElement(ns + "ItemGroup");
+            XElement ciCompileElement = new XElement(ns + "ClCompile", new XAttribute("Include", generator.implementationFilename));
+            fileItemGroupElement.Add(ciCompileElement);
+            XElement fileFilterElement = new XElement(ns + "Filter");
+            fileFilterElement.Add(filterFullPath);
+            ciCompileElement.Add(fileFilterElement);
+            doc.Root.Add(fileItemGroupElement);
+        }
+        public static void AddFilterForCpp(XDocument doc, ClassGenerator generator)
+        {
+            var ns = doc.Root.GetDefaultNamespace();
+            XElement itemGroup = GetFilterItemGroup(doc, ns);
+
+            string filterFullPath = generator.headerSubfolder;
+            string[] filterTokens = filterFullPath.Split('\\');
+
+            string filterSubPath = "";
+            for (int i = 0; i < filterTokens.Length; ++i)
+            {
+                filterSubPath += filterTokens[i];
+                var element = itemGroup.Descendants(ns + "Filter").Where(el => (string)el.Attribute("Include") == filterSubPath);
+                if (element is null || !element.Any())
+                {
+                    XElement filterElement = new XElement(ns + "Filter", new XAttribute("Include", filterSubPath));
+                    XElement identifierElement = new XElement(ns + "UniqueIdentifier");
+                    identifierElement.Add(Guid.NewGuid().ToString("B"));
+                    filterElement.Add(identifierElement);
+                    itemGroup.Add(filterElement);
+                }
+                filterSubPath += '\\';
+            }
+
+            XElement fileItemGroupElement = new XElement(ns + "ItemGroup");
+            XElement ciCompileElement = new XElement(ns + "ClCompile", new XAttribute("Include", generator.headerFilename));
+            fileItemGroupElement.Add(ciCompileElement);
+            XElement fileFilterElement = new XElement(ns + "Filter");
+            fileFilterElement.Add(filterFullPath);
+            ciCompileElement.Add(fileFilterElement);
+            doc.Root.Add(fileItemGroupElement);
+        }
         public static void AddClass(ClassGenerator generator)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             EnvDTE.Project project = CurrentProject();
-            string projectPath = new FileInfo(project.FullName).DirectoryName;
-            string classPath = String.IsNullOrEmpty(subFolder) ? projectPath + '\\' : projectPath + '\\' + subFolder + '\\';
-            Directory.CreateDirectory(classPath);
 
-
-            string filterFilePath = project.FullName + ".filters";
-            Logger.Log("filterFilePath = " + filterFilePath);
+            string filterFilePath = project.Name + ".vcxproj.filters";
             var doc = OpenFilterXmlDocument(filterFilePath);
 
-            doc.Save(filterFilePath);
-
-            project.DTE.ExecuteCommand("Project.ReloadProject");
-        }
-        public static void CreateHeaderFile(ClassGenerator generator, string folder)
-        {
-            string path = folder + generator.headerFilename;
-            if(File.Exists(path))
+            string projectPath = new FileInfo(project.FullName).DirectoryName;
+            CreateHeaderFile(generator, projectPath);
+            AddFilterForHeader(doc, generator);
+            if (generator.hasImplementationFile)
             {
-                throw new InvalidOperationException("Header file for path " + path + " already exists");
+                CreateImplementationFile(generator, projectPath);
+                AddFilterForCpp(doc, generator);
             }
-        }
-        public static void CreateImplementationFile(ClassGenerator generator, string folder)
-        {
 
+            doc.Save(filterFilePath);
+            //project.DTE.ExecuteCommand("Project.ReloadProject");
+            project.DTE.ExecuteCommand("Project.UnloadProject");
+            project.DTE.ExecuteCommand("Project.ReloadProject");
         }
     }
 }
