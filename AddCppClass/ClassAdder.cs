@@ -98,13 +98,10 @@ namespace Dwarfovich.AddCppClass
             doc.Root.Add(filterItemGroup);
             return filterItemGroup;
         }
-        public static void AddFilterForHeader(XDocument doc, ClassGenerator generator)
+        public static void AddFilter(XDocument doc, XNamespace ns, ClassGenerator generator, string path)
         {
-            var ns = doc.Root.GetDefaultNamespace();
             XElement itemGroup = GetFilterItemGroup(doc, ns);
-
-            string filterFullPath = generator.headerSubfolder;
-            string[] filterTokens = filterFullPath.Split('\\');
+            string[] filterTokens = path.Split('\\');
 
             string filterSubPath = "";
             for (int i = 0; i < filterTokens.Length; ++i)
@@ -123,43 +120,11 @@ namespace Dwarfovich.AddCppClass
             }
 
             XElement fileItemGroupElement = new XElement(ns + "ItemGroup");
-            XElement ciCompileElement = new XElement(ns + "ClCompile", new XAttribute("Include", generator.implementationFilename));
-            fileItemGroupElement.Add(ciCompileElement);
+            XElement clCompileElement = new XElement(ns + "ClCompile", new XAttribute("Include", generator.implementationFilename));
+            fileItemGroupElement.Add(clCompileElement);
             XElement fileFilterElement = new XElement(ns + "Filter");
-            fileFilterElement.Add(filterFullPath);
-            ciCompileElement.Add(fileFilterElement);
-            doc.Root.Add(fileItemGroupElement);
-        }
-        public static void AddFilterForCpp(XDocument doc, ClassGenerator generator)
-        {
-            var ns = doc.Root.GetDefaultNamespace();
-            XElement itemGroup = GetFilterItemGroup(doc, ns);
-
-            string filterFullPath = generator.headerSubfolder;
-            string[] filterTokens = filterFullPath.Split('\\');
-
-            string filterSubPath = "";
-            for (int i = 0; i < filterTokens.Length; ++i)
-            {
-                filterSubPath += filterTokens[i];
-                var element = itemGroup.Descendants(ns + "Filter").Where(el => (string)el.Attribute("Include") == filterSubPath);
-                if (element is null || !element.Any())
-                {
-                    XElement filterElement = new XElement(ns + "Filter", new XAttribute("Include", filterSubPath));
-                    XElement identifierElement = new XElement(ns + "UniqueIdentifier");
-                    identifierElement.Add(Guid.NewGuid().ToString("B"));
-                    filterElement.Add(identifierElement);
-                    itemGroup.Add(filterElement);
-                }
-                filterSubPath += '\\';
-            }
-
-            XElement fileItemGroupElement = new XElement(ns + "ItemGroup");
-            XElement ciCompileElement = new XElement(ns + "ClCompile", new XAttribute("Include", generator.headerFilename));
-            fileItemGroupElement.Add(ciCompileElement);
-            XElement fileFilterElement = new XElement(ns + "Filter");
-            fileFilterElement.Add(filterFullPath);
-            ciCompileElement.Add(fileFilterElement);
+            fileFilterElement.Add(path);
+            clCompileElement.Add(fileFilterElement);
             doc.Root.Add(fileItemGroupElement);
         }
         public static void AddClass(ClassGenerator generator)
@@ -170,14 +135,15 @@ namespace Dwarfovich.AddCppClass
 
             string filterFilePath = project.FullName + ".filters";
             var doc = OpenFilterXmlDocument(filterFilePath);
+            var ns = doc.Root.GetDefaultNamespace();
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             CreateHeaderFile(project, generator, projectPath);
-            AddFilterForHeader(doc, generator);
+            AddFilter(doc, ns, generator, generator.headerSubfolder);
             if (generator.hasImplementationFile)
             {
                 CreateImplementationFile(project, generator, projectPath);
-                AddFilterForCpp(doc, generator);
+                AddFilter(doc, ns, generator, generator.implementationSubfolder);
             }
             doc.Save(filterFilePath);
 
