@@ -1,5 +1,4 @@
 ﻿using AddCppClass;
-using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
@@ -48,23 +47,29 @@ namespace Dwarfovich.AddCppClass
             Logger.Log("OpenFilterXmlDocument: " + filterFilePath);
             if (File.Exists(filterFilePath))
             {
-                return new XDocument(filterFilePath);
+                return XDocument.Load(filterFilePath);
             }
             else
             {
                 return CreateFilterXmlDocument();
             }
         }
-        public static void CreateHeaderFile(ClassGenerator generator, string projectPath)
+        public static void CreateHeaderFile(EnvDTE.Project project, ClassGenerator generator, string projectPath)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             string path = Path.Combine(projectPath, generator.headerSubfolder);
             Directory.CreateDirectory(path);
             path = Path.Combine(path, generator.headerFilename);
             File.Create(path);
+            ProjectItems projectItems = project.ProjectItems;
+            projectItems.AddFromFile(path);
         }
 
-        public static void CreateImplementationFile(ClassGenerator generator, string projectPath)
+        public static void CreateImplementationFile(EnvDTE.Project project, ClassGenerator generator, string projectPath)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             string cppPath = "";
             if (generator.useSingleSubfolder)
             {
@@ -75,11 +80,13 @@ namespace Dwarfovich.AddCppClass
                 cppPath = Path.Combine(projectPath, generator.implementationSubfolder, generator.implementationFilename);
             }
             File.Create(cppPath);
+            ProjectItems projectItems = project.ProjectItems;
+            projectItems.AddFromFile(cppPath);
         }
 
         private static XElement GetFilterItemGroup(XDocument doc, XNamespace ns)
         {
-            foreach (var element in doc.Elements(ns + "ItemGroup"))
+            foreach (var element in doc.Root.Elements(ns + "ItemGroup"))
             {
                 if (element.Elements(ns + "Filter").Any())
                 {
@@ -87,7 +94,7 @@ namespace Dwarfovich.AddCppClass
                 }
             }
 
-            var filterItemGroup = new XElement("ItemGroup");
+            var filterItemGroup = new XElement(ns + "ItemGroup");
             doc.Root.Add(filterItemGroup);
             return filterItemGroup;
         }
@@ -100,7 +107,8 @@ namespace Dwarfovich.AddCppClass
             string[] filterTokens = filterFullPath.Split('\\');
 
             string filterSubPath = "";
-            for (int i = 0; i < filterTokens.Length; ++i) {
+            for (int i = 0; i < filterTokens.Length; ++i)
+            {
                 filterSubPath += filterTokens[i];
                 var element = itemGroup.Descendants(ns + "Filter").Where(el => (string)el.Attribute("Include") == filterSubPath);
                 if (element is null || !element.Any())
@@ -160,20 +168,20 @@ namespace Dwarfovich.AddCppClass
 
             EnvDTE.Project project = CurrentProject();
 
-            string filterFilePath = project.Name + ".vcxproj.filters";
+            string filterFilePath = project.FullName + ".filters";
             var doc = OpenFilterXmlDocument(filterFilePath);
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
-            CreateHeaderFile(generator, projectPath);
+            CreateHeaderFile(project, generator, projectPath);
             AddFilterForHeader(doc, generator);
             if (generator.hasImplementationFile)
             {
-                CreateImplementationFile(generator, projectPath);
+                CreateImplementationFile(project, generator, projectPath);
                 AddFilterForCpp(doc, generator);
             }
-
             doc.Save(filterFilePath);
-            //project.DTE.ExecuteCommand("Project.ReloadProject");
+
+            project.DTE.ExecuteCommand("File.SaveAll");
             project.DTE.ExecuteCommand("Project.UnloadProject");
             project.DTE.ExecuteCommand("Project.ReloadProject");
         }
