@@ -3,6 +3,8 @@ using EnvDTE;
 using EnvDTE80;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Windows.Controls;
 using System.Xml.Linq;
 
 namespace Dwarfovich.AddCppClass
@@ -91,7 +93,7 @@ namespace Dwarfovich.AddCppClass
             doc.Root.Add(filterItemGroup);
             return filterItemGroup;
         }
-        public static void AddFilter(XDocument doc, XNamespace ns, ClassGenerator generator, string path)
+        private static void AddFilter(XDocument doc, XNamespace ns, ClassGenerator generator, string path)
         {
             XElement filterItemGroup = GetFilterItemGroup(doc, ns);
             string[] filterTokens = path.Split('\\');
@@ -111,31 +113,54 @@ namespace Dwarfovich.AddCppClass
                 }
             }
         }
-        public static void ReplaceHeaderFileFilter(XDocument doc, XNamespace ns, ClassGenerator generator, string newFilterPath)
+
+        private static void ReplaceFileFilter(XDocument doc, XNamespace ns, string fileName, string newFilterPath, string clDirective)
         {
             var itemGroupElements = doc.Root.Elements(ns + "ItemGroup");
-            string filePath = Path.Combine(newFilterPath, generator.headerFilename);
-            foreach (var fileFilter in itemGroupElements) {
-                var clElement = fileFilter.Descendants(ns + "ClInclude").Where(el => (string)el.Attribute("Include") == filePath);
-                clElement.Descendants(ns + "Filter").Remove();
+            var filePath = Path.Combine(newFilterPath, fileName);
+            foreach (var fileFilter in itemGroupElements)
+            {
+              fileFilter.Descendants(ns + clDirective).Where(el => (string)el.Attribute("Include") == filePath).Remove();
             }
             XElement newItemGroup = new XElement(ns + "ItemGroup");
-            XElement clCompileElement = new XElement(ns + "ClInclude", new XAttribute("Include", filePath));
+            XElement clCompileElement = new XElement(ns + clDirective, new XAttribute("Include", filePath));
             newItemGroup.Add(clCompileElement);
             XElement fileFilterElement = new XElement(ns + "Filter");
             fileFilterElement.Add(newFilterPath);
             clCompileElement.Add(fileFilterElement);
             doc.Root.Add(newItemGroup);
         }
+        private static void ReplaceHeaderFileFilter(XDocument doc, XNamespace ns, ClassGenerator generator, string newFilterPath)
+        {
+            ReplaceFileFilter(doc, ns, generator.headerFilename, newFilterPath, "ClInclude");
+        }
+        private static void ReplaceImplementationFileFilter(XDocument doc, XNamespace ns, ClassGenerator generator, string newFilterPath)
+        {
+            ReplaceFileFilter(doc, ns, generator.implementationFilename, newFilterPath, "ClCompile");
+        }
+
+        private static void CreateFilters(EnvDTE.Project project, ClassGenerator generator)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            string filterFilePath = project.FullName + ".filters";
+            var doc = OpenFilterXmlDocument(filterFilePath);
+            var ns = doc.Root.GetDefaultNamespace();
+            AddFilter(doc, ns, generator, generator.implementationSubfolder);
+            AddFilter(doc, ns, generator, generator.headerSubfolder);
+            ReplaceHeaderFileFilter(doc, ns, generator, generator.headerSubfolder);
+            if (generator.hasImplementationFile)
+            {
+                ReplaceImplementationFileFilter(doc, ns, generator, generator.implementationSubfolder);
+            }
+            doc.Save(filterFilePath);
+        }
+
         public static void AddClass(ClassGenerator generator)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             EnvDTE.Project project = CurrentProject();
-
-            string filterFilePath = project.FullName + ".filters";
-            var doc = OpenFilterXmlDocument(filterFilePath);
-            var ns = doc.Root.GetDefaultNamespace();
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             CreateHeaderFile(project, generator, projectPath);
@@ -147,16 +172,9 @@ namespace Dwarfovich.AddCppClass
 
             if (generator.createFilters)
             {
-                AddFilter(doc, ns, generator, generator.implementationSubfolder);
-                AddFilter(doc, ns, generator, generator.headerSubfolder);
-                ReplaceHeaderFileFilter(doc, ns, generator, generator.headerSubfolder);
-                if (generator.hasImplementationFile)
-                {
-                    //ReplaceFileFilter(doc, ns, generator, generator.implementationSubfolder);
-                }
+                CreateFilters(project, generator);
             }
 
-            doc.Save(filterFilePath);
             project.DTE.ExecuteCommand("Project.UnloadProject");
             project.DTE.ExecuteCommand("Project.ReloadProject");
         }
