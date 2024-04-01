@@ -25,11 +25,11 @@ namespace Dwarfovich.AddCppClass
         {
             if (HeaderFilename is not null)
             {
-                HeaderFilename.Text = generator.headerFilename;
+                HeaderFilename.Text = settings.headerFilename;
             }
             if (ImplementationFilename is not null)
             {
-                ImplementationFilename.Text = generator.implementationFilename;
+                ImplementationFilename.Text = settings.implementationFilename;
             }
         }
 
@@ -61,7 +61,7 @@ namespace Dwarfovich.AddCppClass
                 if (button.GroupName == "filenameStyleGroup")
                 {
                     UpdateFilenameStyleSettings(button);
-                    generator.GenerateClassData(settings);
+                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenamesForChangedExtension(settings);
                 }
                 else
                 {
@@ -77,7 +77,7 @@ namespace Dwarfovich.AddCppClass
             if (textBox != null)
             {
                 settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
-                generator.GenerateClassData(settings);
+                (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
                 UpdateFilenameTextBoxes();
                 AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
             }
@@ -201,19 +201,19 @@ namespace Dwarfovich.AddCppClass
 
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
-            generator.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
-            generator.headerSubfolder = HeaderSubfolderCombo.Text.Replace('/','\\');
-            if (generator.useSingleSubfolder)
+            settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
+            settings.headerSubfolder = HeaderSubfolderCombo.Text.Replace('/','\\');
+            if (settings.useSingleSubfolder)
             {
-                generator.implementationSubfolder = generator.headerSubfolder;
+                settings.implementationSubfolder = settings.headerSubfolder;
             }
             else
             {
-                generator.implementationSubfolder = ImplementationSubfolderCombo.Text.Replace('/', '\\');
+                settings.implementationSubfolder = ImplementationSubfolderCombo.Text.Replace('/', '\\');
             }
-            generator.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
+            settings.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
 
-            ClassAdder.AddClass(generator);
+            ClassAdder.AddClass(settings);
             Close();
         }
         private void UseSingleSubfolderCheckChanged(object sender, RoutedEventArgs e)
@@ -235,7 +235,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            generator.createFilters = (bool)checkBox.IsChecked;
+            settings.createFilters = (bool)checkBox.IsChecked;
         }
     }
 }
