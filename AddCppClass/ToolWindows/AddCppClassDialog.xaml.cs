@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
+﻿using Community.VisualStudio.Toolkit;
+using Microsoft.VisualStudio.PlatformUI;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,17 +8,27 @@ namespace Dwarfovich.AddCppClass
 {
     public partial class AddCppClassDialog : DialogWindow
     {
-        private ClassSettings settings;
-        private ClassGenerator generator;
+        private ClassSettings settings = new ClassSettings();
+        private ClassGenerator generator = new ClassGenerator();
         private bool shiftEnabled = false;
         public AddCppClassDialog()
         {
-            settings = new ClassSettings();
-            generator = new ClassGenerator();
             InitializeComponent();
-            ClassNameTextBox.PreviewKeyDown += KeyDownPreviewHandler;
-            ClassNameTextBox.PreviewKeyUp += KeyUpPreviewHandler;
-            ClassNameTextBox.KeyDown += KeyDownHandler;
+            ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
+            ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
+            ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
+            HeaderSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
+            HeaderSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
+            HeaderSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
+            ImplementationSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
+            ImplementationSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
+            ImplementationSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
+            HeaderFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
+            HeaderFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
+            HeaderFilename.KeyDown += FileKeyDownHandler;
+            ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
+            ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
+            ImplementationFilename.KeyDown += FileKeyDownHandler;
             AddClassButton.IsEnabled = false;
         }
 
@@ -61,37 +72,14 @@ namespace Dwarfovich.AddCppClass
                 if (button.GroupName == "filenameStyleGroup")
                 {
                     UpdateFilenameStyleSettings(button);
-                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenamesForChangedExtension(settings);
+                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
                 }
                 else
                 {
                     UpdateHeaderExtensionSettings(button);
-                    generator.GenerateFilenames(settings);
+                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenamesForChangedExtension(settings);
                 }
                 UpdateFilenameTextBoxes();
-            }
-        }
-        private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
-        {
-            TextBox textBox = sender as TextBox;
-            if (textBox != null)
-            {
-                settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
-                (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
-                UpdateFilenameTextBoxes();
-                AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
-            }
-        }
-        private void KeyDownPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
             }
         }
 
@@ -129,6 +117,14 @@ namespace Dwarfovich.AddCppClass
         {
             return key == Key.OemMinus && shiftEnabled;
         }
+        private bool IsPathSeparator(Key key)
+        {
+            return key == Key.OemBackslash || key == Key.Divide || (key == Key.OemQuestion && !shiftEnabled) || key == Key.Oem5;
+        }
+        private bool IsPeriod(Key key)
+        {
+            return key == Key.OemPeriod;
+        }
         private bool IsLetter(Key key)
         {
             return key >= Key.A && key <= Key.Z;
@@ -144,7 +140,31 @@ namespace Dwarfovich.AddCppClass
                 || key == Key.Home
                 || key == Key.End;
         }
-        private void KeyDownHandler(object sender, KeyEventArgs e)
+
+        private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
+                (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
+                UpdateFilenameTextBoxes();
+                AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
+            }
+        }
+        private void ClassNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = true;
+
+            }
+            else if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+        private void ClassNameKeyDownHandler(object sender, KeyEventArgs e)
         {
             TextBox textBox = sender as TextBox;
             if (textBox == null)
@@ -176,7 +196,7 @@ namespace Dwarfovich.AddCppClass
 
             if (IsDigit(e.Key))
             {
-                e.Handled = caretPos == 0 || textBox.Text[caretPos - 1] == ':';
+                e.Handled = (caretPos == 0 || textBox.Text[caretPos - 1] == ':');
                 return;
             }
 
@@ -191,7 +211,7 @@ namespace Dwarfovich.AddCppClass
                 e.Handled = true;
             }
         }
-        private void KeyUpPreviewHandler(object sender, KeyEventArgs e)
+        private void ClassNameKeyUpPreviewHandler(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
@@ -202,15 +222,25 @@ namespace Dwarfovich.AddCppClass
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
-            settings.headerSubfolder = HeaderSubfolderCombo.Text.Replace('/','\\');
+
+            if (HeaderSubfolderCombo.Text.EndsWith("/"))
+            {
+                HeaderSubfolderCombo.Text = HeaderSubfolderCombo.Text.Remove(HeaderSubfolderCombo.Text.Length - 1);
+            }
+            settings.headerSubfolder = HeaderSubfolderCombo.Text.Replace('/', '\\');
             if (settings.useSingleSubfolder)
             {
                 settings.implementationSubfolder = settings.headerSubfolder;
             }
             else
             {
+                if (ImplementationSubfolderCombo.Text.EndsWith("/"))
+                {
+                    ImplementationSubfolderCombo.Text = ImplementationSubfolderCombo.Text.Remove(ImplementationSubfolderCombo.Text.Length - 1);
+                }
                 settings.implementationSubfolder = ImplementationSubfolderCombo.Text.Replace('/', '\\');
             }
+            
             settings.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
 
             ClassAdder.AddClass(settings);
@@ -236,6 +266,125 @@ namespace Dwarfovich.AddCppClass
             }
 
             settings.createFilters = (bool)checkBox.IsChecked;
+        }
+
+        private bool CanInsertPathSeparator(string text, int caretPos)
+        {
+            if (String.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            int previousPos = caretPos - 1;
+            int nextPos = caretPos + 1 < text.Length ? caretPos + 1 : -1;
+
+            if (previousPos < 0 || text[previousPos] != '/')
+            {
+                if (nextPos == -1 || (text[nextPos] != '/'))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        private void SubfolderKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = true;
+
+            }
+            else if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void SubfolderKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key))
+            {
+                e.Handled = false;
+            }
+            else if (IsPathSeparator(e.Key))
+            {
+                ComboBox combo = sender as ComboBox;
+                if (combo == null)
+                {
+                    throw new InvalidCastException("Sender should be a TextBox");
+                }
+
+                var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
+                if (textBox == null)
+                {
+                    throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
+                }
+
+                var caretPos = textBox.CaretIndex;
+                if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0) // First symbol cann't be a path separator.
+                {
+                    if (IsPathSeparator(e.Key))
+                    {
+                        e.Handled = true;
+                        return;
+                    }
+                }
+
+                if (IsPathSeparator(e.Key))
+                {
+                    var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
+                    if (canInsert)
+                    {
+                        textBox.Text = textBox.Text.Insert(caretPos, "/"); ;
+                        textBox.CaretIndex = caretPos + 1;
+                    }
+                    e.Handled = true;
+                    return;
+                }
+
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+        private void SubfolderKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = false;
+            }
+        }
+
+        private void FileKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = true;
+
+            }
+            else if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+        private void FileKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key))
+            {
+                e.Handled = false;
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+        private void FileKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = false;
+            }
         }
     }
 }
