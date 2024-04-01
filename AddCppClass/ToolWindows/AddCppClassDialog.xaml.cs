@@ -18,8 +18,7 @@ namespace Dwarfovich.AddCppClass
             ClassNameTextBox.PreviewKeyDown += KeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += KeyUpPreviewHandler;
             ClassNameTextBox.KeyDown += KeyDownHandler;
-            // TODO: Change to false.
-            AddClassButton.IsEnabled = true;
+            AddClassButton.IsEnabled = false;
         }
 
         private void UpdateFilenameTextBoxes()
@@ -80,8 +79,7 @@ namespace Dwarfovich.AddCppClass
                 settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                 generator.GenerateClassData(settings);
                 UpdateFilenameTextBoxes();
-                // TODO: uncomment.
-                //AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
+                AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
             }
         }
         private void KeyDownPreviewHandler(object sender, KeyEventArgs e)
@@ -204,18 +202,19 @@ namespace Dwarfovich.AddCppClass
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
             generator.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
-            generator.headerSubfolder = HeaderSubfolderCombo.Text;
+            generator.headerSubfolder = HeaderSubfolderCombo.Text.Replace('/','\\');
             if (generator.useSingleSubfolder)
             {
                 generator.implementationSubfolder = generator.headerSubfolder;
             }
             else
             {
-                generator.implementationSubfolder = ImplementationSubfolderCombo.Text;
+                generator.implementationSubfolder = ImplementationSubfolderCombo.Text.Replace('/', '\\');
             }
             generator.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
 
             ClassAdder.AddClass(generator);
+            Close();
         }
         private void UseSingleSubfolderCheckChanged(object sender, RoutedEventArgs e)
         {
@@ -226,6 +225,17 @@ namespace Dwarfovich.AddCppClass
             }
 
             ImplementationSubfolderCombo.IsEnabled = (bool)!checkBox.IsChecked;
+        }
+
+        private void CreateFiltersCheckChanged(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            if (checkBox is null)
+            {
+                return;
+            }
+
+            generator.createFilters = (bool)checkBox.IsChecked;
         }
     }
 }

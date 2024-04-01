@@ -43,6 +43,8 @@ namespace Dwarfovich.AddCppClass
         public string implementationSubfolder { get; set; } = "";
         public bool useSingleSubfolder { get; set; } = true;
         public bool hasImplementationFile { get; set; } = true;
+        public bool createFilters { get; set; } = true;
+
         public ClassGenerator()
         {
         }

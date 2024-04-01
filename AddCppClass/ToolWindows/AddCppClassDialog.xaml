@@ -89,7 +89,7 @@
         <TextBox x:Name="ImplementationFilename" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="6" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="200" Height="18"/>
         <Label Grid.Column="2" Content="Implementation subfolder" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="158"/>
         <ComboBox Grid.Column="2" Name="ImplementationSubfolderCombo" IsEditable="True" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" Width="268"/>
-        <CheckBox Content="Automatically add to filter" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="-2.152,0.208" Width="206" Grid.Column="2" Height="15" Grid.ColumnSpan="2" Grid.Row="5"/>
+        <CheckBox Content="Create filters based on subfolder" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="-2.152,0.208" Width="206" Grid.Column="2" Height="15" Grid.ColumnSpan="2" Grid.Row="5"/>
         <CheckBox Grid.Column="3" Name="UseSingleSubfolderCheckBox" Content="Use single subfolder" IsChecked="True" Checked="UseSingleSubfolderCheckChanged" Unchecked="UseSingleSubfolderCheckChanged" HorizontalAlignment="Left" Margin="53,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="231"/>
         <CheckBox Grid.Column="2" Name="DontCreateCppFileCheckBox" Content="Don't create .cpp file" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="168"/>
         <Button Grid.Column="3" x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" HorizontalAlignment="Center" Grid.Row="7" VerticalAlignment="Center" RenderTransformOrigin="0.298,-0.332" Height="34" Width="104">
