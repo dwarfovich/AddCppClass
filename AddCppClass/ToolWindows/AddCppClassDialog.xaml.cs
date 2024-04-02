@@ -129,11 +129,9 @@ namespace Dwarfovich.AddCppClass
         {
             return key >= Key.A && key <= Key.Z;
         }
-        private bool IsNavigationOrEditKey(Key key)
+        private bool IsNavigationKey(Key key)
         {
-            return key == Key.Delete
-                || key == Key.Back
-                || key == Key.Left
+            return key == Key.Left
                 || key == Key.Up
                 || key == Key.Right
                 || key == Key.Down
@@ -154,6 +152,7 @@ namespace Dwarfovich.AddCppClass
         }
         private void ClassNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
         {
+            Logger.Log(e.Key.ToString());
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shiftEnabled = true;
@@ -162,6 +161,73 @@ namespace Dwarfovich.AddCppClass
             else if (e.Key == Key.Space)
             {
                 e.Handled = true;
+            }
+            else if (e.Key == Key.Delete)
+            {
+                TextBox textBox = sender as TextBox;
+                if (textBox == null)
+                {
+                    throw new InvalidCastException("Sender should be a TextBox");
+                }
+
+                var caretPos = textBox.CaretIndex;
+                if (caretPos < textBox.Text.Length && textBox.Text[caretPos] == ':')
+                {
+                    if (caretPos + 1 < textBox.Text.Length - 1 && textBox.Text[caretPos + 1] == ':')
+                    {
+                        textBox.Text = textBox.Text.Remove(caretPos, 2);
+                    }
+                    else if (caretPos - 1 >= 0 && textBox.Text[caretPos - 1] == ':')
+                    {
+                        textBox.Text = textBox.Text.Remove(caretPos - 1, 2);
+                        textBox.CaretIndex = caretPos - 1;
+                    }
+                    e.Handled = true;
+                }
+                else
+                {
+                    e.Handled = false;
+                }
+            }
+            else if (e.Key == Key.Back)
+            {
+                TextBox textBox = sender as TextBox;
+                if (textBox == null)
+                {
+                    throw new InvalidCastException("Sender should be a TextBox");
+                }
+
+                var caretPos = textBox.CaretIndex;
+                if (caretPos < textBox.Text.Length && textBox.Text[caretPos] == ':')
+                {
+                    if (caretPos - 1 >= 0 && textBox.Text[caretPos - 1] == ':')
+                    {
+                        textBox.Text = textBox.Text.Remove(caretPos - 1, 2);
+                        textBox.CaretIndex = caretPos - 1;
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        e.Handled = false;
+                    }
+                }
+                else if (caretPos == textBox.Text.Length || textBox.Text[caretPos] != ':')
+                {
+                    if (caretPos - 1 >= 0 && textBox.Text[caretPos - 1] == ':')
+                    {
+                        textBox.Text = textBox.Text.Remove(caretPos - 2, 2);
+                        textBox.CaretIndex = caretPos - 2;
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        e.Handled = false;
+                    }
+                }
+                else
+                {
+                    e.Handled = false;
+                }
             }
         }
         private void ClassNameKeyDownHandler(object sender, KeyEventArgs e)
@@ -202,7 +268,7 @@ namespace Dwarfovich.AddCppClass
 
             if (IsUnderline(e.Key)
                 || IsLetter(e.Key)
-                || IsNavigationOrEditKey(e.Key))
+                || IsNavigationKey(e.Key))
             {
                 e.Handled = false;
             }
@@ -240,7 +306,7 @@ namespace Dwarfovich.AddCppClass
                 }
                 settings.implementationSubfolder = ImplementationSubfolderCombo.Text.Replace('/', '\\');
             }
-            
+
             settings.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
 
             ClassAdder.AddClass(settings);
