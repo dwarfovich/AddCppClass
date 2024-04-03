@@ -171,6 +171,7 @@ namespace Dwarfovich.AddCppClass.Tests
         public void IsInvalidClassNameTest()
         {
             Assert.IsFalse(ClassGenerator.IsValidClassName(""));
+            Assert.IsFalse(ClassGenerator.IsValidClassName(" "));
             Assert.IsFalse(ClassGenerator.IsValidClassName("1"));
             Assert.IsFalse(ClassGenerator.IsValidClassName("0abc"));
             Assert.IsFalse(ClassGenerator.IsValidClassName("a a"));
@@ -179,7 +180,6 @@ namespace Dwarfovich.AddCppClass.Tests
             Assert.IsFalse(ClassGenerator.IsValidClassName("_ _"));
             Assert.IsFalse(ClassGenerator.IsValidClassName("a "));
             Assert.IsFalse(ClassGenerator.IsValidClassName("abra746 "));
-
         }
 
         [TestMethod()]

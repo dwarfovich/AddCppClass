@@ -12,7 +12,7 @@ namespace Dwarfovich.AddCppClass
     public class ClassGenerator
     {
         private string filename = "";
-
+        private static readonly Regex fileNameRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
         public ClassGenerator()
         {
         }
@@ -73,8 +73,7 @@ namespace Dwarfovich.AddCppClass
         }
         public static bool IsValidClassName(string name)
         {
-            Regex rg = new Regex(@"[_a-zA-Z][_a-zA-Z0-9]*");
-            return rg.IsMatch(name);
+            return fileNameRegex.IsMatch(name);
         }
     }
 }
