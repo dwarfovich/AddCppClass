@@ -144,10 +144,17 @@ namespace Dwarfovich.AddCppClass
             TextBox textBox = sender as TextBox;
             if (textBox != null)
             {
-                settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
-                (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
-                UpdateFilenameTextBoxes();
-                AddClassButton.IsEnabled = !String.IsNullOrEmpty(settings.ClassName);
+                if(ClassGenerator.IsValidClassName(textBox.Text))
+                {
+                    settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
+                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
+                    UpdateFilenameTextBoxes();
+                    AddClassButton.IsEnabled = true;
+                }
+                else
+                {
+                    AddClassButton.IsEnabled = false;
+                }
             }
         }
         private void ClassNameKeyDownPreviewHandler(object sender, KeyEventArgs e)

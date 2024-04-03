@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using static System.Net.Mime.MediaTypeNames;
@@ -69,6 +70,11 @@ namespace Dwarfovich.AddCppClass
                 default: throw new NotImplementedException();
             }
 
+        }
+        public static bool IsValidClassName(string name)
+        {
+            Regex rg = new Regex(@"[_a-zA-Z][_a-zA-Z0-9]*");
+            return rg.IsMatch(name);
         }
     }
 }
