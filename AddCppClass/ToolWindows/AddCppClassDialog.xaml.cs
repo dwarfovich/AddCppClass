@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.PlatformUI;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Collections.Generic;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -11,9 +12,12 @@ namespace Dwarfovich.AddCppClass
         private ClassSettings settings = new ClassSettings();
         private ClassGenerator generator = new ClassGenerator();
         private bool shiftEnabled = false;
+        private ClassSettingsErrorsCollection errors = new();
+
         public AddCppClassDialog()
         {
             InitializeComponent();
+
             ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
             ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
@@ -29,7 +33,9 @@ namespace Dwarfovich.AddCppClass
             ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
             ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
             ImplementationFilename.KeyDown += FileKeyDownHandler;
-            AddClassButton.IsEnabled = false;
+
+            errors.Clear();
+            ClassNameTextBox.Text = "Test";
         }
 
         private void UpdateFilenameTextBoxes()
@@ -139,22 +145,112 @@ namespace Dwarfovich.AddCppClass
                 || key == Key.End;
         }
 
+        private void RemoveError(Object source)
+        {
+            bool hasOtherErrors = errors.RemoveError(source);
+            if (AddClassButton != null)
+            {
+                AddClassButton.IsEnabled = !hasOtherErrors;
+            }
+        }
+
+        private void AddError(Object source, string message)
+        {
+            errors.AddError(source, message);
+            if (AddClassButton != null) {
+                AddClassButton.IsEnabled = false;
+            }
+        }
         private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
             if (textBox != null)
             {
-                if(ClassGenerator.IsValidClassName(textBox.Text))
+                if (ClassGenerator.IsValidClassName(textBox.Text))
                 {
                     settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                     (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
                     UpdateFilenameTextBoxes();
-                    AddClassButton.IsEnabled = true;
+                    RemoveError(textBox);
                 }
                 else
                 {
-                    AddClassButton.IsEnabled = false;
+                    AddError(textBox, "Class name contains errors");
                 }
+            }
+        }
+
+        private void HeaderSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox is null)
+            {
+                return;
+            }
+
+            if (ClassGenerator.IsValidSubfolder(comboBox.Text))
+            {
+                RemoveError(comboBox);
+            }
+            else
+            {
+
+                AddError(comboBox, "Header subfolder is invalid");
+            }
+        }
+        private void ImplementationSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox is null)
+            {
+                return;
+            }
+
+            if (ClassGenerator.IsValidSubfolder(comboBox.Text))
+            {
+                RemoveError(comboBox);
+            }
+            else
+            {
+
+                AddError(comboBox, "Implementation subfolder is invalid");
+            }
+        }
+
+        private void HeaderFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox is null)
+            {
+                return;
+            }
+
+            if (ClassGenerator.IsValidFilename(textBox.Text))
+            {
+                RemoveError(textBox);
+            }
+            else
+            {
+
+                AddError(textBox, "Header file name is invalid");
+            }
+        }
+        private void ImplementationFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox is null)
+            {
+                return;
+            }
+
+            if (ClassGenerator.IsValidFilename(textBox.Text))
+            {
+                RemoveError(textBox);
+            }
+            else
+            {
+
+                AddError(textBox, "Implementation file name is invalid");
             }
         }
         private void ClassNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
@@ -296,22 +392,20 @@ namespace Dwarfovich.AddCppClass
         {
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
 
-            if (HeaderSubfolderCombo.Text.EndsWith("/"))
+            if (HeaderSubfolderCombo.Text.EndsWith("\\"))
             {
                 HeaderSubfolderCombo.Text = HeaderSubfolderCombo.Text.Remove(HeaderSubfolderCombo.Text.Length - 1);
             }
-            settings.headerSubfolder = HeaderSubfolderCombo.Text.Replace('/', '\\');
             if (settings.useSingleSubfolder)
             {
                 settings.implementationSubfolder = settings.headerSubfolder;
             }
             else
             {
-                if (ImplementationSubfolderCombo.Text.EndsWith("/"))
+                if (ImplementationSubfolderCombo.Text.EndsWith("\\"))
                 {
                     ImplementationSubfolderCombo.Text = ImplementationSubfolderCombo.Text.Remove(ImplementationSubfolderCombo.Text.Length - 1);
                 }
-                settings.implementationSubfolder = ImplementationSubfolderCombo.Text.Replace('/', '\\');
             }
 
             settings.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
@@ -408,7 +502,7 @@ namespace Dwarfovich.AddCppClass
                     var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
                     if (canInsert)
                     {
-                        textBox.Text = textBox.Text.Insert(caretPos, "/"); ;
+                        textBox.Text = textBox.Text.Insert(caretPos, "\\"); ;
                         textBox.CaretIndex = caretPos + 1;
                     }
                     e.Handled = true;

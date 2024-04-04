@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Dwarfovich.AddCppClass
@@ -74,6 +75,25 @@ namespace Dwarfovich.AddCppClass
         public static bool IsValidClassName(string name)
         {
             return fileNameRegex.IsMatch(name);
+        }
+
+        public static bool IsValidSubfolder(string subfolder)
+        {
+            try
+            {
+                string testPath = Path.Combine(Environment.CurrentDirectory, subfolder);
+                string fullPath = Path.GetFullPath(subfolder);
+                return fullPath == testPath;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsValidFilename(string filename)
+        {
+            return filename.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
         }
     }
 }
