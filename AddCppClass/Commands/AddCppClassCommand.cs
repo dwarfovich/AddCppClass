@@ -17,7 +17,14 @@ namespace Dwarfovich.AddCppClass
             var activeProject = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
             if (activeProject is null)
             {
-                return Path.Combine(new FileInfo(dte.Solution.FullName).DirectoryName, "AddCppClass.config.json");
+                if (dte.Solution is null)
+                {
+                    return "";
+                }
+                else
+                {
+                    return Path.Combine(new FileInfo(dte.Solution.FullName).DirectoryName, "AddCppClass.config.json");
+                }
             }
             else
             {
@@ -50,7 +57,7 @@ namespace Dwarfovich.AddCppClass
             var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;
-            bool result = (bool)dialog.ShowModal();
+            dialog.ShowModal();
             //await VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }
     }
