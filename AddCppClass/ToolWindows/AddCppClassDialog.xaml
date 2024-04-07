@@ -10,7 +10,7 @@
                         toolkit:Themes.UseVsTheme="False"
                         mc:Ignorable="d"
                         Width="645"
-                        Height="308">
+                        Height="395">
 
     <Window.Resources>
         <local:ClassSettings x:Key="ClassName"/>
@@ -33,7 +33,7 @@
             <ColumnDefinition Width="55*"/>
             <ColumnDefinition Width="336*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="5,10,28,10" RenderTransformOrigin="0.456,0.492">
+        <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="5,10,28,118" RenderTransformOrigin="0.456,0.492">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="113*" />
                 <ColumnDefinition Width="124*" />
@@ -97,5 +97,7 @@
             </Button.Style>
         </Button>
         <CheckBox Grid.Column="3" Content="Auto-save settings" Name="AutosaveSettingsCheckBox" HorizontalAlignment="Left" Margin="41,13,0,0" Grid.Row="7" VerticalAlignment="Top" Width="172"/>
+        <CheckBox Grid.Column="1" Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" HorizontalAlignment="Left" Margin="8,0,0,0" Grid.Row="7" VerticalAlignment="Center" Width="192"/>
+        <TextBox Grid.Column="1"  Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" HorizontalAlignment="Center" Margin="0,115,0,0" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="195"/>
     </Grid>
 </platform:DialogWindow>

@@ -17,22 +17,7 @@ namespace Dwarfovich.AddCppClass
         public AddCppClassDialog()
         {
             InitializeComponent();
-
-            ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
-            ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
-            ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
-            HeaderSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
-            HeaderSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
-            HeaderSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
-            ImplementationSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
-            ImplementationSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
-            ImplementationSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
-            HeaderFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
-            HeaderFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
-            HeaderFilename.KeyDown += FileKeyDownHandler;
-            ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
-            ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
-            ImplementationFilename.KeyDown += FileKeyDownHandler;
+            AssignKeyHandlers();
 
             errors.Clear();
             ClassNameTextBox.Text = "MyClass";
@@ -41,7 +26,15 @@ namespace Dwarfovich.AddCppClass
         public AddCppClassDialog(ExtensionSettings settings)
         {
             InitializeComponent();
+            AssignKeyHandlers();
 
+            LoadSettings(settings);
+            errors.Clear();
+            ClassNameTextBox.Text = "MyClass";
+        }
+
+        private void AssignKeyHandlers()
+        {
             ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
             ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
@@ -57,12 +50,10 @@ namespace Dwarfovich.AddCppClass
             ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
             ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
             ImplementationFilename.KeyDown += FileKeyDownHandler;
-
-            LoadSettings(settings);
-            errors.Clear();
-            ClassNameTextBox.Text = "MyClass";
+            PrecompiledHeader.PreviewKeyDown += PrecompiledHeaderKeyDownPreviewHandler;
+            PrecompiledHeader.PreviewKeyUp += PrecompiledHeaderKeyUpPreviewHandler;
+            PrecompiledHeader.KeyDown += PrecompiledHeaderKeyDownHandler;
         }
-
         private void LoadSettings(ExtensionSettings settings)
         {
             switch (settings.filenameStyle)
@@ -611,6 +602,57 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
+        private void PrecompiledHeaderKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = true;
+
+            }
+            else if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+        private void PrecompiledHeaderKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key) || IsPathSeparator(e.Key))
+            {
+                if (IsPathSeparator(e.Key))
+                {
+                    var textBox = sender as TextBox;
+                    if (textBox == null)
+                    {
+                        throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
+                    }
+
+                    var caretPos = textBox.CaretIndex;
+                    var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
+                    if (canInsert)
+                    {
+                        textBox.Text = textBox.Text.Insert(caretPos, "/"); ;
+                        textBox.CaretIndex = caretPos + 1;
+                    }
+                    e.Handled = true;
+                }
+                else
+                {
+                    e.Handled = false;
+                }
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+        private void PrecompiledHeaderKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = false;
+            }
+        }
+
         private void DontCreateCppCheckChanged(object sender, EventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
@@ -620,5 +662,31 @@ namespace Dwarfovich.AddCppClass
                 ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
             }
         }
+
+        private void IncludePrecompiledHeaderCheckChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox != null)
+            {
+                PrecompiledHeader.IsEnabled = (bool)checkBox.IsChecked;
+            }
+        }
+
+        private void PrecompiledHeaderFilenameChangedEventHandler(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                if(ClassGenerator.IsValidSubfolder(textBox.Text))
+                {
+                    RemoveError(sender);
+                }
+                else
+                {
+                    AddError(sender, "Precompiled header file name is invalid");
+                }
+            }
+        }
+        
     }
 }

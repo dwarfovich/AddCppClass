@@ -11,14 +11,15 @@ namespace Dwarfovich.AddCppClass
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public string headerExtension { get; set; } = ".h";
         public bool useSingleSubfolder { get; set; } = true;
-        public bool createFilters {  get; set; } = true;
+        public bool createFilters { get; set; } = true;
         public bool dontCreateImplementationFile { get; set; } = false;
-        public int recentHeaderSubfoldersCount {  get; set; } = 10;
+        public int recentHeaderSubfoldersCount { get; set; } = 10;
         public string[] recentHeaderSubfolders { get; set; } = [];
         public int recentImplementationSubfoldersCount { get; set; } = 10;
         public string[] recentImplementationSubfolders { get; set; } = [];
         public bool autoSaveSettings { get; set; } = true;
-
+        public bool includePrecompiledHeader { get; set; } = false;
+        public string precompiledHeader { get; set; } = ".pch";
         public ExtensionSettings() { }
     }
 }
