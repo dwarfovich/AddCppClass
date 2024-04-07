@@ -1,19 +1,56 @@
-﻿using EnvDTE;
+﻿using AddCppClass;
+using Community.VisualStudio.Toolkit;
+using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.Threading;
+using Newtonsoft.Json;
+using System.IO;
+using System.Runtime;
 
 namespace Dwarfovich.AddCppClass
 {
     [Command(PackageIds.AddCppClassCommand)]
     internal sealed class AddCppClassCommand : BaseCommand<AddCppClassCommand>
     {
+        private static string SettingsPath(DTE2 dte)
+        {
+            var activeProject = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            if (activeProject is null)
+            {
+                // TODO: Show message.
+                return "";
+            }
+            return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, "AddCppClass.config.json");
+        }
+
+        private static ExtensionSettings GetExtensionSettings()
+        {
+            string settingsPath = SettingsPath(AddCppClassPackage.dte);
+            ExtensionSettings settings = new ();
+            try
+            {
+                if (File.Exists(settingsPath))
+                {
+                    string jsonString = File.ReadAllText(settingsPath);
+                    settings = JsonConvert.DeserializeObject<ExtensionSettings>(jsonString);
+                }
+            }
+            catch
+            {
+                // TODO: handle error.
+            }
+
+            return settings;
+        }
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
-            //await VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
-            
+            var settings = GetExtensionSettings();
+
             var dialog = new AddCppClassDialog();
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;
             bool result = (bool)dialog.ShowModal();
+            //await VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }
     }
 }

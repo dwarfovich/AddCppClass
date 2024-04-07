@@ -14,20 +14,7 @@ namespace Dwarfovich.AddCppClass
     {
         private static readonly DTE2 dte = AddCppClassPackage.dte;
 
-        private static EnvDTE.Project CurrentProject()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            Array projects = dte.ActiveSolutionProjects as Array;
-            if (projects != null && projects.Length != 0)
-            {
-                return projects.GetValue(0) as EnvDTE.Project;
-            }
-            else
-            {
-                throw new InvalidOperationException("No selected project in solution");
-            }
-        }
+        
 
         private static XDocument CreateFilterXmlDocument()
         {
@@ -161,7 +148,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            EnvDTE.Project project = CurrentProject();
+            EnvDTE.Project project = Utils.Solution.CurrentProject(dte);
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             CreateHeaderFile(project, settings, projectPath);

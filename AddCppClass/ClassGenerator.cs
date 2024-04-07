@@ -79,6 +79,11 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidSubfolder(string subfolder)
         {
+            if (String.IsNullOrEmpty(subfolder))
+            {
+                return true;
+            }
+
             try
             {
                 string testPath = Path.Combine(Environment.CurrentDirectory, subfolder);

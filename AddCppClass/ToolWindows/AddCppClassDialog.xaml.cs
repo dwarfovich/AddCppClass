@@ -35,7 +35,7 @@ namespace Dwarfovich.AddCppClass
             ImplementationFilename.KeyDown += FileKeyDownHandler;
 
             errors.Clear();
-            ClassNameTextBox.Text = "Test";
+            ClassNameTextBox.Text = "MyClass";
         }
 
         private void UpdateFilenameTextBoxes()
