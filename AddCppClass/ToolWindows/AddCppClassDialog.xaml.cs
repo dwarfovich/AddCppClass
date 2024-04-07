@@ -38,6 +38,62 @@ namespace Dwarfovich.AddCppClass
             ClassNameTextBox.Text = "MyClass";
         }
 
+        public AddCppClassDialog(ExtensionSettings settings)
+        {
+            InitializeComponent();
+
+            ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
+            ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
+            ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
+            HeaderSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
+            HeaderSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
+            HeaderSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
+            ImplementationSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
+            ImplementationSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
+            ImplementationSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
+            HeaderFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
+            HeaderFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
+            HeaderFilename.KeyDown += FileKeyDownHandler;
+            ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
+            ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
+            ImplementationFilename.KeyDown += FileKeyDownHandler;
+
+            LoadSettings(settings);
+            errors.Clear();
+            ClassNameTextBox.Text = "MyClass";
+        }
+
+        private void LoadSettings(ExtensionSettings settings)
+        {
+            switch (settings.filenameStyle)
+            {
+                case FilenameStyle.CamelCase: CamelCaseNameStyle.IsChecked = true; break;
+                case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
+                case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
+            }
+            if (settings.headerExtension == ".h")
+            {
+                HeaderHStyle.IsChecked = true;
+            }
+            else
+            {
+                HeaderHppStyle.IsChecked = true;
+            }
+            UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
+            CreateFiltersCheckBox.IsChecked = settings.createFilters;
+            DontCreateCppFileCheckBox.IsChecked = settings.dontCreateImplementationFile;
+            for (int i = 0; i < Math.Min(settings.recentHeaderSubfoldersCount, settings.recentHeaderSubfolders.Length); ++i)
+            {
+                HeaderSubfolderCombo.Items.Add(settings.recentHeaderSubfolders[i]);
+            }
+            HeaderSubfolderCombo.SelectedIndex = 0;
+            for (int i = 0; i < Math.Min(settings.recentImplementationSubfoldersCount, settings.recentImplementationSubfolders.Length); ++i)
+            {
+                ImplementationSubfolderCombo.Items.Add(settings.recentImplementationSubfolders[i]);
+            }
+            ImplementationSubfolderCombo.SelectedIndex = 0;
+            AutosaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
+        }
         private void UpdateFilenameTextBoxes()
         {
             if (HeaderFilename is not null)
@@ -157,7 +213,8 @@ namespace Dwarfovich.AddCppClass
         private void AddError(Object source, string message)
         {
             errors.AddError(source, message);
-            if (AddClassButton != null) {
+            if (AddClassButton != null)
+            {
                 AddClassButton.IsEnabled = false;
             }
         }
@@ -551,6 +608,16 @@ namespace Dwarfovich.AddCppClass
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shiftEnabled = false;
+            }
+        }
+
+        private void DontCreateCppCheckChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox != null)
+            {
+                ImplementationFilename.IsEnabled = !(bool)checkBox.IsChecked;
+                ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
             }
         }
     }

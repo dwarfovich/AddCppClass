@@ -17,16 +17,18 @@ namespace Dwarfovich.AddCppClass
             var activeProject = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
             if (activeProject is null)
             {
-                // TODO: Show message.
-                return "";
+                return Path.Combine(new FileInfo(dte.Solution.FullName).DirectoryName, "AddCppClass.config.json");
             }
-            return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, "AddCppClass.config.json");
+            else
+            {
+                return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, "AddCppClass.config.json");
+            }
         }
 
         private static ExtensionSettings GetExtensionSettings()
         {
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
-            ExtensionSettings settings = new ();
+            ExtensionSettings settings = new();
             try
             {
                 if (File.Exists(settingsPath))
@@ -45,8 +47,7 @@ namespace Dwarfovich.AddCppClass
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             var settings = GetExtensionSettings();
-
-            var dialog = new AddCppClassDialog();
+            var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;
             bool result = (bool)dialog.ShowModal();
