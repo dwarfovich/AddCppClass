@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System.IO;
 using System.Runtime;
+using System.Windows.Shapes;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -51,13 +52,28 @@ namespace Dwarfovich.AddCppClass
 
             return settings;
         }
+
+        private void SaveSettings(ExtensionSettings settings)
+        {
+            string settingsPath = SettingsPath(AddCppClassPackage.dte);
+            if(String.IsNullOrEmpty(settingsPath))
+            {
+                // TODO: Handle error.
+            }
+            string json = JsonConvert.SerializeObject(settings);
+            File.WriteAllText(settingsPath, json);
+        }
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             var settings = GetExtensionSettings();
             var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;
-            dialog.ShowModal();
+            bool result = (bool)dialog.ShowModal();
+            if (result && dialog.ShouldSaveSettings())
+            {
+                SaveSettings(dialog.ExtensionSettings());
+            }
             //await VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }
     }

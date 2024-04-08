@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -460,6 +461,56 @@ namespace Dwarfovich.AddCppClass
             ClassAdder.AddClass(settings);
             Close();
         }
+
+        public bool ShouldSaveSettings()
+        {
+            return (bool)AutosaveSettingsCheckBox.IsChecked;
+        }
+        public ExtensionSettings ExtensionSettings()
+        {
+            ExtensionSettings settings = new();
+            if ((bool)CamelCaseNameStyle.IsChecked)
+            {
+                settings.filenameStyle = FilenameStyle.CamelCase;
+            } else if ((bool)SnakeCaseNameStyle.IsChecked)
+            {
+                settings.filenameStyle = FilenameStyle.SnakeCase;
+            } else
+            {
+                settings.filenameStyle = FilenameStyle.LowerCase;
+            }
+            if ((bool)HeaderHStyle.IsChecked)
+            {
+                settings.headerExtension = ".h";
+            }
+            else
+            {
+                settings.headerExtension = ".hpp";
+            }
+            settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
+            settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
+            settings.dontCreateImplementationFile = (bool)DontCreateCppFileCheckBox.IsChecked;
+           
+            string[] subfolders = Array.Empty<String>();
+            for (int i = 0; i < Math.Min(HeaderSubfolderCombo.Items.Count, settings.recentHeaderSubfoldersCount); i++)
+            {
+                subfolders.Append(HeaderSubfolderCombo.Items[i].ToString());
+            }
+            settings.recentHeaderSubfolders = subfolders;
+
+            subfolders = Array.Empty<String>();
+
+            for (int i = 0; i < Math.Min(ImplementationSubfolderCombo.Items.Count, settings.recentImplementationSubfoldersCount); i++)
+            {
+                subfolders.Append(ImplementationSubfolderCombo.Items[i].ToString());
+            }
+            settings.recentImplementationSubfolders = subfolders;
+
+            settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
+
+            return settings;
+        }
+
         private void UseSingleSubfolderCheckChanged(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
