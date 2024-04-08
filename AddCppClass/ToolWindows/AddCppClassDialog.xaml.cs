@@ -1,16 +1,14 @@
-﻿using Community.VisualStudio.Toolkit;
-using Microsoft.VisualStudio.PlatformUI;
+﻿using Microsoft.VisualStudio.PlatformUI;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Collections.Generic;
 
 namespace Dwarfovich.AddCppClass
 {
     public partial class AddCppClassDialog : DialogWindow
     {
-        private ClassSettings settings = new ClassSettings();
-        private ClassGenerator generator = new ClassGenerator();
+        private ClassSettings settings = new();
+        private ClassGenerator generator = new();
         private ClassSettingsErrorsCollection errors = new();
         private bool shiftEnabled = false;
 
@@ -497,7 +495,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if((bool)checkBox.IsChecked)
+            if ((bool)checkBox.IsChecked)
             {
                 if (ClassGenerator.IsValidSubfolder(HeaderSubfolderCombo.Text))
                 {
