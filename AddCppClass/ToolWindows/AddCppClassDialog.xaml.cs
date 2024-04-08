@@ -11,8 +11,8 @@ namespace Dwarfovich.AddCppClass
     {
         private ClassSettings settings = new ClassSettings();
         private ClassGenerator generator = new ClassGenerator();
-        private bool shiftEnabled = false;
         private ClassSettingsErrorsCollection errors = new();
+        private bool shiftEnabled = false;
 
         public AddCppClassDialog()
         {
@@ -61,6 +61,7 @@ namespace Dwarfovich.AddCppClass
                 case FilenameStyle.CamelCase: CamelCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
+                default: CamelCaseNameStyle.IsChecked = true; break;
             }
             if (settings.headerExtension == ".h")
             {
@@ -469,7 +470,23 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            ImplementationSubfolderCombo.IsEnabled = (bool)!checkBox.IsChecked;
+            settings.useSingleSubfolder = (bool)checkBox.IsChecked;
+            ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
+            if ((bool)checkBox.IsChecked)
+            {
+                RemoveError(ImplementationSubfolderCombo);
+            }
+            else
+            {
+                if (ClassGenerator.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                {
+                    RemoveError(ImplementationSubfolderCombo);
+                }
+                else
+                {
+                    AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
+                }
+            }
         }
 
         private void CreateFiltersCheckChanged(object sender, RoutedEventArgs e)
@@ -478,6 +495,31 @@ namespace Dwarfovich.AddCppClass
             if (checkBox is null)
             {
                 return;
+            }
+
+            if((bool)checkBox.IsChecked)
+            {
+                if (ClassGenerator.IsValidSubfolder(HeaderSubfolderCombo.Text))
+                {
+                    RemoveError(HeaderSubfolderCombo);
+                }
+                else
+                {
+                    AddError(HeaderSubfolderCombo, "Header subfolder is invalid");
+                }
+                if (ClassGenerator.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                {
+                    RemoveError(ImplementationSubfolderCombo);
+                }
+                else
+                {
+                    AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
+                }
+            }
+            else
+            {
+                RemoveError(HeaderSubfolderCombo);
+                RemoveError(ImplementationSubfolderCombo);
             }
 
             settings.createFilters = (bool)checkBox.IsChecked;
@@ -656,19 +698,57 @@ namespace Dwarfovich.AddCppClass
         private void DontCreateCppCheckChanged(object sender, EventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
-            if (checkBox != null)
+            if (checkBox is null)
+            {
+                return;
+            }
+
+            settings.hasImplementationFile = !(bool)checkBox.IsChecked;
+
+            if ((bool)checkBox.IsChecked)
             {
                 ImplementationFilename.IsEnabled = !(bool)checkBox.IsChecked;
+                RemoveError(ImplementationFilename);
                 ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
+                RemoveError(ImplementationSubfolderCombo);
+            }
+            else
+            {
+                if (!ClassGenerator.IsValidFilename(ImplementationFilename.Text))
+                {
+                    AddError(ImplementationFilename, "Implementation file name is invalid");
+                }
+                if (!ClassGenerator.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                {
+                    AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
+                }
             }
         }
 
         private void IncludePrecompiledHeaderCheckChanged(object sender, EventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
-            if (checkBox != null)
+            if (checkBox is null)
             {
-                PrecompiledHeader.IsEnabled = (bool)checkBox.IsChecked;
+                return;
+            }
+
+            if ((bool)checkBox.IsChecked)
+            {
+                PrecompiledHeader.IsEnabled = true;
+                if (ClassGenerator.IsValidSubfolder(PrecompiledHeader.Text))
+                {
+                    RemoveError(PrecompiledHeader);
+                }
+                else
+                {
+                    AddError(PrecompiledHeader, "Precompiled header file name is invalid");
+                }
+            }
+            else
+            {
+                PrecompiledHeader.IsEnabled = false;
+                RemoveError(PrecompiledHeader);
             }
         }
 
@@ -677,7 +757,7 @@ namespace Dwarfovich.AddCppClass
             TextBox textBox = sender as TextBox;
             if (textBox != null)
             {
-                if(ClassGenerator.IsValidSubfolder(textBox.Text))
+                if (ClassGenerator.IsValidSubfolder(textBox.Text))
                 {
                     RemoveError(sender);
                 }
@@ -687,6 +767,5 @@ namespace Dwarfovich.AddCppClass
                 }
             }
         }
-        
     }
 }
