@@ -8,7 +8,7 @@ namespace Dwarfovich.AddCppClass
 {
     public partial class AddCppClassDialog : DialogWindow
     {
-        private ClassSettings settings = new();
+        public Settings settings { get; private set; } = new();
         private ClassGenerator generator = new();
         private ClassSettingsErrorsCollection errors = new();
         private bool shiftEnabled = false;
@@ -22,7 +22,7 @@ namespace Dwarfovich.AddCppClass
             ClassNameTextBox.Text = "MyClass";
         }
 
-        public AddCppClassDialog(ExtensionSettings settings)
+        public AddCppClassDialog(Settings settings)
         {
             InitializeComponent();
             AssignKeyHandlers();
@@ -53,16 +53,16 @@ namespace Dwarfovich.AddCppClass
             PrecompiledHeader.PreviewKeyUp += PrecompiledHeaderKeyUpPreviewHandler;
             PrecompiledHeader.KeyDown += PrecompiledHeaderKeyDownHandler;
         }
-        private void LoadSettings(ExtensionSettings settings)
+        private void LoadSettings(Settings settings)
         {
-            switch (settings.filenameStyle)
+            switch (settings.Style)
             {
                 case FilenameStyle.CamelCase: CamelCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
                 default: CamelCaseNameStyle.IsChecked = true; break;
             }
-            if (settings.headerExtension == ".h")
+            if (settings.HeaderExtension == ".h")
             {
                 HeaderHStyle.IsChecked = true;
             }
@@ -72,7 +72,7 @@ namespace Dwarfovich.AddCppClass
             }
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
-            DontCreateCppFileCheckBox.IsChecked = settings.dontCreateImplementationFile;
+            HasCppFileCheckBox.IsChecked = settings.hasImplementationFile;
             for (int i = 0; i < Math.Min(settings.recentHeaderSubfoldersCount, settings.recentHeaderSubfolders.Length); ++i)
             {
                 HeaderSubfolderCombo.Items.Add(settings.recentHeaderSubfolders[i]);
@@ -456,7 +456,7 @@ namespace Dwarfovich.AddCppClass
                 }
             }
 
-            settings.hasImplementationFile = !(bool)DontCreateCppFileCheckBox.IsChecked;
+            settings.hasImplementationFile = (bool)HasCppFileCheckBox.IsChecked;
 
             ClassAdder.AddClass(settings);
             Close();
@@ -466,30 +466,30 @@ namespace Dwarfovich.AddCppClass
         {
             return (bool)AutosaveSettingsCheckBox.IsChecked;
         }
-        public ExtensionSettings ExtensionSettings()
+        public Settings ExtensionSettings()
         {
-            ExtensionSettings settings = new();
+            Settings settings = new();
             if ((bool)CamelCaseNameStyle.IsChecked)
             {
-                settings.filenameStyle = FilenameStyle.CamelCase;
+                settings.Style = FilenameStyle.CamelCase;
             } else if ((bool)SnakeCaseNameStyle.IsChecked)
             {
-                settings.filenameStyle = FilenameStyle.SnakeCase;
+                settings.Style = FilenameStyle.SnakeCase;
             } else
             {
-                settings.filenameStyle = FilenameStyle.LowerCase;
+                settings.Style = FilenameStyle.LowerCase;
             }
             if ((bool)HeaderHStyle.IsChecked)
             {
-                settings.headerExtension = ".h";
+                settings.HeaderExtension = ".h";
             }
             else
             {
-                settings.headerExtension = ".hpp";
+                settings.HeaderExtension = ".hpp";
             }
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
-            settings.dontCreateImplementationFile = (bool)DontCreateCppFileCheckBox.IsChecked;
+            settings.hasImplementationFile = (bool)HasCppFileCheckBox.IsChecked;
            
             string[] subfolders = Array.Empty<String>();
             for (int i = 0; i < Math.Min(HeaderSubfolderCombo.Items.Count, settings.recentHeaderSubfoldersCount); i++)

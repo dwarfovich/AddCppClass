@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System.IO;
 using System.Runtime;
-using System.Windows.Shapes;
+//using System.Windows.Shapes;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -33,16 +33,16 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private static ExtensionSettings GetExtensionSettings()
+        private static Settings GetExtensionSettings()
         {
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
-            ExtensionSettings settings = new();
+            Settings settings = new();
             try
             {
                 if (File.Exists(settingsPath))
                 {
                     string jsonString = File.ReadAllText(settingsPath);
-                    settings = JsonConvert.DeserializeObject<ExtensionSettings>(jsonString);
+                    settings = JsonConvert.DeserializeObject<Settings>(jsonString);
                 }
             }
             catch
@@ -53,7 +53,7 @@ namespace Dwarfovich.AddCppClass
             return settings;
         }
 
-        private void SaveSettings(ExtensionSettings settings)
+        private void SaveSettings(Settings settings)
         {
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
             if(String.IsNullOrEmpty(settingsPath))

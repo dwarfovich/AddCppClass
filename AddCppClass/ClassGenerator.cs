@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Text.RegularExpressions;
 using System.IO;
-using static System.Net.Mime.MediaTypeNames;
+using Dwarfovich.AddCppClass;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -17,23 +11,23 @@ namespace Dwarfovich.AddCppClass
         public ClassGenerator()
         {
         }
-        public (string header, string implementation) GenerateFilenamesForChangedExtension(ClassSettings classSettings)
+        public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
             return (filename + classSettings.HeaderExtension, filename + classSettings.ImplementationExtension);
         }
 
-        public (string header, string implementation) GenerateFilenames(ClassSettings classSettings)
+        public (string header, string implementation) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
             return (filename + classSettings.HeaderExtension, filename + classSettings.ImplementationExtension);
         }
-        public string GenerateCamelCaseFilename(ClassSettings classSettings)
+        public string GenerateCamelCaseFilename(Settings classSettings)
         {
             return classSettings.ClassName;
         }
 
-        public string GenerateSnakeCaseFilename(ClassSettings classSettings)
+        public string GenerateSnakeCaseFilename(Settings classSettings)
         {
             Func<char, char, bool> ShouldInsertUnderline = (char previousChar, char nextChar) =>
             {
@@ -54,11 +48,11 @@ namespace Dwarfovich.AddCppClass
             }
             return filename;
         }
-        public string GenerateLowerCaseFilename(ClassSettings classSettings)
+        public string GenerateLowerCaseFilename(Settings classSettings)
         {
             return classSettings.ClassName.ToLower();
         }
-        public string GenerateFilename(ClassSettings classSettings)
+        public string GenerateFilename(Settings classSettings)
         {
             switch (classSettings.Style)
             {

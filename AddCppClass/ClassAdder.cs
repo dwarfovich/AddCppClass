@@ -37,7 +37,7 @@ namespace Dwarfovich.AddCppClass
                 return CreateFilterXmlDocument();
             }
         }
-        public static void CreateHeaderFile(EnvDTE.Project project, ClassSettings settings, string projectPath)
+        public static void CreateHeaderFile(EnvDTE.Project project, Settings settings, string projectPath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -49,7 +49,7 @@ namespace Dwarfovich.AddCppClass
             projectItems.AddFromFile(path);
         }
 
-        public static void CreateImplementationFile(EnvDTE.Project project, ClassSettings settings, string projectPath)
+        public static void CreateImplementationFile(EnvDTE.Project project, Settings settings, string projectPath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -118,16 +118,16 @@ namespace Dwarfovich.AddCppClass
             clCompileElement.Add(fileFilterElement);
             doc.Root.Add(newItemGroup);
         }
-        private static void ReplaceHeaderFileFilter(XDocument doc, XNamespace ns, ClassSettings settings, string newFilterPath)
+        private static void ReplaceHeaderFileFilter(XDocument doc, XNamespace ns, Settings settings, string newFilterPath)
         {
             ReplaceFileFilter(doc, ns, settings.headerFilename, newFilterPath, "ClInclude");
         }
-        private static void ReplaceImplementationFileFilter(XDocument doc, XNamespace ns, ClassSettings settings, string newFilterPath)
+        private static void ReplaceImplementationFileFilter(XDocument doc, XNamespace ns, Settings settings, string newFilterPath)
         {
             ReplaceFileFilter(doc, ns, settings.implementationFilename, newFilterPath, "ClCompile");
         }
 
-        private static void CreateFilters(EnvDTE.Project project, ClassSettings settings)
+        private static void CreateFilters(EnvDTE.Project project, Settings settings)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -144,7 +144,7 @@ namespace Dwarfovich.AddCppClass
             doc.Save(filterFilePath);
         }
 
-        public static void AddClass(ClassSettings settings)
+        public static void AddClass(Settings settings)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
