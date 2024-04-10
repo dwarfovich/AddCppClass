@@ -472,10 +472,12 @@ namespace Dwarfovich.AddCppClass
             if ((bool)CamelCaseNameStyle.IsChecked)
             {
                 settings.Style = FilenameStyle.CamelCase;
-            } else if ((bool)SnakeCaseNameStyle.IsChecked)
+            }
+            else if ((bool)SnakeCaseNameStyle.IsChecked)
             {
                 settings.Style = FilenameStyle.SnakeCase;
-            } else
+            }
+            else
             {
                 settings.Style = FilenameStyle.LowerCase;
             }
@@ -490,7 +492,7 @@ namespace Dwarfovich.AddCppClass
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
             settings.hasImplementationFile = (bool)HasCppFileCheckBox.IsChecked;
-           
+
             string[] subfolders = Array.Empty<String>();
             for (int i = 0; i < Math.Min(HeaderSubfolderCombo.Items.Count, settings.recentHeaderSubfoldersCount); i++)
             {
@@ -744,7 +746,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void DontCreateCppCheckChanged(object sender, EventArgs e)
+        private void HasCppFileCheckChanged(object sender, EventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
             if (checkBox is null)
@@ -752,16 +754,11 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            settings.hasImplementationFile = !(bool)checkBox.IsChecked;
+            settings.hasImplementationFile = (bool)checkBox.IsChecked;
+            ImplementationFilename.IsEnabled = (bool)checkBox.IsChecked;
+            ImplementationSubfolderCombo.IsEnabled = (bool)checkBox.IsChecked;
 
             if ((bool)checkBox.IsChecked)
-            {
-                ImplementationFilename.IsEnabled = !(bool)checkBox.IsChecked;
-                RemoveError(ImplementationFilename);
-                ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
-                RemoveError(ImplementationSubfolderCombo);
-            }
-            else
             {
                 if (!ClassGenerator.IsValidFilename(ImplementationFilename.Text))
                 {
@@ -771,6 +768,11 @@ namespace Dwarfovich.AddCppClass
                 {
                     AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
                 }
+            }
+            else
+            {
+                RemoveError(ImplementationFilename);
+                RemoveError(ImplementationSubfolderCombo);
             }
         }
 
