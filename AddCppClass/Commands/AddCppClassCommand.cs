@@ -72,7 +72,7 @@ namespace Dwarfovich.AddCppClass
             bool result = (bool)dialog.ShowModal();
             if (result && dialog.ShouldSaveSettings())
             {
-                SaveSettings(dialog.Settings());
+                SaveSettings(dialog.settings);
             }
             //await VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }

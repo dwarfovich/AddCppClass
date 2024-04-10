@@ -1,4 +1,6 @@
-﻿namespace Dwarfovich.AddCppClass
+﻿using Newtonsoft.Json;
+
+namespace Dwarfovich.AddCppClass
 {
     public enum FilenameStyle
     {
@@ -8,13 +10,19 @@
     };
     public class Settings
     {
+        [JsonIgnore]
         public string className { get; set; } = "";
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public string headerExtension { get; set; } = "";
+        [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
+        [JsonIgnore]
         public string headerFilename { get; set; } = "";
+        [JsonIgnore]
         public string implementationFilename { get; set; } = "";
+        [JsonIgnore]
         public string headerSubfolder { get; set; } = "";
+        [JsonIgnore]
         public string implementationSubfolder { get; set; } = "";
         public bool useSingleSubfolder { get; set; } = true;
         public bool hasImplementationFile { get; set; } = true;
@@ -24,8 +32,8 @@
         public int recentImplementationSubfoldersCount { get; set; } = 10;
         public string[] recentImplementationSubfolders { get; set; } = [];
         public bool autoSaveSettings { get; set; } = true;
-        //public bool includePrecompiledHeader { get; set; } = false;
-        //public string precompiledHeader { get; set; } = ".pch";
+        public bool includePrecompiledHeader { get; set; } = false;
+        public string precompiledHeader { get; set; } = ".pch";
         public Settings() { }
     }
 }

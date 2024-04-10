@@ -444,6 +444,7 @@ namespace Dwarfovich.AddCppClass
             {
                 HeaderSubfolderCombo.Text = HeaderSubfolderCombo.Text.Remove(HeaderSubfolderCombo.Text.Length - 1);
             }
+            settings.headerSubfolder = HeaderSubfolderCombo.Text;
             if (settings.useSingleSubfolder)
             {
                 settings.implementationSubfolder = settings.headerSubfolder;
@@ -454,44 +455,14 @@ namespace Dwarfovich.AddCppClass
                 {
                     ImplementationSubfolderCombo.Text = ImplementationSubfolderCombo.Text.Remove(ImplementationSubfolderCombo.Text.Length - 1);
                 }
+                settings.implementationSubfolder = ImplementationSubfolderCombo.Text;
             }
 
+            settings.className = ClassNameTextBox.Text;
+            settings.headerFilename = HeaderFilename.Text;
+            settings.implementationFilename = ImplementationFilename.Text;
             settings.hasImplementationFile = (bool)HasCppFileCheckBox.IsChecked;
-
-            ClassAdder.AddClass(settings);
-            Close();
-        }
-
-        public bool ShouldSaveSettings()
-        {
-            return (bool)AutosaveSettingsCheckBox.IsChecked;
-        }
-        public Settings Settings()
-        {
-            if ((bool)CamelCaseNameStyle.IsChecked)
-            {
-                settings.filenameStyle = FilenameStyle.CamelCase;
-            }
-            else if ((bool)SnakeCaseNameStyle.IsChecked)
-            {
-                settings.filenameStyle = FilenameStyle.SnakeCase;
-            }
-            else
-            {
-                settings.filenameStyle = FilenameStyle.LowerCase;
-            }
-            if ((bool)HeaderHStyle.IsChecked)
-            {
-                settings.headerExtension = ".h";
-            }
-            else
-            {
-                settings.headerExtension = ".hpp";
-            }
-            settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
-            settings.hasImplementationFile = (bool)HasCppFileCheckBox.IsChecked;
-
             string[] subfolders = Array.Empty<String>();
             for (int i = 0; i < Math.Min(HeaderSubfolderCombo.Items.Count, settings.recentHeaderSubfoldersCount); i++)
             {
@@ -506,10 +477,17 @@ namespace Dwarfovich.AddCppClass
                 subfolders.Append(ImplementationSubfolderCombo.Items[i].ToString());
             }
             settings.recentImplementationSubfolders = subfolders;
-
             settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
+            settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
+            settings.precompiledHeader = PrecompiledHeader.Text;
 
-            return settings;
+            ClassAdder.AddClass(settings);
+            Close();
+        }
+
+        public bool ShouldSaveSettings()
+        {
+            return settings.autoSaveSettings;
         }
 
         private void UseSingleSubfolderCheckChanged(object sender, RoutedEventArgs e)
