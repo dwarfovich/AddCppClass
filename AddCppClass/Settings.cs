@@ -8,11 +8,10 @@
     };
     public class Settings
     {
-
-        public string ClassName { get; set; } = "";
-        public FilenameStyle Style { get; set; } = FilenameStyle.CamelCase;
-        public string HeaderExtension { get; set; } = "";
-        public string ImplementationExtension { get { return ".cpp"; } }
+        public string className { get; set; } = "";
+        public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
+        public string headerExtension { get; set; } = "";
+        public string implementationExtension { get { return ".cpp"; } }
         public string headerFilename { get; set; } = "";
         public string implementationFilename { get; set; } = "";
         public string headerSubfolder { get; set; } = "";

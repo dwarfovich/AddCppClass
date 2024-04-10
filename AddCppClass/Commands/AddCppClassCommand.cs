@@ -33,7 +33,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private static Settings GetExtensionSettings()
+        private static Settings GetSettings()
         {
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
             Settings settings = new();
@@ -65,7 +65,7 @@ namespace Dwarfovich.AddCppClass
         }
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
-            var settings = GetExtensionSettings();
+            var settings = GetSettings();
             var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;

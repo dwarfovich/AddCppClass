@@ -55,14 +55,14 @@ namespace Dwarfovich.AddCppClass
         }
         private void LoadSettings(Settings settings)
         {
-            switch (settings.Style)
+            switch (settings.filenameStyle)
             {
                 case FilenameStyle.CamelCase: CamelCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
                 default: CamelCaseNameStyle.IsChecked = true; break;
             }
-            if (settings.HeaderExtension == ".h")
+            if (settings.headerExtension == ".h")
             {
                 HeaderHStyle.IsChecked = true;
             }
@@ -101,21 +101,21 @@ namespace Dwarfovich.AddCppClass
         {
             if (button.Content.ToString() == "CamelCase")
             {
-                settings.Style = FilenameStyle.CamelCase;
+                settings.filenameStyle = FilenameStyle.CamelCase;
             }
             else if (button.Content.ToString() == "snake__case")
             {
-                settings.Style = FilenameStyle.SnakeCase;
+                settings.filenameStyle = FilenameStyle.SnakeCase;
             }
             else
             {
-                settings.Style = FilenameStyle.LowerCase;
+                settings.filenameStyle = FilenameStyle.LowerCase;
             }
         }
 
         private void UpdateHeaderExtensionSettings(RadioButton button)
         {
-            settings.HeaderExtension = button.Content.ToString();
+            settings.headerExtension = button.Content.ToString();
         }
         private void RadioButtonChecked(object sender, EventArgs e)
         {
@@ -216,7 +216,7 @@ namespace Dwarfovich.AddCppClass
             {
                 if (ClassGenerator.IsValidClassName(textBox.Text))
                 {
-                    settings.ClassName = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
+                    settings.className = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                     (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
                     UpdateFilenameTextBoxes();
                     RemoveError(textBox);
@@ -471,23 +471,23 @@ namespace Dwarfovich.AddCppClass
             Settings settings = new();
             if ((bool)CamelCaseNameStyle.IsChecked)
             {
-                settings.Style = FilenameStyle.CamelCase;
+                settings.filenameStyle = FilenameStyle.CamelCase;
             }
             else if ((bool)SnakeCaseNameStyle.IsChecked)
             {
-                settings.Style = FilenameStyle.SnakeCase;
+                settings.filenameStyle = FilenameStyle.SnakeCase;
             }
             else
             {
-                settings.Style = FilenameStyle.LowerCase;
+                settings.filenameStyle = FilenameStyle.LowerCase;
             }
             if ((bool)HeaderHStyle.IsChecked)
             {
-                settings.HeaderExtension = ".h";
+                settings.headerExtension = ".h";
             }
             else
             {
-                settings.HeaderExtension = ".hpp";
+                settings.headerExtension = ".hpp";
             }
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
