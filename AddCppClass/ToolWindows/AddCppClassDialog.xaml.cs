@@ -466,9 +466,8 @@ namespace Dwarfovich.AddCppClass
         {
             return (bool)AutosaveSettingsCheckBox.IsChecked;
         }
-        public Settings ExtensionSettings()
+        public Settings Settings()
         {
-            Settings settings = new();
             if ((bool)CamelCaseNameStyle.IsChecked)
             {
                 settings.filenameStyle = FilenameStyle.CamelCase;
