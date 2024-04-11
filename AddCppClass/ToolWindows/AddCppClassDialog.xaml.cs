@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -12,24 +13,35 @@ namespace Dwarfovich.AddCppClass
         private ClassGenerator generator = new();
         private ClassSettingsErrorsCollection errors = new();
         private bool shiftEnabled = false;
-
+        private readonly string title = "Add C++ class";
+        private readonly string defaultClassName = "MyClass";
         public AddCppClassDialog()
         {
-            InitializeComponent();
-            AssignKeyHandlers();
-
+            InitializeGui();
+            
             errors.Clear();
-            ClassNameTextBox.Text = "MyClass";
         }
 
         public AddCppClassDialog(Settings settings)
         {
-            InitializeComponent();
-            AssignKeyHandlers();
+            InitializeGui();
 
             LoadSettings(settings);
             errors.Clear();
-            ClassNameTextBox.Text = "MyClass";
+        }
+
+        private void InitializeGui()
+        {
+            InitializeComponent();
+            AssignKeyHandlers();
+            Title = title;
+            ClassNameTextBox.Text = defaultClassName;
+            
+
+            //Label label = new Label();
+            //label.Content = "Class name";
+            //ClassNameStack.Children.Add(label);
+            //ClassNameStack.Children.Add(coolPic);
         }
 
         private void AssignKeyHandlers()
@@ -794,6 +806,11 @@ namespace Dwarfovich.AddCppClass
                     AddError(sender, "Precompiled header file name is invalid");
                 }
             }
+        }
+
+        private void ClassNameInfoButtonDown(object sender, EventArgs e)
+        {
+            _ = VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }
     }
 }
