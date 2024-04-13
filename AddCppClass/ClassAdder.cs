@@ -13,9 +13,7 @@ namespace Dwarfovich.AddCppClass
     public class ClassAdder
     {
         private static readonly DTE2 dte = AddCppClassPackage.dte;
-
         
-
         private static XDocument CreateFilterXmlDocument()
         {
             XDocument doc = new XDocument(new XDeclaration("1.0", "utf-8", null));
