@@ -9,51 +9,57 @@
                         toolkit:Themes.UseVsTheme="False"
                         mc:Ignorable="d"
                         Width="645"
-                        Height="395">
+                        Height="415">
 
     <Window.Resources>
         <local:Settings x:Key="ClassName"/>
     </Window.Resources>
 
-    <Grid Margin="0,0,0,-6">
+    <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="20"/>
-            <RowDefinition Height="15"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="75*"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40*"/>
             <ColumnDefinition Width="272*"/>
-            <ColumnDefinition Width="82*"/>
-            <ColumnDefinition Width="251*"/>
+            <ColumnDefinition Width="26*"/>
+            <ColumnDefinition Width="307*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Margin="5,10,28,118" RenderTransformOrigin="0.456,0.492">
+        <Grid Grid.Column="1" Grid.Row="6" Margin="0,0,5,16" RenderTransformOrigin="0.456,0.492">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="113*" />
-                <ColumnDefinition Width="124*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="20"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            
-            <Label Content="Filename style" HorizontalAlignment="Center" VerticalAlignment="Top" Height="32" Width="92" Margin="0,-2,0,0" Grid.RowSpan="2"/>
-            <RadioButton Content="CamelCase" Name="CamelCaseNameStyle" Checked="RadioButtonChecked" Grid.Row="1" GroupName="filenameStyleGroup" IsChecked="True" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="105"/>
-            <RadioButton Content="snake__case" Name="SnakeCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="105"/>
-            <RadioButton Content="lowercase" Name="LowerCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="105"/>
-            <Label Content="Header extension" HorizontalAlignment="Left" VerticalAlignment="Center" Width="104" Height="26" RenderTransformOrigin="-0.229,0.578" Grid.Column="1"/>
-            <RadioButton Content=".h" Name="HeaderHStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" IsChecked="True" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Center" Grid.Column="1" Height="14" Margin="10,0,0,0" Width="28"/>
-            <RadioButton Content=".hpp" Name="HeaderHppStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="2" VerticalAlignment="Center" Grid.Column="1" Height="15" Width="43"/>
 
-
+            <Label Content="Filename style" HorizontalContentAlignment="Center" VerticalAlignment="Center" Height="26"/>
+            <RadioButton Content="CamelCase" Name="CamelCaseNameStyle" Checked="RadioButtonChecked" Grid.Row="1" GroupName="filenameStyleGroup" IsChecked="True" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="114"/>
+            <RadioButton Content="snake__case" Name="SnakeCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="114"/>
+            <RadioButton Content="lowercase" Name="LowerCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="114"/>
+            <Label Content="Header extension" HorizontalContentAlignment="Center" VerticalAlignment="Center" Width="133" Height="26" Grid.Column="1" />
+            <RadioButton Content=".h" Name="HeaderHStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" IsChecked="True" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Grid.Column="1" Height="14" Width="113"/>
+            <RadioButton Content=".hpp" Name="HeaderHppStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center" Grid.Column="1" Height="16" Width="113"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Width="254" Margin="10,0,0,0">
+                <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
+                <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StackPanel>
+            <TextBox Grid.Column="0" Grid.ColumnSpan="2" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" HorizontalAlignment="Left" Grid.Row="5" TextWrapping="Wrap" VerticalAlignment="Center" Width="266" Height="18"/>
         </Grid>
-        
+
         <TextBox Name="ClassNameTextBox" TextChanged="ClassNameChangedEventHandler" Grid.Column="1"  HorizontalAlignment="Left" Grid.Row="1" TextWrapping="NoWrap" VerticalAlignment="Center" Width="267" Height="18"/>
         <TextBlock IsHitTestVisible="False" Text="Class name" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="192" Height="18" Foreground="DarkGray" Grid.Row="1" Margin="4,0,0,0">
             <TextBlock.Style>
@@ -67,22 +73,31 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <StackPanel Name="ClassNameStack" Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Margin="-5,0,0,0">
+        <StackPanel Name="ClassNameStack" Orientation="Horizontal" Grid.Row="0" Margin="35,0,0,0" Grid.ColumnSpan="2">
             <Label Content="Class name" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" ToolTip="Hello"/>
             <Image MouseLeftButtonDown="ClassNameInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </StackPanel>
-        <Label Grid.Column="1" Content="Header" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Height="26" Width="87"/>
-        <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="200" Height="18"/>
+        <StackPanel Name="HeaderStack" Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2" Margin="35,0,0,0" Grid.ColumnSpan="2" Width="61">
+            <Label Content="Header"  VerticalAlignment="Center" Height="26" Width="51" />
+            <Image MouseLeftButtonDown="HeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        </StackPanel>
+        <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="3" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="267" Height="18"/>
+        <StackPanel Name="CppStack" Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="4" Grid.Column="1" Width="280">
+            <Label Grid.Column="1" Content="Implementation" VerticalAlignment="Center" Height="26" Width="94"/>
+            <Image MouseLeftButtonDown="CppInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <CheckBox Name="HasCppFileCheckBox" VerticalContentAlignment="Center" Content="Create .cpp file" Checked="HasCppFileCheckChanged" Unchecked="HasCppFileCheckChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Width="168" Height="18" Margin="8,0,0,0"/>
+        </StackPanel>
+        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="5" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="267" Height="18"/>
         <Label Grid.Column="2" Content="Header subfolder" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Center" Height="26" Width="103" Grid.ColumnSpan="2"/>
-        <ComboBox Grid.Column="2" Name="HeaderSubfolderCombo" TextBoxBase.TextChanged="HeaderSubfolderChangedEventHandler" HorizontalAlignment="Left" IsEditable="True" Grid.Row="2" VerticalAlignment="Center" Width="268" Grid.ColumnSpan="2" Height="21"/>
-        <Label Grid.Column="1" Content="Implementation" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Center" Height="26" Width="105"/>
-        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="6" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="200" Height="18"/>
-        <Label Grid.Column="2" Content="Implementation subfolder" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="158" Height="25"/>
-        <ComboBox Grid.Column="2" Name="ImplementationSubfolderCombo" TextBoxBase.TextChanged="ImplementationSubfolderChangedEventHandler" IsEditable="True" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" Width="268" Height="21"/>
-        <CheckBox Content="Create filters based on subfolder" Name="CreateFiltersCheckBox"  IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="-2.152,0.208" Width="206" Grid.Column="2" Height="15" Grid.ColumnSpan="2" Grid.Row="5"/>
+        <ComboBox Grid.Column="2" Name="HeaderSubfolderCombo" TextBoxBase.TextChanged="HeaderSubfolderChangedEventHandler" HorizontalAlignment="Left" IsEditable="True" Grid.Row="2" VerticalAlignment="Center" Width="268" Grid.ColumnSpan="2" Height="20"/>
+
+
+        <Label Grid.Column="2" Content="Implementation subfolder" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="158" Height="24"/>
+        <ComboBox Grid.Column="2" Name="ImplementationSubfolderCombo" TextBoxBase.TextChanged="ImplementationSubfolderChangedEventHandler" IsEditable="True" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" Width="268" Height="20"/>
+        <CheckBox Content="Create filters based on subfolder" Name="CreateFiltersCheckBox"  IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="-2.152,0.208" Width="206" Grid.Column="2" Height="16" Grid.ColumnSpan="2" Grid.Row="5"/>
         <CheckBox Grid.Column="3" Name="UseSingleSubfolderCheckBox" Content="Use single subfolder" IsChecked="True" Checked="UseSingleSubfolderCheckChanged" Unchecked="UseSingleSubfolderCheckChanged" HorizontalAlignment="Left" Margin="53,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="231" Height="16"/>
-        <CheckBox Grid.Column="2" Name="HasCppFileCheckBox" Content="Create .cpp file" Checked="HasCppFileCheckChanged" Unchecked="HasCppFileCheckChanged" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="168" Height="15"/>
-        <Button Grid.Column="3" x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" HorizontalAlignment="Center" Grid.Row="6" VerticalAlignment="Center" RenderTransformOrigin="0.298,-0.332" Height="34" Width="104">
+
+        <Button Grid.Column="3" x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" RenderTransformOrigin="0.298,-0.332" Height="34" Width="124" Margin="10,106,0,0">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="IsEnabled" Value="False"/>
@@ -97,8 +112,7 @@
                 </Style>
             </Button.Style>
         </Button>
-        <CheckBox Grid.Column="3" Content="Auto-save settings" Name="AutosaveSettingsCheckBox" HorizontalAlignment="Left" Margin="41,13,0,0" Grid.Row="6" VerticalAlignment="Top" Width="172" Height="15"/>
-        <CheckBox Grid.Column="1" Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" HorizontalAlignment="Left" Margin="8,0,0,0" Grid.Row="6" VerticalAlignment="Center" Width="192" Height="15"/>
-        <TextBox Grid.Column="1"  Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" HorizontalAlignment="Center" Margin="0,115,0,0" Grid.Row="6" TextWrapping="Wrap" VerticalAlignment="Top" Width="194" Height="18"/>
+        <CheckBox Grid.Column="3" Content="Auto-save settings" Name="AutosaveSettingsCheckBox" HorizontalAlignment="Left" Margin="10,86,0,0" Grid.Row="6" VerticalAlignment="Top" Width="172" Height="15"/>
+
     </Grid>
 </platform:DialogWindow>

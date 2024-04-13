@@ -812,5 +812,20 @@ namespace Dwarfovich.AddCppClass
         {
             _ = VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }
+
+        private void IncludePrecompiledHeaderInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
+
+        private void HeaderInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CppInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
     }
 }
