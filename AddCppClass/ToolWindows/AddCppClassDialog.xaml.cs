@@ -36,12 +36,6 @@ namespace Dwarfovich.AddCppClass
             AssignKeyHandlers();
             Title = title;
             ClassNameTextBox.Text = defaultClassName;
-            
-
-            //Label label = new Label();
-            //label.Content = "Class name";
-            //ClassNameStack.Children.Add(label);
-            //ClassNameStack.Children.Add(coolPic);
         }
 
         private void AssignKeyHandlers()
@@ -824,6 +818,16 @@ namespace Dwarfovich.AddCppClass
         }
 
         private void CppInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
+
+        private void UseSingleFolderInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CreateFiltersInfoButtonDown(object sender, EventArgs e)
         {
 
         }
