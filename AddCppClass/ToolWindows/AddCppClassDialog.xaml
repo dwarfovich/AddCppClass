@@ -8,8 +8,8 @@
                         xmlns:local="clr-namespace:Dwarfovich.AddCppClass"
                         toolkit:Themes.UseVsTheme="False"
                         mc:Ignorable="d"
-                        Width="578"
-                        Height="415">
+                        Width="594"
+                        Height="281">
 
     <Window.Resources>
         <local:Settings x:Key="ClassName"/>
@@ -23,8 +23,9 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="20"/>
             <RowDefinition Height="20"/>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="139"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12"/>
@@ -66,7 +67,7 @@
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
             <Label Content="Header subfolder" HorizontalAlignment="Left" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="26" Width="104"/>
-            <CheckBox Name="UseSingleSubfolderCheckBox" Content="Use single subfolder" IsChecked="True" Checked="UseSingleSubfolderCheckChanged" Unchecked="UseSingleSubfolderCheckChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+            <CheckBox Name="UseSingleSubfolderCheckBox" Content="Use single subfolder" Checked="UseSingleSubfolderCheckChanged" Unchecked="UseSingleSubfolderCheckChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
             <Image MouseLeftButtonDown="UseSingleFolderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4,0,0,0"/>
         </StackPanel>
 
@@ -93,7 +94,7 @@
                 </Style>
             </Button.Style>
         </Button>
-        <CheckBox Grid.Column="3" Content="Auto-save settings" Name="AutosaveSettingsCheckBox" HorizontalAlignment="Left" Margin="3,63,0,0" Grid.Row="6" VerticalAlignment="Top" Width="172" Height="15"/>
+        <CheckBox Grid.Column="3" Content="Auto-save settings" Name="AutosaveSettingsCheckBox" HorizontalAlignment="Left" Margin="3,0,0,0" Grid.Row="6" VerticalAlignment="Center" Width="172" Height="15"/>
 
         <Grid Grid.Column="1" Grid.Row="6">
             <Grid.ColumnDefinitions>
