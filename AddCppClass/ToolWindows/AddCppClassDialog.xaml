@@ -8,14 +8,15 @@
                         xmlns:local="clr-namespace:Dwarfovich.AddCppClass"
                         toolkit:Themes.UseVsTheme="False"
                         mc:Ignorable="d"
-                        Width="594"
-                        Height="281">
+                        ResizeMode="NoResize"
+                        Width="604"
+                        Height="330">
 
     <Window.Resources>
         <local:Settings x:Key="ClassName"/>
     </Window.Resources>
 
-    <Grid Margin="0,0,0,0">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
@@ -23,15 +24,14 @@
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
-            <RowDefinition Height="139"/>
-            <RowDefinition Height="10"/>
+            <RowDefinition Height="125"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12"/>
             <ColumnDefinition Width="282"/>
             <ColumnDefinition Width="12"/>
-            <ColumnDefinition Width="41.322"/>
+            <ColumnDefinition Width="42"/>
             <ColumnDefinition Width="230"/>
             <ColumnDefinition Width="12"/>
         </Grid.ColumnDefinitions>
@@ -79,22 +79,12 @@
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
 
-        <Button Grid.Column="4" x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" RenderTransformOrigin="0.298,-0.332" Height="34" Width="124" Margin="3,83,0,0">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="IsEnabled" Value="False"/>
-                    <Style.Triggers>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding (Validation.HasError), ElementName=ClassNameTextBox}" Value="False"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="IsEnabled" Value="True"/>
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
-        <CheckBox Grid.Column="4" Content="Auto-save settings" Name="AutosaveSettingsCheckBox" HorizontalAlignment="Left" Margin="3,0,0,0" Grid.Row="6" VerticalAlignment="Center" Width="172" Height="15"/>
+        <StackPanel Orientation="Vertical" Grid.Row="6" Grid.Column="4" VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" >
+                <CheckBox Content="Auto-save settings" Name="AutosaveSettingsCheckBox"/>
+            </StackPanel>
+            <Button x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" Width="120" Height="35"  HorizontalAlignment="Left" Margin="0,4,0,0"/>
+        </StackPanel>
 
         <Grid Grid.Column="1" Grid.Row="6">
             <Grid.ColumnDefinitions>
