@@ -17,12 +17,12 @@
 
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition Height="139"/>
             <RowDefinition Height="10"/>
             <RowDefinition/>
@@ -36,11 +36,11 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
-            <Label Content="Class name" Height="26" ToolTip="Hello"/>
-            <Image MouseLeftButtonDown="ClassNameInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Label Content="Class name" Padding="0" VerticalContentAlignment="Center" ToolTip="Hello"/>
+            <Image MouseLeftButtonDown="ClassNameInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
-        <TextBox Name="ClassNameTextBox" TextChanged="ClassNameChangedEventHandler" Grid.Column="1"  HorizontalAlignment="Left" Grid.Row="1" TextWrapping="NoWrap" VerticalAlignment="Center" Width="266" Height="18" Margin="6,0,0,0"/>
-        <TextBlock IsHitTestVisible="False" Text="Class name" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="266" Height="18" Foreground="DarkGray" Grid.Row="1">
+        <TextBox Name="ClassNameTextBox" TextChanged="ClassNameChangedEventHandler" Grid.Column="1"  Grid.Row="1" TextWrapping="NoWrap" VerticalContentAlignment="Center"/>
+        <TextBlock IsHitTestVisible="False" Text="Class name" Grid.Column="1" Foreground="DarkGray" Grid.Row="1" Margin="2">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -54,16 +54,16 @@
         </TextBlock>
 
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
-            <Label Content="Header" VerticalAlignment="Center" Height="26" Margin="1,0,0,0" />
-            <Image MouseLeftButtonDown="HeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Label Content="Header" VerticalContentAlignment="Center" Padding="0"/>
+            <Image MouseLeftButtonDown="HeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
-        <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="TextBox" HorizontalAlignment="Left" VerticalAlignment="Center" Height="18" Width="266" Margin="6,0,0,0"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" Margin="1,0,0,0">
-            <Label Grid.Column="1" Content="Implementation" VerticalAlignment="Center" Height="26" Width="94"/>
-            <Image MouseLeftButtonDown="CppInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <CheckBox Name="HasCppFileCheckBox" VerticalContentAlignment="Center" Content="Create .cpp file" Checked="HasCppFileCheckChanged" Unchecked="HasCppFileCheckChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Width="168" Height="18" Margin="8,0,0,0"/>
+        <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="TextBox"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+            <Label Grid.Column="1" Content="Implementation" Padding="0" VerticalContentAlignment="Center"/>
+            <Image MouseLeftButtonDown="CppInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
+            <CheckBox Name="HasCppFileCheckBox" Content="Create .cpp file" Checked="HasCppFileCheckChanged" Unchecked="HasCppFileCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
-        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="5" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Height="18" Margin="6,0,10,0"/>
+        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="5" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
             <Label Content="Header subfolder" HorizontalAlignment="Left" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="26" Width="104"/>
@@ -110,18 +110,18 @@
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
 
-            <Label Content="Filename style" HorizontalContentAlignment="Left" VerticalAlignment="Center" Height="26" Margin="14,0,0,0"/>
-            <RadioButton Content="CamelCase" Name="CamelCaseNameStyle" Checked="RadioButtonChecked" Grid.Row="1" GroupName="filenameStyleGroup" IsChecked="True" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="114"/>
-            <RadioButton Content="snake__case" Name="SnakeCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="114"/>
-            <RadioButton Content="lowercase" Name="LowerCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Width="114"/>
-            <Label Content="Header extension" HorizontalContentAlignment="Left" VerticalAlignment="Center" Height="26" Grid.Column="1" Margin="14,0,4,0" />
-            <RadioButton Content=".h" Name="HeaderHStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" IsChecked="True" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Grid.Column="1" Height="14" Width="113"/>
-            <RadioButton Content=".hpp" Name="HeaderHppStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center" Grid.Column="1" Height="16" Width="113"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Width="254" Margin="10,0,0,0">
+            <Label Content="Filename style" HorizontalContentAlignment="Left" VerticalAlignment="Center" Padding="0"/>
+            <RadioButton Content="CamelCase" Name="CamelCaseNameStyle" Checked="RadioButtonChecked" Grid.Row="1" GroupName="filenameStyleGroup" IsChecked="True" VerticalContentAlignment="Center"/>
+            <RadioButton Content="snake__case" Name="SnakeCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="2" VerticalContentAlignment="Center" />
+            <RadioButton Content="lowercase" Name="LowerCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="3" VerticalContentAlignment="Center" />
+            <Label Content="Header extension" Grid.Column="1" Padding="0" />
+            <RadioButton Content=".h" Name="HeaderHStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" IsChecked="True" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center"/>
+            <RadioButton Content=".hpp" Name="HeaderHppStyle" Checked="RadioButtonChecked" GroupName="headerExtensionGroup" Grid.Row="2"  Grid.Column="1" VerticalContentAlignment="Center"/>
+            <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" >
                 <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
-                <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
             </StackPanel>
-            <TextBox Grid.Column="0" Grid.ColumnSpan="2" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" HorizontalAlignment="Left" Grid.Row="5" TextWrapping="Wrap" VerticalAlignment="Center" Width="262" Height="18" Margin="10,0,0,0"/>
+            <TextBox Grid.Column="0" Grid.ColumnSpan="2" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
         </Grid>
 
     </Grid>
