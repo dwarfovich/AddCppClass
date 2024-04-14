@@ -55,6 +55,9 @@ namespace Dwarfovich.AddCppClass
             ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
             ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
             ImplementationFilename.KeyDown += FileKeyDownHandler;
+            HeaderExtensionCombo.PreviewKeyDown += HeaderExtensionKeyDownPreviewHandler;
+            HeaderExtensionCombo.PreviewKeyUp += HeaderExtensionKeyUpPreviewHandler;
+            HeaderExtensionCombo.KeyDown += HeaderExtensionKeyDownHandler;
             PrecompiledHeader.PreviewKeyDown += PrecompiledHeaderKeyDownPreviewHandler;
             PrecompiledHeader.PreviewKeyUp += PrecompiledHeaderKeyUpPreviewHandler;
             PrecompiledHeader.KeyDown += PrecompiledHeaderKeyDownHandler;
@@ -68,14 +71,16 @@ namespace Dwarfovich.AddCppClass
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
                 default: CamelCaseNameStyle.IsChecked = true; break;
             }
-            if (settings.headerExtension == ".h")
+            for (int i = 0; i < settings.recentHeaderExtensions.Length; ++i)
             {
-                HeaderHStyle.IsChecked = true;
+                HeaderExtensionCombo.Items.Add(settings.recentHeaderExtensions[i]);
             }
-            else
+            if(HeaderExtensionCombo.Items.Count == 0)
             {
-                HeaderHppStyle.IsChecked = true;
+                HeaderExtensionCombo.Items.Add(".h");
             }
+            HeaderExtensionCombo.SelectedIndex = 0;
+
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             HasCppFileCheckBox.IsChecked = settings.hasImplementationFile;
@@ -119,10 +124,6 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void UpdateHeaderExtensionSettings(RadioButton button)
-        {
-            settings.headerExtension = button.Content.ToString();
-        }
         private void RadioButtonChecked(object sender, EventArgs e)
         {
             RadioButton button = sender as RadioButton;
@@ -132,11 +133,6 @@ namespace Dwarfovich.AddCppClass
                 {
                     UpdateFilenameStyleSettings(button);
                     (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
-                }
-                else
-                {
-                    UpdateHeaderExtensionSettings(button);
-                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenamesForChangedExtension(settings);
                 }
                 UpdateFilenameTextBoxes();
             }
@@ -671,6 +667,37 @@ namespace Dwarfovich.AddCppClass
             }
         }
         private void FileKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = false;
+            }
+        }
+
+        private void HeaderExtensionKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = true;
+
+            }
+            else if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+        private void HeaderExtensionKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key))
+            {
+                e.Handled = false;
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+        private void HeaderExtensionKeyUpPreviewHandler(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {

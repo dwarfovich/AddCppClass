@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.IO;
 using Dwarfovich.AddCppClass;
+using System.Linq;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -13,14 +14,14 @@ namespace Dwarfovich.AddCppClass
         }
         public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
-            return (filename + classSettings.headerExtension, filename + classSettings.implementationExtension);
+            return (filename + (classSettings.recentHeaderExtensions.First() ?? ".h"), filename + classSettings.implementationExtension);
         }
 
         public (string header, string implementation) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
-            return (filename + classSettings.headerExtension, filename + classSettings.implementationExtension);
+            return (filename + (classSettings.recentHeaderExtensions.First() ?? ".h"), filename + classSettings.implementationExtension);
         }
         public string GenerateCamelCaseFilename(Settings classSettings)
         {

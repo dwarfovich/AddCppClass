@@ -13,7 +13,7 @@ namespace Dwarfovich.AddCppClass
         [JsonIgnore]
         public string className { get; set; } = "";
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
-        public string headerExtension { get; set; } = "";
+        public string[] recentHeaderExtensions { get; set; } = [".h", ".hpp"];
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
