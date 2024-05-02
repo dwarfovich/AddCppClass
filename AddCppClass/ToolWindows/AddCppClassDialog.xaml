@@ -10,7 +10,7 @@
                         mc:Ignorable="d"
                         ResizeMode="NoResize"
                         Width="604"
-                        Height="330">
+                        Height="367">
 
     <Window.Resources>
         <local:Settings x:Key="ClassName"/>
@@ -25,7 +25,8 @@
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="125"/>
-            <RowDefinition/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="38*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12"/>
@@ -79,7 +80,7 @@
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" Grid.Row="6" Grid.Column="4" VerticalAlignment="Bottom">
+        <StackPanel Orientation="Vertical" Grid.Row="6" Grid.Column="4" VerticalAlignment="Top" Margin="0,71,0,0" Height="54">
             <StackPanel Orientation="Horizontal" >
                 <CheckBox Content="Auto-save settings" Name="AutosaveSettingsCheckBox"/>
             </StackPanel>
@@ -104,14 +105,18 @@
             <RadioButton Content="CamelCase" Name="CamelCaseNameStyle" Checked="RadioButtonChecked" Grid.Row="1" GroupName="filenameStyleGroup" IsChecked="True" VerticalContentAlignment="Center"/>
             <RadioButton Content="snake__case" Name="SnakeCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="2" VerticalContentAlignment="Center" />
             <RadioButton Content="lowercase" Name="LowerCaseNameStyle" Checked="RadioButtonChecked" GroupName="filenameStyleGroup" Grid.Row="3" VerticalContentAlignment="Center" />
-            <Label Content="Header extension" Grid.Column="1" Padding="0" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal"  Grid.Row="0" Grid.Column="1">
+                <Label Content="Header extension" VerticalAlignment="Center" Padding="0"/>
+                <Image MouseLeftButtonDown="HeaderExtensionInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
+            </StackPanel>
+            <ComboBox Name="HeaderExtensionCombo" IsEditable="True" Grid.Row="1" Grid.Column="1"/>
             <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" >
                 <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
                 <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
             </StackPanel>
             <TextBox Grid.Column="0" Grid.ColumnSpan="2" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
-            <ComboBox Name="HeaderExtensionCombo" Grid.Column="1" Grid.Row="1" IsEditable="True"/>
-        </Grid>
 
+        </Grid>
+        <Label Name="LastErrorMessage"  Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="4" Content="Last error:" Padding="0" Margin="0,3,0,0"/>
     </Grid>
 </platform:DialogWindow>

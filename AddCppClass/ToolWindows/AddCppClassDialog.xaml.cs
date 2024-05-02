@@ -692,6 +692,42 @@ namespace Dwarfovich.AddCppClass
             {
                 e.Handled = false;
             }
+            else if (e.Key == Key.Back)
+            {
+                TextBox textBox = sender as TextBox;
+                if (textBox == null)
+                {
+                    throw new InvalidCastException("Sender should be a TextBox");
+                }
+
+                var caretPos = textBox.CaretIndex;
+                if (caretPos == 1 && caretPos - 1>0 && textBox.Text[caretPos - 1] == '.')
+                {
+                    e.Handled = true;
+                }
+                else
+                {
+                    e.Handled = false;
+                }
+            }
+            else if (e.Key == Key.Delete)
+            {
+                TextBox textBox = sender as TextBox;
+                if (textBox == null)
+                {
+                    throw new InvalidCastException("Sender should be a TextBox");
+                }
+
+                var caretPos = textBox.CaretIndex;
+                if(caretPos == 0) 
+                {
+                    e.Handled = true;
+                }
+                else
+                {
+                    e.Handled = false;
+                }
+            }
             else
             {
                 e.Handled = true;
@@ -858,5 +894,11 @@ namespace Dwarfovich.AddCppClass
         {
 
         }
+
+        private void HeaderExtensionInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
+        
     }
 }
