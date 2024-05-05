@@ -2,6 +2,7 @@
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -32,6 +33,31 @@ namespace Dwarfovich.AddCppClass
                 return CreateFilterXmlDocument();
             }
         }
+
+        private static void PopulateHeaderFile(FileStream fileStream, Settings settings)
+        {
+            using (var writer = new StreamWriter(fileStream))
+            {
+                writer.WriteLine("#pragma once" + Environment.NewLine);
+                writer.WriteLine("class " + settings.className + " {");
+                writer.WriteLine("public:");
+                writer.WriteLine("private:");
+                writer.WriteLine("};");
+            }
+        }
+
+        private static void PopulateCppFile(FileStream fileStream, Settings settings)
+        {
+            using (var writer = new StreamWriter(fileStream))
+            {
+                if (settings.includePrecompiledHeader)
+                {
+                    writer.WriteLine("#include \"" + settings.precompiledHeader + '\"');
+                }
+                writer.WriteLine("#include \"" + settings.headerSubfolder + '/' + settings.headerFilename + '\"');
+            }
+        }
+
         public static void CreateHeaderFile(EnvDTE.Project project, Settings settings, string projectPath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -39,7 +65,9 @@ namespace Dwarfovich.AddCppClass
             string path = Path.Combine(projectPath, settings.headerSubfolder);
             Directory.CreateDirectory(path);
             path = Path.Combine(path, settings.headerFilename);
-            File.Create(path);
+            var fileStream = File.Create(path);
+            PopulateHeaderFile(fileStream, settings);
+            fileStream.Close();
             ProjectItems projectItems = project.ProjectItems;
             projectItems.AddFromFile(path);
         }
@@ -57,7 +85,9 @@ namespace Dwarfovich.AddCppClass
             {
                 cppPath = Path.Combine(projectPath, settings.implementationSubfolder, settings.implementationFilename);
             }
-            File.Create(cppPath);
+            var fileStream = File.Create(cppPath);
+            PopulateCppFile(fileStream, settings);
+            fileStream.Close();
             ProjectItems projectItems = project.ProjectItems;
             projectItems.AddFromFile(cppPath);
         }
@@ -80,6 +110,9 @@ namespace Dwarfovich.AddCppClass
         {
             XElement filterItemGroup = GetFilterItemGroup(doc, ns);
             string[] filterTokens = path.Split('\\');
+            if(filterTokens.Length == 0 || String.IsNullOrEmpty(filterTokens.First())) {
+                return;
+            }
 
             string filterSubPath = "";
             for (int i = 0; i < filterTokens.Length; ++i, filterSubPath += '\\')
