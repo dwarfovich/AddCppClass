@@ -1,11 +1,8 @@
 ﻿using AddCppClass;
-using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Windows.Controls;
 using System.Xml.Linq;
 
 namespace Dwarfovich.AddCppClass
@@ -85,7 +82,7 @@ namespace Dwarfovich.AddCppClass
             string[] filterTokens = path.Split('\\');
 
             string filterSubPath = "";
-            for (int i = 0; i < filterTokens.Length; ++i, filterSubPath += '/')
+            for (int i = 0; i < filterTokens.Length; ++i, filterSubPath += '\\')
             {
                 filterSubPath += filterTokens[i];
                 var element = filterItemGroup.Descendants(ns + "Filter").Where(el => (string)el.Attribute("Include") == filterSubPath);

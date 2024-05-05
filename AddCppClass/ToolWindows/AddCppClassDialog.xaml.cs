@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -18,7 +17,7 @@ namespace Dwarfovich.AddCppClass
         public AddCppClassDialog()
         {
             InitializeGui();
-            
+
             errors.Clear();
         }
 
@@ -75,7 +74,7 @@ namespace Dwarfovich.AddCppClass
             {
                 HeaderExtensionCombo.Items.Add(settings.recentHeaderExtensions[i]);
             }
-            if(HeaderExtensionCombo.Items.Count == 0)
+            if (HeaderExtensionCombo.Items.Count == 0)
             {
                 HeaderExtensionCombo.Items.Add(".h");
             }
@@ -267,6 +266,26 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
+        private void HeaderExtensionChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox is null)
+            {
+                return;
+            }
+
+            if (ClassGenerator.IsValidHeaderExtension(comboBox.Text))
+            {
+                RemoveError(comboBox);
+                settings.lastUsedHeaderExtension = comboBox.Text;
+                (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenamesForChangedExtension(settings);
+                UpdateFilenameTextBoxes();
+            }
+            else
+            {
+                AddError(comboBox, "Header extension is invalid");
+            }
+        }
         private void HeaderFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
@@ -561,12 +580,13 @@ namespace Dwarfovich.AddCppClass
             {
                 return false;
             }
+
             int previousPos = caretPos - 1;
             int nextPos = caretPos + 1 < text.Length ? caretPos + 1 : -1;
 
-            if (previousPos < 0 || text[previousPos] != '/')
+            if (previousPos < 0 || text[previousPos] != '\\' && text[previousPos] != '.')
             {
-                if (nextPos == -1 || (text[nextPos] != '/'))
+                if (nextPos == -1 || (text[nextPos] != '\\'))
                 {
                     return true;
                 }
@@ -701,7 +721,7 @@ namespace Dwarfovich.AddCppClass
                 }
 
                 var caretPos = textBox.CaretIndex;
-                if (caretPos == 1 && caretPos - 1>0 && textBox.Text[caretPos - 1] == '.')
+                if (caretPos == 1 && caretPos - 1 > 0 && textBox.Text[caretPos - 1] == '.')
                 {
                     e.Handled = true;
                 }
@@ -719,7 +739,7 @@ namespace Dwarfovich.AddCppClass
                 }
 
                 var caretPos = textBox.CaretIndex;
-                if(caretPos == 0) 
+                if (caretPos == 0)
                 {
                     e.Handled = true;
                 }
@@ -769,7 +789,7 @@ namespace Dwarfovich.AddCppClass
                     var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
                     if (canInsert)
                     {
-                        textBox.Text = textBox.Text.Insert(caretPos, "/"); ;
+                        textBox.Text = textBox.Text.Insert(caretPos, "\\");
                         textBox.CaretIndex = caretPos + 1;
                     }
                     e.Handled = true;
@@ -899,6 +919,6 @@ namespace Dwarfovich.AddCppClass
         {
 
         }
-        
+
     }
 }

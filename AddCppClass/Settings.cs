@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Linq;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -14,6 +15,7 @@ namespace Dwarfovich.AddCppClass
         public string className { get; set; } = "";
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public string[] recentHeaderExtensions { get; set; } = [".h", ".hpp"];
+        public string lastUsedHeaderExtension = "";
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
@@ -35,5 +37,22 @@ namespace Dwarfovich.AddCppClass
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = ".pch";
         public Settings() { }
+
+        public string HeaderExtension()
+        {
+            if (!string.IsNullOrEmpty(lastUsedHeaderExtension))
+            {
+                return lastUsedHeaderExtension;
+            }
+
+            if(recentHeaderExtensions.Length > 0)
+            {
+                return recentHeaderExtensions.First();
+            }
+            else
+            {
+                return ".h";
+            }
+        }
     }
 }

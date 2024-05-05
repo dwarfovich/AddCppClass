@@ -2,6 +2,7 @@
 using System.IO;
 using Dwarfovich.AddCppClass;
 using System.Linq;
+using System;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -14,14 +15,14 @@ namespace Dwarfovich.AddCppClass
         }
         public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
-            return (filename + (classSettings.recentHeaderExtensions.First() ?? ".h"), filename + classSettings.implementationExtension);
+            return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
         }
 
         public (string header, string implementation) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
-            return (filename + (classSettings.recentHeaderExtensions.First() ?? ".h"), filename + classSettings.implementationExtension);
+            return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
         }
         public string GenerateCamelCaseFilename(Settings classSettings)
         {
@@ -94,6 +95,26 @@ namespace Dwarfovich.AddCppClass
         public static bool IsValidFilename(string filename)
         {
             return filename.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+        }
+
+        public static bool IsValidHeaderExtension(string extension)
+        {
+            if (String.IsNullOrEmpty(extension))
+            {
+                return false;
+            }
+
+            if(extension.First() != '.')
+            {
+                return false;
+            }
+
+            if (extension.Any(Char.IsWhiteSpace))
+            {
+                return false;
+            }
+
+            return extension.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
         }
     }
 }

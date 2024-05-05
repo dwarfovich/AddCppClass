@@ -109,7 +109,7 @@
                 <Label Content="Header extension" VerticalAlignment="Center" Padding="0"/>
                 <Image MouseLeftButtonDown="HeaderExtensionInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
             </StackPanel>
-            <ComboBox Name="HeaderExtensionCombo" IsEditable="True" Grid.Row="1" Grid.Column="1"/>
+            <ComboBox Name="HeaderExtensionCombo" TextBoxBase.TextChanged="HeaderExtensionChangedEventHandler" IsEditable="True" Grid.Row="1" Grid.Column="1"/>
             <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" >
                 <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
                 <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
