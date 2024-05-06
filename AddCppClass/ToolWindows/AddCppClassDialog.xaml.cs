@@ -1,5 +1,8 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
+﻿using Community.VisualStudio.Toolkit;
+using Dwarfovich.AddCppClass.Utils;
+using Microsoft.VisualStudio.PlatformUI;
 using System.Linq;
+using System.Runtime;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -82,7 +85,7 @@ namespace Dwarfovich.AddCppClass
 
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
-            HasCppFileCheckBox.IsChecked = settings.hasImplementationFile;
+            HasImplementationFileCheckBox.IsChecked = settings.hasImplementationFile;
             for (int i = 0; i < Math.Min(settings.recentHeaderSubfoldersCount, settings.recentHeaderSubfolders.Length); ++i)
             {
                 HeaderSubfolderCombo.Items.Add(settings.recentHeaderSubfolders[i]);
@@ -212,7 +215,18 @@ namespace Dwarfovich.AddCppClass
         }
         private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
-            TextBox textBox = sender as TextBox;
+            ComboBox combo = sender as ComboBox;
+            if (combo == null)
+            {
+                throw new InvalidCastException("Sender should be a ComboBox");
+            }
+
+            var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
+            if (textBox == null)
+            {
+                throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
+            }
+
             if (textBox != null)
             {
                 if (ClassGenerator.IsValidClassName(textBox.Text))
@@ -227,6 +241,16 @@ namespace Dwarfovich.AddCppClass
                     AddError(textBox, "Class name contains errors");
                 }
             }
+        }
+
+        private void ClassNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ComboBox combo = sender as ComboBox;
+            if (combo == null) {
+                return;
+            }
+
+            var classNamespace = combo.SelectedValue;
         }
 
         private void HeaderSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -324,7 +348,6 @@ namespace Dwarfovich.AddCppClass
         }
         private void ClassNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
         {
-            Logger.Log(e.Key.ToString());
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shiftEnabled = true;
@@ -336,10 +359,16 @@ namespace Dwarfovich.AddCppClass
             }
             else if (e.Key == Key.Delete)
             {
-                TextBox textBox = sender as TextBox;
+                ComboBox combo = sender as ComboBox;
+                if (combo == null)
+                {
+                    throw new InvalidCastException("Sender should be a ComboBox");
+                }
+
+                var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
                 if (textBox == null)
                 {
-                    throw new InvalidCastException("Sender should be a TextBox");
+                    throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
                 }
 
                 var caretPos = textBox.CaretIndex;
@@ -363,10 +392,16 @@ namespace Dwarfovich.AddCppClass
             }
             else if (e.Key == Key.Back)
             {
-                TextBox textBox = sender as TextBox;
+                ComboBox combo = sender as ComboBox;
+                if (combo == null)
+                {
+                    throw new InvalidCastException("Sender should be a ComboBox");
+                }
+
+                var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
                 if (textBox == null)
                 {
-                    throw new InvalidCastException("Sender should be a TextBox");
+                    throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
                 }
 
                 var caretPos = textBox.CaretIndex;
@@ -404,10 +439,16 @@ namespace Dwarfovich.AddCppClass
         }
         private void ClassNameKeyDownHandler(object sender, KeyEventArgs e)
         {
-            TextBox textBox = sender as TextBox;
+            ComboBox combo = sender as ComboBox;
+            if (combo == null)
+            {
+                throw new InvalidCastException("Sender should be a ComboBox");
+            }
+
+            var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
             if (textBox == null)
             {
-                throw new InvalidCastException("Sender should be a TextBox");
+                throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
             }
 
             var caretPos = textBox.CaretIndex;
@@ -479,10 +520,10 @@ namespace Dwarfovich.AddCppClass
                 settings.implementationSubfolder = ImplementationSubfolderCombo.Text;
             }
 
-            settings.className = ClassNameTextBox.Text;
+            (settings.lastUsedNamespace, settings.className) = ClassUtils.SeparateClassNameAndNamespace(ClassNameTextBox.Text);
             settings.headerFilename = HeaderFilename.Text;
             settings.implementationFilename = ImplementationFilename.Text;
-            settings.hasImplementationFile = (bool)HasCppFileCheckBox.IsChecked;
+            settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
             string[] subfolders = Array.Empty<String>();
             for (int i = 0; i < Math.Min(HeaderSubfolderCombo.Items.Count, settings.recentHeaderSubfoldersCount); i++)
@@ -492,15 +533,16 @@ namespace Dwarfovich.AddCppClass
             settings.recentHeaderSubfolders = subfolders;
 
             subfolders = Array.Empty<String>();
-
             for (int i = 0; i < Math.Min(ImplementationSubfolderCombo.Items.Count, settings.recentImplementationSubfoldersCount); i++)
             {
                 subfolders.Append(ImplementationSubfolderCombo.Items[i].ToString());
             }
+
             settings.recentImplementationSubfolders = subfolders;
             settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
             settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
             settings.precompiledHeader = PrecompiledHeader.Text;
+            
 
             ClassAdder.AddClass(settings);
             Close();
@@ -812,7 +854,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void HasCppFileCheckChanged(object sender, EventArgs e)
+        private void HasImplementationFileCheckChanged(object sender, EventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
             if (checkBox is null)
@@ -900,7 +942,7 @@ namespace Dwarfovich.AddCppClass
 
         }
 
-        private void CppInfoButtonDown(object sender, EventArgs e)
+        private void ImplementationInfoButtonDown(object sender, EventArgs e)
         {
 
         }

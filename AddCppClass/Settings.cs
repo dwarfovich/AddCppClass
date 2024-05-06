@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Dwarfovich.AddCppClass.Utils;
+using Newtonsoft.Json;
 using System.Linq;
 
 namespace Dwarfovich.AddCppClass
@@ -13,6 +14,18 @@ namespace Dwarfovich.AddCppClass
     {
         [JsonIgnore]
         public string className { get; set; } = "";
+        public string[] recentNamespaces { get; set; } = [];
+
+        private string _lastUsedNamespace { get; set; } = "";
+        public string lastUsedNamespace {
+            get { return _lastUsedNamespace; }
+            set {
+                _lastUsedNamespace = value;
+                lastUsedNamespaceTokenized = ClassUtils.TokenizeNamespace(value);
+            }
+        }
+        [JsonIgnore]
+        public string[] lastUsedNamespaceTokenized {  get; private set; } = [];
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public string[] recentHeaderExtensions { get; set; } = [".h", ".hpp"];
         public string lastUsedHeaderExtension = "";

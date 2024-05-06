@@ -14,6 +14,33 @@ using EnvDTE80;
 
 namespace Dwarfovich.AddCppClass.Utils
 {
+    public static class ClassUtils
+    {
+        public static (string, string) SeparateClassNameAndNamespace(string className)
+        {
+            var pos = className.LastIndexOf("::");
+            if (pos == -1)
+            {
+                return ("", className);
+            }
+            else
+            {
+                return (className.Substring(0, pos), className.Substring(pos + 2));
+            }
+        }
+        public static string[] TokenizeNamespace(string ns)
+        {
+            if (String.IsNullOrEmpty(ns))
+            {
+                return [];
+            }
+            else
+            {
+                return ns.Split(new[] { "::" }, StringSplitOptions.None);
+            }
+
+        }
+    }
     public static class Keyboard
     {
         public static bool NumlockActive()

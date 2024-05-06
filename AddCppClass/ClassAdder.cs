@@ -39,14 +39,27 @@ namespace Dwarfovich.AddCppClass
             using (var writer = new StreamWriter(fileStream))
             {
                 writer.WriteLine("#pragma once" + Environment.NewLine);
+                foreach (string ns in settings.lastUsedNamespaceTokenized)
+                {
+                    writer.WriteLine("namespace " + ns + " {");
+                }
+                writer.Write(Environment.NewLine);
                 writer.WriteLine("class " + settings.className + " {");
                 writer.WriteLine("public:");
                 writer.WriteLine("private:");
                 writer.WriteLine("};");
+                if(settings.lastUsedNamespaceTokenized.Length > 0)
+                {
+                    writer.Write(Environment.NewLine);
+                }
+                foreach (string ns in settings.lastUsedNamespaceTokenized)
+                {
+                    writer.WriteLine('}');
+                }
             }
         }
 
-        private static void PopulateCppFile(FileStream fileStream, Settings settings)
+        private static void PopulateImplementationFile(FileStream fileStream, Settings settings)
         {
             using (var writer = new StreamWriter(fileStream))
             {
@@ -54,7 +67,14 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("#include \"" + settings.precompiledHeader + '\"');
                 }
-                writer.WriteLine("#include \"" + settings.headerSubfolder + '/' + settings.headerFilename + '\"');
+                if (String.IsNullOrEmpty(settings.headerSubfolder))
+                {
+                    writer.WriteLine("#include \"" + settings.headerFilename + '\"');
+                }
+                else
+                {
+                    writer.WriteLine("#include \"" + settings.headerSubfolder + '/' + settings.headerFilename + '\"');
+                }
             }
         }
 
@@ -76,20 +96,20 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string cppPath = "";
+            string implementationPath = "";
             if (settings.useSingleSubfolder)
             {
-                cppPath = Path.Combine(projectPath, settings.headerSubfolder, settings.implementationFilename);
+                implementationPath = Path.Combine(projectPath, settings.headerSubfolder, settings.implementationFilename);
             }
             else
             {
-                cppPath = Path.Combine(projectPath, settings.implementationSubfolder, settings.implementationFilename);
+                implementationPath = Path.Combine(projectPath, settings.implementationSubfolder, settings.implementationFilename);
             }
-            var fileStream = File.Create(cppPath);
-            PopulateCppFile(fileStream, settings);
+            var fileStream = File.Create(implementationPath);
+            PopulateImplementationFile(fileStream, settings);
             fileStream.Close();
             ProjectItems projectItems = project.ProjectItems;
-            projectItems.AddFromFile(cppPath);
+            projectItems.AddFromFile(implementationPath);
         }
 
         private static XElement GetFilterItemGroup(XDocument doc, XNamespace ns)

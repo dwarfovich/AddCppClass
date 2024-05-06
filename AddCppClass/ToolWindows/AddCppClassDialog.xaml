@@ -41,8 +41,8 @@
             <Label Content="Class name" Padding="0" VerticalContentAlignment="Center" ToolTip="Hello"/>
             <Image MouseLeftButtonDown="ClassNameInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
-        <TextBox Name="ClassNameTextBox" TextChanged="ClassNameChangedEventHandler" Grid.Column="1"  Grid.Row="1" TextWrapping="NoWrap" VerticalContentAlignment="Center"/>
-        <TextBlock IsHitTestVisible="False" Text="Class name" Grid.Column="1" Foreground="DarkGray" Grid.Row="1" Margin="2,2,2,2">
+        <ComboBox Name="ClassNameTextBox" TextBox.TextChanged="ClassNameChangedEventHandler" SelectionChanged="ClassNameComboSelectionChanged" IsEditable="True" Grid.Column="1"  Grid.Row="1" VerticalContentAlignment="Center"/>
+        <TextBlock IsHitTestVisible="False" Text="Class name" Grid.Column="4" Foreground="DarkGray" Grid.Row="6" Margin="18,12,-54,93" Grid.ColumnSpan="2">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -62,8 +62,8 @@
         <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="TextBox"/>
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
             <Label Grid.Column="1" Content="Implementation" Padding="0" VerticalContentAlignment="Center"/>
-            <Image MouseLeftButtonDown="CppInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
-            <CheckBox Name="HasCppFileCheckBox" Content="Create .cpp file" Checked="HasCppFileCheckChanged" Unchecked="HasCppFileCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+            <Image MouseLeftButtonDown="ImplementationInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
+            <CheckBox Name="HasImplementationFileCheckBox" Content="Create .cpp file" Checked="HasImplementationFileCheckChanged" Unchecked="HasImplementationFileCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
         <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="5" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
 
