@@ -1,12 +1,8 @@
 ﻿using AddCppClass;
-using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using EnvDTE80;
-using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System.IO;
-using System.Runtime;
-//using System.Windows.Shapes;
 
 namespace Dwarfovich.AddCppClass
 {

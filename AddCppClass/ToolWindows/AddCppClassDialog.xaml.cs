@@ -1,8 +1,7 @@
-﻿using Community.VisualStudio.Toolkit;
-using Dwarfovich.AddCppClass.Utils;
+﻿using Dwarfovich.AddCppClass.Utils;
 using Microsoft.VisualStudio.PlatformUI;
 using System.Linq;
-using System.Runtime;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -73,7 +72,10 @@ namespace Dwarfovich.AddCppClass
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
                 default: CamelCaseNameStyle.IsChecked = true; break;
             }
-            for (int i = 0; i < settings.recentHeaderExtensions.Length; ++i)
+
+            PopulateClassNameCombo(settings.recentNamespaces);
+
+            for (int i = 0; i < settings.recentHeaderExtensions.Count; ++i)
             {
                 HeaderExtensionCombo.Items.Add(settings.recentHeaderExtensions[i]);
             }
@@ -86,17 +88,27 @@ namespace Dwarfovich.AddCppClass
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             HasImplementationFileCheckBox.IsChecked = settings.hasImplementationFile;
-            for (int i = 0; i < Math.Min(settings.recentHeaderSubfoldersCount, settings.recentHeaderSubfolders.Length); ++i)
+            for (int i = 0; i < Math.Min(settings.recentHeaderSubfoldersCount, settings.recentHeaderSubfolders.Count); ++i)
             {
                 HeaderSubfolderCombo.Items.Add(settings.recentHeaderSubfolders[i]);
             }
             HeaderSubfolderCombo.SelectedIndex = 0;
-            for (int i = 0; i < Math.Min(settings.recentImplementationSubfoldersCount, settings.recentImplementationSubfolders.Length); ++i)
+            for (int i = 0; i < Math.Min(settings.recentImplementationSubfoldersCount, settings.recentImplementationSubfolders.Count); ++i)
             {
                 ImplementationSubfolderCombo.Items.Add(settings.recentImplementationSubfolders[i]);
             }
             ImplementationSubfolderCombo.SelectedIndex = 0;
             AutosaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
+        }
+
+        private void PopulateClassNameCombo(List<string> namespaces)
+        {
+            ClassNameTextBox.Items.Clear();
+            ClassNameTextBox.Items.Add("");
+            foreach (string ns in namespaces)
+            {
+                ClassNameTextBox.Items.Add(ns);
+            }
         }
         private void UpdateFilenameTextBoxes()
         {
@@ -246,11 +258,10 @@ namespace Dwarfovich.AddCppClass
         private void ClassNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ComboBox combo = sender as ComboBox;
-            if (combo == null) {
+            if (combo == null)
+            {
                 return;
             }
-
-            var classNamespace = combo.SelectedValue;
         }
 
         private void HeaderSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -525,26 +536,28 @@ namespace Dwarfovich.AddCppClass
             settings.implementationFilename = ImplementationFilename.Text;
             settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
-            string[] subfolders = Array.Empty<String>();
+
+            List<string> subfolders = new List<string> { };
             for (int i = 0; i < Math.Min(HeaderSubfolderCombo.Items.Count, settings.recentHeaderSubfoldersCount); i++)
             {
                 subfolders.Append(HeaderSubfolderCombo.Items[i].ToString());
             }
             settings.recentHeaderSubfolders = subfolders;
 
-            subfolders = Array.Empty<String>();
+            subfolders.Clear();
             for (int i = 0; i < Math.Min(ImplementationSubfolderCombo.Items.Count, settings.recentImplementationSubfoldersCount); i++)
             {
                 subfolders.Append(ImplementationSubfolderCombo.Items[i].ToString());
             }
-
             settings.recentImplementationSubfolders = subfolders;
+
             settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
             settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
             settings.precompiledHeader = PrecompiledHeader.Text;
-            
+
 
             ClassAdder.AddClass(settings);
+            DialogResult = true;
             Close();
         }
 
