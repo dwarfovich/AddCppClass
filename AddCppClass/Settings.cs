@@ -77,7 +77,7 @@ namespace Dwarfovich.AddCppClass
             var index = recentNamespaces.IndexOf(ns);
             if (index == -1)
             {
-                recentNamespaces.Prepend(ns);
+                recentNamespaces.Insert(0, ns);
                 if(recentNamespaces.Count > recentNamespacesCount)
                 {
                     recentNamespaces.RemoveAt(recentNamespaces.Count - 1);

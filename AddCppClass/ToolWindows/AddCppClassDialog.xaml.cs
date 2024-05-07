@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Community.VisualStudio.Toolkit;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -44,6 +45,9 @@ namespace Dwarfovich.AddCppClass
             ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
             ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
             ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
+            NamespaceCombo.PreviewKeyDown += NamespaceKeyDownPreviewHandler;
+            NamespaceCombo.PreviewKeyUp += NamespaceKeyUpPreviewHandler;
+            NamespaceCombo.KeyDown += NamespaceKeyDownHandler;
             HeaderSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
             HeaderSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
             HeaderSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
@@ -73,8 +77,10 @@ namespace Dwarfovich.AddCppClass
                 default: CamelCaseNameStyle.IsChecked = true; break;
             }
 
-            PopulateClassNameCombo(settings.recentNamespaces);
+            PopulateNamespaceCombo(settings.recentNamespaces);
+            NamespaceCombo.SelectedValue = settings.lastUsedNamespace;
 
+            HeaderExtensionCombo.Items.Clear();
             for (int i = 0; i < settings.recentHeaderExtensions.Count; ++i)
             {
                 HeaderExtensionCombo.Items.Add(settings.recentHeaderExtensions[i]);
@@ -101,13 +107,13 @@ namespace Dwarfovich.AddCppClass
             AutosaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
         }
 
-        private void PopulateClassNameCombo(List<string> namespaces)
+        private void PopulateNamespaceCombo(List<String> namespaces)
         {
-            ClassNameTextBox.Items.Clear();
-            ClassNameTextBox.Items.Add("");
+            NamespaceCombo.Items.Clear();
+            NamespaceCombo.Items.Add("");
             foreach (string ns in namespaces)
             {
-                ClassNameTextBox.Items.Add(ns);
+                NamespaceCombo.Items.Add(ns);
             }
         }
         private void UpdateFilenameTextBoxes()
@@ -227,16 +233,10 @@ namespace Dwarfovich.AddCppClass
         }
         private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
-            ComboBox combo = sender as ComboBox;
-            if (combo == null)
-            {
-                throw new InvalidCastException("Sender should be a ComboBox");
-            }
-
-            var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
+            TextBox textBox = sender as TextBox;
             if (textBox == null)
             {
-                throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
+                throw new InvalidCastException("Sender should be a TextBox");
             }
 
             if (textBox != null)
@@ -368,6 +368,70 @@ namespace Dwarfovich.AddCppClass
             {
                 e.Handled = true;
             }
+            else
+            {
+                e.Handled = false;
+            }
+        }
+        private void ClassNameKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox == null)
+            {
+                throw new InvalidCastException("Sender should be a TextBox");
+            }
+
+            var caretPos = textBox.CaretIndex;
+            if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0) // First symbol cann't be a digit.
+            {
+                if (IsDigit(e.Key))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            if (IsUnderline(e.Key)
+                || IsLetter(e.Key)
+                || IsNavigationKey(e.Key))
+            {
+                e.Handled = false;
+            }
+            else if (IsDigit(e.Key))
+            {
+                if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0)
+                {
+                    e.Handled = true;
+                }
+                else
+                {
+                    e.Handled = false;
+                }
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+        private void ClassNameKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = false;
+            }
+        }
+
+        private void NamespaceKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                shiftEnabled = true;
+
+            }
+            else if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
             else if (e.Key == Key.Delete)
             {
                 ComboBox combo = sender as ComboBox;
@@ -448,7 +512,7 @@ namespace Dwarfovich.AddCppClass
                 }
             }
         }
-        private void ClassNameKeyDownHandler(object sender, KeyEventArgs e)
+        private void NamespaceKeyDownHandler(object sender, KeyEventArgs e)
         {
             ComboBox combo = sender as ComboBox;
             if (combo == null)
@@ -501,7 +565,7 @@ namespace Dwarfovich.AddCppClass
                 e.Handled = true;
             }
         }
-        private void ClassNameKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        private void NamespaceKeyUpPreviewHandler(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
@@ -511,6 +575,9 @@ namespace Dwarfovich.AddCppClass
 
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
+            settings.className = ClassNameTextBox.Text;
+            settings.lastUsedNamespace = NamespaceCombo.Text;
+
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
 
             if (HeaderSubfolderCombo.Text.EndsWith("\\"))
@@ -531,7 +598,6 @@ namespace Dwarfovich.AddCppClass
                 settings.implementationSubfolder = ImplementationSubfolderCombo.Text;
             }
 
-            (settings.lastUsedNamespace, settings.className) = ClassUtils.SeparateClassNameAndNamespace(ClassNameTextBox.Text);
             settings.headerFilename = HeaderFilename.Text;
             settings.implementationFilename = ImplementationFilename.Text;
             settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
@@ -971,6 +1037,11 @@ namespace Dwarfovich.AddCppClass
         }
 
         private void HeaderExtensionInfoButtonDown(object sender, EventArgs e)
+        {
+
+        }
+
+        private void NamespaceInfoButtonDown(object sender, EventArgs e)
         {
 
         }
