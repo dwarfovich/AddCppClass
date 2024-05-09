@@ -1,10 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Input;
 using EnvDTE80;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Dwarfovich.AddCppClass.Utils
 {
+    public class ListClearingContractResolver : DefaultContractResolver
+    {
+        protected override JsonArrayContract CreateArrayContract(Type objectType)
+        {
+            var contract = base.CreateArrayContract(objectType);
+            if (objectType.IsGenericType && (objectType.GetGenericTypeDefinition() == typeof(List<>)))
+            {
+                contract.OnDeserializingCallbacks.Add((obj, streamingContext) =>
+                {
+                    IList list = (IList)obj;
+                    if (list != null)
+                    {
+                        list.Clear();
+                    }
+                });
+            }
+
+            return contract;
+        }
+    }
     public static class ListExtensions
     {
         public static T FirstOrValue<T>(this List<T> list, T value)
@@ -61,7 +85,7 @@ namespace Dwarfovich.AddCppClass.Utils
     }
     public static class Keyboard
     {
-        public static bool NumlockActive()
+        public static bool IsNumlockActive()
         {
             return System.Windows.Input.Keyboard.IsKeyToggled(Key.NumLock);
         }

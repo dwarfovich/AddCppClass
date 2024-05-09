@@ -50,7 +50,7 @@ namespace Dwarfovich.AddCppClass
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions = 10;
         [JsonProperty]
-        public List<string> recentHeaderExtensions = new List<string> { };
+        public List<string> recentHeaderExtensions = new List<string> { ".h", ".hpp" };
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
@@ -62,13 +62,13 @@ namespace Dwarfovich.AddCppClass
         public bool createFilters { get; set; } = true;
         public int maxRecentHeaderSubfolders { get; set; } = 10;
         [JsonProperty]
-        public List<string> recentHeaderSubfolders = new List<string> { };
+        public List<string> recentHeaderSubfolders = new List<string> {};
         public int maxRecentImplementationSubfolders { get; set; } = 10;
         [JsonProperty]
         public List<string> recentImplementationSubfolders = new List<string> { };
         public bool autoSaveSettings { get; set; } = true;
         public bool includePrecompiledHeader { get; set; } = false;
-        public string precompiledHeader { get; set; } = ".pch";
+        public string precompiledHeader { get; set; } = "pch.h";
         public Settings() { }
 
         public string RecentHeaderExtension()

@@ -191,7 +191,7 @@ namespace Dwarfovich.AddCppClass
         private bool IsDigit(Key key)
         {
             return (key >= Key.D0 && key <= Key.D9 && !shiftEnabled)
-                || (key >= Key.NumPad0 && key <= Key.NumPad9 && !Utils.Keyboard.NumlockActive());
+                || (key >= Key.NumPad0 && key <= Key.NumPad9 && !Utils.Keyboard.IsNumlockActive());
         }
 
         private bool IsUnderline(Key key)

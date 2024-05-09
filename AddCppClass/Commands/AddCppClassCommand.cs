@@ -32,13 +32,15 @@ namespace Dwarfovich.AddCppClass
         private static Settings GetSettings()
         {
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
-            Settings settings = new();
+            Settings settings = new Settings();
             try
             {
                 if (File.Exists(settingsPath))
                 {
                     string jsonString = File.ReadAllText(settingsPath);
-                    settings = JsonConvert.DeserializeObject<Settings>(jsonString);
+                    JsonSerializerSettings jsonSettings = new JsonSerializerSettings ();
+                    jsonSettings.ContractResolver = new Utils.ListClearingContractResolver();
+                    settings = JsonConvert.DeserializeObject<Settings>(jsonString, jsonSettings);
                 }
             }
             catch

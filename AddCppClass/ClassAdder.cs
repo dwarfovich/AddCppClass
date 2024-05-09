@@ -2,7 +2,6 @@
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -67,7 +66,7 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("#include \"" + settings.precompiledHeader + '\"');
                 }
-                if (String.IsNullOrEmpty(settings.RecentHeaderExtension()))
+                if (String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
                 {
                     writer.WriteLine("#include \"" + settings.headerFilename + '\"');
                 }
