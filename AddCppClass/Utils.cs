@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Documents;
+using System.Linq;
 using System.Windows.Input;
 using EnvDTE80;
 
@@ -7,6 +7,17 @@ namespace Dwarfovich.AddCppClass.Utils
 {
     public static class ListExtensions
     {
+        public static T FirstOrValue<T>(this List<T> list, T value)
+        {
+            if (list.Count > 0)
+            {
+                return list.First();
+            }
+            else
+            {
+                return value;
+            }
+        }
         public static void AddFrontValue<T>(this List<T> list, T value, int maxListCount)
         {
             var index = list.IndexOf(value);

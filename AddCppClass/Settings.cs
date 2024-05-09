@@ -26,7 +26,7 @@ namespace Dwarfovich.AddCppClass
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions = 10;
         [JsonProperty]
-        public List<string> recentHeaderExtensions = new List<string> { ".h", ".hpp" };
+        public List<string> recentHeaderExtensions = new List<string> { };
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
@@ -49,36 +49,15 @@ namespace Dwarfovich.AddCppClass
 
         public string RecentHeaderExtension()
         {
-            if (recentHeaderExtensions.Count > 0)
-            {
-                return recentHeaderExtensions.First();
-            }
-            else
-            {
-                return ".h";
-            }
+            return recentHeaderExtensions.FirstOrValue(".h");
         }
         public string RecentHeaderSubfolder()
         {
-            if (recentHeaderSubfolders.Count > 0)
-            {
-                return recentHeaderSubfolders.First();
-            }
-            else
-            {
-                return "";
-            }
+            return recentHeaderSubfolders.FirstOrValue("");
         }
         public string RecentImplementationSubfolder()
         {
-            if (recentImplementationSubfolders.Count > 0)
-            {
-                return recentImplementationSubfolders.First();
-            }
-            else
-            {
-                return "";
-            }
+            return recentImplementationSubfolders.FirstOrValue("");
         }
         public void AddMostRecentNamespace(string ns)
         {

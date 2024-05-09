@@ -10,7 +10,7 @@
                         mc:Ignorable="d"
                         ResizeMode="NoResize"
                         Width="604"
-                        Height="367">
+                        Height="387">
 
     <Window.Resources>
         <local:Settings x:Key="ClassName"/>
@@ -18,6 +18,8 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
@@ -63,17 +65,17 @@
         </StackPanel>
         <ComboBox Name="NamespaceCombo" Grid.Column="1" Grid.Row="3" IsEditable="True" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         
-        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4">
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="6">
             <Label Content="Header" VerticalContentAlignment="Center" Padding="0"/>
             <Image MouseLeftButtonDown="HeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
-        <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="TextBox"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1">
+        <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" Grid.Row="7" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="TextBox"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="1">
             <Label Grid.Column="1" Content="Implementation" Padding="0" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="ImplementationInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
             <CheckBox Name="HasImplementationFileCheckBox" Content="Create .cpp file" Checked="HasImplementationFileCheckChanged" Unchecked="HasImplementationFileCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
-        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="7" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="9" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2">
             <Label Content="Header subfolder" VerticalContentAlignment="Center" Padding="0"/>
@@ -88,14 +90,21 @@
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" Grid.Row="8" Grid.Column="4" VerticalAlignment="Top">
+        <StackPanel Orientation="Vertical" Grid.Row="6" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" >
                 <CheckBox Content="Auto-save settings" Name="AutosaveSettingsCheckBox"/>
             </StackPanel>
             <Button x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" Width="120" Height="35"  HorizontalAlignment="Left" Margin="0,4,0,0"/>
         </StackPanel>
 
-        <Grid Grid.Column="1" Grid.Row="8">
+        <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" >
+            <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
+            <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
+        </StackPanel>
+        <TextBox Grid.Column="1" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
+
+        
+        <Grid Grid.Column="1" Grid.Row="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
@@ -118,14 +127,9 @@
                 <Image MouseLeftButtonDown="HeaderExtensionInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
             </StackPanel>
             <ComboBox Name="HeaderExtensionCombo" TextBoxBase.TextChanged="HeaderExtensionChangedEventHandler" IsEditable="True" Grid.Row="1" Grid.Column="1"/>
-            <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" >
-                <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
-                <Image MouseLeftButtonDown="IncludePrecompiledHeaderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/question_mark_icon.png" Width="12" Height="12" Margin="3"/>
-            </StackPanel>
-            <TextBox Grid.Column="0" Grid.ColumnSpan="2" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
-
+            
         </Grid>
-        <Label Name="LastErrorMessage"  Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="4" Content="Last error:" Padding="0" Margin="0,3,0,0"/>
+        <Label Name="LastErrorMessage"  Grid.Column="1" Grid.Row="12" Grid.ColumnSpan="4" Content="Last error:" Padding="0" Margin="0,3,0,0"/>
         
     </Grid>
 </platform:DialogWindow>
