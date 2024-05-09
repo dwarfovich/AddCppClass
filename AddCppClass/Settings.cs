@@ -1,7 +1,10 @@
 ﻿using Dwarfovich.AddCppClass.Utils;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -11,58 +14,42 @@ namespace Dwarfovich.AddCppClass
         SnakeCase,
         LowerCase
     };
+
     public class Settings
     {
         [JsonIgnore]
         public string className { get; set; } = "";
-        public int recentNamespacesCount = 10;
-        public List<string> recentNamespaces { get; set; } = new List<string> { };
-
-        private string _lastUsedNamespace { get; set; } = "";
-
-        public string lastUsedNamespace {
-            get { return _lastUsedNamespace; }
-            set {
-                _lastUsedNamespace = value;
-                lastUsedNamespaceTokenized = ClassUtils.TokenizeNamespace(value);
-                AddNamespaceToRecents(value);
-            }
-        }
+        public int maxRecentNamespaces = 10;
+        public List<string> recentNamespaces { get; private set; }  = new List<string> { };
         [JsonIgnore]
-        public string[] lastUsedNamespaceTokenized {  get; private set; } = [];
+        public string[] mostRecentNamespaceTokenized { get; private set; } = [];
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
-        public List<string> recentHeaderExtensions { get; set; } = new List<string> { ".h", ".hpp" };
-        public string lastUsedHeaderExtension = "";
+        public int maxRecentHeaderExtensions = 10;
+        [JsonProperty]
+        public List<string> recentHeaderExtensions = new List<string> { ".h", ".hpp" };
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
         public string headerFilename { get; set; } = "";
         [JsonIgnore]
         public string implementationFilename { get; set; } = "";
-        [JsonIgnore]
-        public string headerSubfolder { get; set; } = "";
-        [JsonIgnore]
-        public string implementationSubfolder { get; set; } = "";
         public bool useSingleSubfolder { get; set; } = true;
         public bool hasImplementationFile { get; set; } = true;
         public bool createFilters { get; set; } = true;
-        public int recentHeaderSubfoldersCount { get; set; } = 10;
-        public List<string> recentHeaderSubfolders { get; set; } = new List<string> { };
-        public int recentImplementationSubfoldersCount { get; set; } = 10;
-        public List<string> recentImplementationSubfolders { get; set; } = new List<string> { };
+        public int maxRecentHeaderSubfolders { get; set; } = 10;
+        [JsonProperty]
+        public List<string> recentHeaderSubfolders = new List<string> { };
+        public int maxRecentImplementationSubfolders { get; set; } = 10;
+        [JsonProperty]
+        public List<string> recentImplementationSubfolders = new List<string> { };
         public bool autoSaveSettings { get; set; } = true;
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = ".pch";
         public Settings() { }
 
-        public string HeaderExtension()
+        public string RecentHeaderExtension()
         {
-            if (!string.IsNullOrEmpty(lastUsedHeaderExtension))
-            {
-                return lastUsedHeaderExtension;
-            }
-
-            if(recentHeaderExtensions.Count > 0)
+            if (recentHeaderExtensions.Count > 0)
             {
                 return recentHeaderExtensions.First();
             }
@@ -71,22 +58,45 @@ namespace Dwarfovich.AddCppClass
                 return ".h";
             }
         }
-
-        private void AddNamespaceToRecents(string ns)
+        public string RecentHeaderSubfolder()
         {
-            var index = recentNamespaces.IndexOf(ns);
-            if (index == -1)
+            if (recentHeaderSubfolders.Count > 0)
             {
-                recentNamespaces.Insert(0, ns);
-                if(recentNamespaces.Count > recentNamespacesCount)
-                {
-                    recentNamespaces.RemoveAt(recentNamespaces.Count - 1);
-                }
+                return recentHeaderSubfolders.First();
             }
             else
             {
-                recentNamespaces.MoveItemAtIndexToFront(index);
+                return "";
             }
+        }
+        public string RecentImplementationSubfolder()
+        {
+            if (recentImplementationSubfolders.Count > 0)
+            {
+                return recentImplementationSubfolders.First();
+            }
+            else
+            {
+                return "";
+            }
+        }
+        public void AddMostRecentNamespace(string ns)
+        {
+            recentNamespaces.AddFrontValue(ns, maxRecentNamespaces);
+            mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(ns);
+        }
+
+        public void AddMostRecentHeaderExtension(string extension)
+        {
+            recentHeaderExtensions.AddFrontValue(extension, maxRecentHeaderExtensions);
+        }
+        public void AddMostRecentHeaderSubfolder(string subfolder)
+        {
+            recentHeaderSubfolders.AddFrontValue(subfolder, maxRecentHeaderSubfolders);
+        }
+        public void AddMostRecentImplementationSubfolder(string subfolder)
+        {
+            recentImplementationSubfolders.AddFrontValue(subfolder, maxRecentImplementationSubfolders);
         }
     }
 }

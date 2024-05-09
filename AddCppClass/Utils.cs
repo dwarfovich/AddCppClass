@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Documents;
 using System.Windows.Input;
 using EnvDTE80;
 
@@ -6,6 +7,22 @@ namespace Dwarfovich.AddCppClass.Utils
 {
     public static class ListExtensions
     {
+        public static void AddFrontValue<T>(this List<T> list, T value, int maxListCount)
+        {
+            var index = list.IndexOf(value);
+            if (index == -1)
+            {
+                list.Insert(0, value);
+                if (list.Count > maxListCount)
+                {
+                    list.RemoveRange(maxListCount, list.Count - maxListCount);
+                }
+            }
+            else
+            {
+                list.MoveItemAtIndexToFront(index);
+            }
+        }
         public static void MoveItemAtIndexToFront<T>(this List<T> list, int index)
         {
             T item = list[index];

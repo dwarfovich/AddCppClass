@@ -15,14 +15,14 @@ namespace Dwarfovich.AddCppClass
         }
         public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
-            return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
+            return (filename + classSettings.RecentHeaderExtension(), filename + classSettings.implementationExtension);
         }
 
         public (string header, string implementation) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
-            return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
+            return (filename + classSettings.RecentHeaderExtension(), filename + classSettings.implementationExtension);
         }
         public string GenerateCamelCaseFilename(Settings classSettings)
         {

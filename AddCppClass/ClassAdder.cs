@@ -39,7 +39,7 @@ namespace Dwarfovich.AddCppClass
             using (var writer = new StreamWriter(fileStream))
             {
                 writer.WriteLine("#pragma once" + Environment.NewLine);
-                foreach (string ns in settings.lastUsedNamespaceTokenized)
+                foreach (string ns in settings.mostRecentNamespaceTokenized)
                 {
                     writer.WriteLine("namespace " + ns + " {");
                 }
@@ -48,11 +48,11 @@ namespace Dwarfovich.AddCppClass
                 writer.WriteLine("public:");
                 writer.WriteLine("private:");
                 writer.WriteLine("};");
-                if(settings.lastUsedNamespaceTokenized.Length > 0)
+                if(settings.mostRecentNamespaceTokenized.Length > 0)
                 {
                     writer.Write(Environment.NewLine);
                 }
-                foreach (string ns in settings.lastUsedNamespaceTokenized)
+                foreach (string ns in settings.mostRecentNamespaceTokenized)
                 {
                     writer.WriteLine('}');
                 }
@@ -67,13 +67,13 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("#include \"" + settings.precompiledHeader + '\"');
                 }
-                if (String.IsNullOrEmpty(settings.headerSubfolder))
+                if (String.IsNullOrEmpty(settings.RecentHeaderExtension()))
                 {
                     writer.WriteLine("#include \"" + settings.headerFilename + '\"');
                 }
                 else
                 {
-                    writer.WriteLine("#include \"" + settings.headerSubfolder + '/' + settings.headerFilename + '\"');
+                    writer.WriteLine("#include \"" + settings.RecentHeaderSubfolder() + '/' + settings.headerFilename + '\"');
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string path = Path.Combine(projectPath, settings.headerSubfolder);
+            string path = Path.Combine(projectPath, settings.RecentHeaderSubfolder());
             Directory.CreateDirectory(path);
             path = Path.Combine(path, settings.headerFilename);
             var fileStream = File.Create(path);
@@ -99,11 +99,11 @@ namespace Dwarfovich.AddCppClass
             string implementationPath = "";
             if (settings.useSingleSubfolder)
             {
-                implementationPath = Path.Combine(projectPath, settings.headerSubfolder, settings.implementationFilename);
+                implementationPath = Path.Combine(projectPath, settings.RecentHeaderSubfolder(), settings.implementationFilename);
             }
             else
             {
-                implementationPath = Path.Combine(projectPath, settings.implementationSubfolder, settings.implementationFilename);
+                implementationPath = Path.Combine(projectPath, settings.RecentImplementationSubfolder(), settings.implementationFilename);
             }
             var fileStream = File.Create(implementationPath);
             PopulateImplementationFile(fileStream, settings);
@@ -182,12 +182,12 @@ namespace Dwarfovich.AddCppClass
             string filterFilePath = project.FullName + ".filters";
             var doc = OpenFilterXmlDocument(filterFilePath);
             var ns = doc.Root.GetDefaultNamespace();
-            AddFilter(doc, ns, settings.implementationSubfolder);
-            AddFilter(doc, ns, settings.headerSubfolder);
-            ReplaceHeaderFileFilter(doc, ns, settings, settings.headerSubfolder);
+            AddFilter(doc, ns, settings.RecentImplementationSubfolder());
+            AddFilter(doc, ns, settings.RecentHeaderSubfolder());
+            ReplaceHeaderFileFilter(doc, ns, settings, settings.RecentHeaderSubfolder());
             if (settings.hasImplementationFile)
             {
-                ReplaceImplementationFileFilter(doc, ns, settings, settings.implementationSubfolder);
+                ReplaceImplementationFileFilter(doc, ns, settings, settings.RecentImplementationSubfolder());
             }
             doc.Save(filterFilePath);
         }
