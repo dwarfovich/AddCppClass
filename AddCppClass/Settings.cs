@@ -22,7 +22,31 @@ namespace Dwarfovich.AddCppClass
         public int maxRecentNamespaces = 10;
         public List<string> recentNamespaces { get; private set; }  = new List<string> { };
         [JsonIgnore]
-        public string[] mostRecentNamespaceTokenized { get; private set; } = [];
+        private string[] _mostRecentNamespaceTokenized = [];
+        [JsonIgnore]
+        public string[] mostRecentNamespaceTokenized
+        {
+            get
+            {
+                if (_mostRecentNamespaceTokenized == null || _mostRecentNamespaceTokenized.Length == 0)
+                {
+                    if (recentNamespaces == null || recentNamespaces.Count == 0)
+                    {
+                        return [];
+                    }
+                    else
+                    {
+                        _mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(recentNamespaces.First());
+                    }
+                }
+
+                return _mostRecentNamespaceTokenized;
+            }
+            private set
+            {
+                _mostRecentNamespaceTokenized = value;
+            }
+        }
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions = 10;
         [JsonProperty]

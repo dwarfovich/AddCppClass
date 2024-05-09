@@ -52,9 +52,9 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.Write(Environment.NewLine);
                 }
-                foreach (string ns in settings.mostRecentNamespaceTokenized)
+                for (int i = settings.mostRecentNamespaceTokenized.Count() - 1; i >= 0; --i)
                 {
-                    writer.WriteLine('}');
+                    writer.WriteLine("} // namespace " + settings.mostRecentNamespaceTokenized[i]);
                 }
             }
         }
