@@ -1,16 +1,21 @@
-﻿using AddCppClass;
+﻿global using Task = System.Threading.Tasks.Task;
 using EnvDTE;
 using EnvDTE80;
-using Newtonsoft.Json;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
+using Newtonsoft.Json;
+using AddCppClass;
 
 namespace Dwarfovich.AddCppClass
 {
     [Command(PackageIds.AddCppClassCommand)]
     internal sealed class AddCppClassCommand : BaseCommand<AddCppClassCommand>
     {
+        private static readonly string extensionConfigFile = "AddCppClass.config.json";
         private static string SettingsPath(DTE2 dte)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var activeProject = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
             if (activeProject is null)
             {
@@ -20,17 +25,19 @@ namespace Dwarfovich.AddCppClass
                 }
                 else
                 {
-                    return Path.Combine(new FileInfo(dte.Solution.FullName).DirectoryName, "AddCppClass.config.json");
+                    return Path.Combine(new FileInfo(dte.Solution.FullName).DirectoryName, extensionConfigFile);
                 }
             }
             else
             {
-                return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, "AddCppClass.config.json");
+                return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, extensionConfigFile);
             }
         }
 
         private static Settings GetSettings()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
             Settings settings = new Settings();
             try
@@ -38,31 +45,39 @@ namespace Dwarfovich.AddCppClass
                 if (File.Exists(settingsPath))
                 {
                     string jsonString = File.ReadAllText(settingsPath);
-                    JsonSerializerSettings jsonSettings = new JsonSerializerSettings ();
+                    JsonSerializerSettings jsonSettings = new JsonSerializerSettings();
                     jsonSettings.ContractResolver = new Utils.ListClearingContractResolver();
                     settings = JsonConvert.DeserializeObject<Settings>(jsonString, jsonSettings);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: handle error.
+                _ = VS.MessageBox.Show("Error occured while loading AddCppClass settings", "Error message: " + ex.Message, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+                return settings;
             }
-
+         
             return settings;
         }
 
         private void SaveSettings(Settings settings)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
             if(String.IsNullOrEmpty(settingsPath))
             {
-                // TODO: Handle error.
+                _ = VS.MessageBox.Show("Error occured while saving AddCppClass settings", "Couldn't get settings file path. Settings will not be saved.", OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
             }
-            string json = JsonConvert.SerializeObject(settings);
-            File.WriteAllText(settingsPath, json);
+            else
+            {
+                string json = JsonConvert.SerializeObject(settings);
+                File.WriteAllText(settingsPath, json);
+            }
         }
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
             var settings = GetSettings();
             var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
@@ -72,7 +87,6 @@ namespace Dwarfovich.AddCppClass
             {
                 SaveSettings(dialog.settings);
             }
-            //await VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
         }
     }
 }

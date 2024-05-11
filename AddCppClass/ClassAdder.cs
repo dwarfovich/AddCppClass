@@ -22,7 +22,6 @@ namespace Dwarfovich.AddCppClass
         }
         private static XDocument OpenFilterXmlDocument(string filterFilePath)
         {
-            Logger.Log("OpenFilterXmlDocument: " + filterFilePath);
             if (File.Exists(filterFilePath))
             {
                 return XDocument.Load(filterFilePath);

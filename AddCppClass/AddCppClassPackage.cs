@@ -1,14 +1,12 @@
 ﻿global using Community.VisualStudio.Toolkit;
 global using Microsoft.VisualStudio.Shell;
 global using System;
-global using Task = System.Threading.Tasks.Task;
+//global using Task = System.Threading.Tasks.Task;
 using Dwarfovich;
 using Dwarfovich.AddCppClass;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft;
-using Microsoft.VisualStudio.Shell.Interop;
-using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -24,6 +22,8 @@ namespace AddCppClass
         public static DTE2 dte;
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+
             await this.RegisterCommandsAsync();
             Logger.Initialize(this, Vsix.Name);
             Logger.Log("Hello, logger");

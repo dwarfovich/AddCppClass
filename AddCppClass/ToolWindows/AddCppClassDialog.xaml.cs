@@ -635,6 +635,8 @@ namespace Dwarfovich.AddCppClass
 
         private bool CheckFiles()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
@@ -665,7 +667,7 @@ namespace Dwarfovich.AddCppClass
                 string precompiledHeaderPath = System.IO.Path.Combine(projectPath, PrecompiledHeader.Text);
                 if (!File.Exists(precompiledHeaderPath))
                 {
-                    message = "Precompiled header at path \"" + precompiledHeaderPath + "\" doen't exist. Proceed anyway?";
+                    message = "Precompiled header at path \"" + precompiledHeaderPath + "\" doesn't exist. Proceed anyway?";
                     return VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_YESNO) == VSConstants.MessageBoxResult.IDYES;
                 }
             }
@@ -675,6 +677,8 @@ namespace Dwarfovich.AddCppClass
 
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             bool result = CheckFiles();
             if (!result)
             {
@@ -690,6 +694,7 @@ namespace Dwarfovich.AddCppClass
                 bool closeDialog = VS.MessageBox.Show("Error", errorMessage, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL) == VSConstants.MessageBoxResult.IDCANCEL;
                 if (closeDialog)
                 {
+                    DialogResult = false;
                     Close();
                 } else
                 {
