@@ -53,7 +53,7 @@ namespace Dwarfovich.AddCppClass
             catch (Exception ex)
             {
                 _ = VS.MessageBox.Show("Error occured while loading AddCppClass settings", "Error message: " + ex.Message, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
-                return settings;
+                return new Settings();
             }
          
             return settings;
