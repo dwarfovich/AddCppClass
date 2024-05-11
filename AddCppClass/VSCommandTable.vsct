@@ -10,22 +10,30 @@
         <Buttons>
             <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0100" type="Button">
                 <Parent guid="guidSHLMainMenu" id="IDG_VS_PROJ_MISCADD" />
+                <Icon guid="testIcon" id="testIcon1" />
                 <Strings>
-                    <ButtonText>Add C++ Class</ButtonText>
+                    <ButtonText>Add C++ Class...</ButtonText>
                 </Strings>
             </Button>
             <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0200" type="Button">
                 <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_ITEMS"/>
-                <CommandFlag>IconIsMoniker</CommandFlag>
+                <!--<CommandFlag>IconIsMoniker</CommandFlag>-->
                 <Strings>
-                    <CommandName>AddCppClassCommand</CommandName>
-                    <ButtonText>Add C++ Class</ButtonText>
+                    <ButtonText>Add C++ Class...</ButtonText>
                 </Strings>
             </Button>
         </Buttons>
+
+        <Bitmaps>
+            <Bitmap guid="testIcon" href="Resources\Command.png" usedList="testIcon1"/>
+        </Bitmaps>
+
     </Commands>
 
     <Symbols>
+        <GuidSymbol name="testIcon" value="{B8CF8B42-0F17-4E76-B925-B1608F399014}">
+            <IDSymbol name="testIcon1" value="1" />
+        </GuidSymbol>
         <GuidSymbol name="AddCppClass" value="{a21a05fe-1b28-4faa-ba1f-83394176f032}">
             <IDSymbol name="AddCppClassCommand" value="0x0100" />
         </GuidSymbol>

@@ -1,9 +1,16 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
-using System.Linq;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
+using System.Windows.Shapes;
+using AddCppClass;
+using static System.Net.Mime.MediaTypeNames;
+using System;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -15,6 +22,7 @@ namespace Dwarfovich.AddCppClass
         private bool shiftEnabled = false;
         private readonly string title = "Add C++ class";
         private readonly string defaultClassName = "MyClass";
+        private readonly string errorMessageBeginning = "Error message: ";
         public AddCppClassDialog()
         {
             InitializeGui();
@@ -82,7 +90,7 @@ namespace Dwarfovich.AddCppClass
 
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             HasImplementationFileCheckBox.IsChecked = settings.hasImplementationFile;
-            
+
             PopulateComboBox(HeaderSubfolderCombo, settings.recentHeaderSubfolders, settings.maxRecentHeaderSubfolders);
             PopulateComboBox(ImplementationSubfolderCombo, settings.recentImplementationSubfolders, settings.maxRecentImplementationSubfolders);
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
@@ -226,16 +234,26 @@ namespace Dwarfovich.AddCppClass
             if (AddClassButton != null)
             {
                 AddClassButton.IsEnabled = !hasOtherErrors;
+                SetErrorMessage(errors.NextMessage());
             }
         }
 
+        private void SetErrorMessage(string message)
+        {
+            if(ErrorMessage != null)
+            {
+                ErrorMessage.Content = errorMessageBeginning + message;
+            }
+        }
         private void AddError(Object source, string message)
         {
             errors.AddError(source, message);
+            SetErrorMessage(message);
             if (AddClassButton != null)
             {
                 AddClassButton.IsEnabled = false;
             }
+
         }
         private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
@@ -256,7 +274,7 @@ namespace Dwarfovich.AddCppClass
                 }
                 else
                 {
-                    AddError(textBox, "Class name contains errors");
+                    AddError(textBox, "Class name is invalid.");
                 }
             }
         }
@@ -281,14 +299,13 @@ namespace Dwarfovich.AddCppClass
             if (ClassGenerator.IsValidSubfolder(comboBox.Text))
             {
                 RemoveError(comboBox);
-                if(settings.useSingleSubfolder)
+                if (settings.useSingleSubfolder)
                 {
                     ImplementationSubfolderCombo.Text = comboBox.Text;
                 }
             }
             else
             {
-
                 AddError(comboBox, "Header subfolder is invalid");
             }
         }
@@ -306,7 +323,6 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-
                 AddError(comboBox, "Implementation subfolder is invalid");
             }
         }
@@ -616,10 +632,70 @@ namespace Dwarfovich.AddCppClass
             settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
             settings.precompiledHeader = PrecompiledHeader.Text;
         }
+
+        private bool CheckFiles()
+        {
+            EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+
+            string projectPath = new FileInfo(project.FullName).DirectoryName;
+            string headerPath = System.IO.Path.Combine(projectPath, HeaderSubfolderCombo.Text, HeaderFilename.Text);
+            string message = "";
+            if (File.Exists(headerPath))
+            {
+                message += "Header file already exists.";
+            }
+            string implementationPath = System.IO.Path.Combine(projectPath, ImplementationSubfolderCombo.Text, ImplementationFilename.Text);
+            if (File.Exists(implementationPath))
+            {
+                message += "\nImplementation file already exists.";
+            }
+            bool filesOk = true;
+            if (message != "")
+            {
+                message += "\nDo you want to overwrite file/files?";
+                filesOk = VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_YESNO) == VSConstants.MessageBoxResult.IDYES;
+            }
+            if (!filesOk)
+            {
+                return false;
+            }
+
+            if ((bool)IncludePrecompiledHeaderCheckBox.IsChecked)
+            {
+                string precompiledHeaderPath = System.IO.Path.Combine(projectPath, PrecompiledHeader.Text);
+                if (!File.Exists(precompiledHeaderPath))
+                {
+                    message = "Precompiled header at path \"" + precompiledHeaderPath + "\" doen't exist. Proceed anyway?";
+                    return VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_YESNO) == VSConstants.MessageBoxResult.IDYES;
+                }
+            }
+
+            return true;
+        }
+
         private void AddClassButtonClicked(object sender, RoutedEventArgs e)
         {
+            bool result = CheckFiles();
+            if (!result)
+            {
+                return;
+            }
+
             SaveSettings();
-            ClassAdder.AddClass(settings);
+            try
+            {
+                ClassAdder.AddClass(settings);
+            } catch (Exception ex) {
+                var errorMessage = "Oops! An error occured while adding class, error message: " + ex.Message + ". Please fix the error and commit it to AddCppClass project on GitHub)";
+                bool closeDialog = VS.MessageBox.Show("Error", errorMessage, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL) == VSConstants.MessageBoxResult.IDCANCEL;
+                if (closeDialog)
+                {
+                    Close();
+                } else
+                {
+                    return;
+                }
+            }
             DialogResult = true;
             Close();
         }
@@ -1004,45 +1080,24 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void ClassNameInfoButtonDown(object sender, EventArgs e)
+        private void ShowInfoMessage(string caption, string text)
         {
-            _ = VS.MessageBox.ShowWarningAsync("AddCppClass", "Button clicked");
+            _ = VS.MessageBox.Show(caption, text, OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK);
         }
-
-        private void IncludePrecompiledHeaderInfoButtonDown(object sender, EventArgs e)
-        {
-
-        }
-
-        private void HeaderInfoButtonDown(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ImplementationInfoButtonDown(object sender, EventArgs e)
-        {
-
-        }
-
+        
         private void UseSingleFolderInfoButtonDown(object sender, EventArgs e)
         {
-
+            ShowInfoMessage("Use single subfolder", "If this checkbox is checked implementation file would be created in the same folder as header file");
         }
 
         private void CreateFiltersInfoButtonDown(object sender, EventArgs e)
         {
-
+            ShowInfoMessage("Create filters", "If this checkbox is checked filters with corresponding files would be added to the project. For example, file with path \"src/header.h\" will added to filter \"src\".");
         }
 
         private void HeaderExtensionInfoButtonDown(object sender, EventArgs e)
         {
-
+            ShowInfoMessage("Header extension", "A file extension for the header. Should be started with the dot '.'.");
         }
-
-        private void NamespaceInfoButtonDown(object sender, EventArgs e)
-        {
-
-        }
-
     }
 }
