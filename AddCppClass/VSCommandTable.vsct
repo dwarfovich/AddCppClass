@@ -1,41 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <Extern href="stdidcmd.h"/>
-  <Extern href="vsshlids.h"/>
-  <Include href="KnownImageIds.vsct"/>
-  <Include href="VSGlobals.vsct"/>
+    <Extern href="stdidcmd.h"/>
+    <Extern href="vsshlids.h"/>
+    <Include href="KnownImageIds.vsct"/>
+    <Include href="VSGlobals.vsct"/>
 
-  <Commands package="AddCppClass">
-      
-    <!--This section defines the elements the user can interact with, like a menu command or a button
-        or combo box in a toolbar. -->
-    <Buttons>
-      <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0100" type="Button">
-        <Parent guid="AddCppClass" id="MyMenuGroup" />
-        <Icon guid="ImageCatalogGuid" id="StatusInformation" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>My Command</ButtonText>
-          <LocCanonicalName>.AddCppClass.AddCppClassCommand</LocCanonicalName>
-        </Strings>
-      </Button>
-        <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0200" type="Button">
-            <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_ITEMS"/>
-            <!--<CommandFlag>DynamicVisibility</CommandFlag>-->
-            <CommandFlag>IconIsMoniker</CommandFlag>
-            <Strings>
-                <CommandName>AddCppClassCommand</CommandName>
-                <ButtonText>New my command...</ButtonText>
-            </Strings>
-        </Button>
-    </Buttons>
-  </Commands>
+    <Commands package="AddCppClass">
+        <Buttons>
+            <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0100" type="Button">
+                <Parent guid="guidSHLMainMenu" id="IDG_VS_PROJ_MISCADD" />
+                <Strings>
+                    <ButtonText>Add C++ Class</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0200" type="Button">
+                <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_ITEMS"/>
+                <CommandFlag>IconIsMoniker</CommandFlag>
+                <Strings>
+                    <CommandName>AddCppClassCommand</CommandName>
+                    <ButtonText>Add C++ Class</ButtonText>
+                </Strings>
+            </Button>
+        </Buttons>
+    </Commands>
 
-  <Symbols>
-    <GuidSymbol name="AddCppClass" value="{a21a05fe-1b28-4faa-ba1f-83394176f032}">
-      <IDSymbol name="MyMenuGroup" value="0x0001" />
-      <IDSymbol name="AddCppClassCommand" value="0x0100" />
-    </GuidSymbol>
-  </Symbols>
+    <Symbols>
+        <GuidSymbol name="AddCppClass" value="{a21a05fe-1b28-4faa-ba1f-83394176f032}">
+            <IDSymbol name="AddCppClassCommand" value="0x0100" />
+        </GuidSymbol>
+    </Symbols>
 </CommandTable>

@@ -20,7 +20,6 @@ namespace Dwarfovich.AddCppClass
     /// </summary>
     internal sealed partial class PackageIds
     {
-        public const int MyMenuGroup = 0x0001;
         public const int AddCppClassCommand = 0x0100;
     }
 }
