@@ -82,7 +82,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        public static void CreateHeaderFile(EnvDTE.Project project, Settings settings, string projectPath)
+        public static string CreateHeaderFile(EnvDTE.Project project, Settings settings, string projectPath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -94,6 +94,8 @@ namespace Dwarfovich.AddCppClass
             fileStream.Close();
             ProjectItems projectItems = project.ProjectItems;
             projectItems.AddFromFile(path);
+
+            return path;
         }
 
         public static void CreateImplementationFile(EnvDTE.Project project, Settings settings, string projectPath)
@@ -218,7 +220,7 @@ namespace Dwarfovich.AddCppClass
             EnvDTE.Project project = Utils.Solution.CurrentProject(dte);
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
-            CreateHeaderFile(project, settings, projectPath);
+            string headerPath = CreateHeaderFile(project, settings, projectPath);
             if (settings.hasImplementationFile)
             {
                 CreateImplementationFile(project, settings, projectPath);
@@ -232,6 +234,7 @@ namespace Dwarfovich.AddCppClass
 
             project.DTE.ExecuteCommand("Project.UnloadProject");
             project.DTE.ExecuteCommand("Project.ReloadProject");
+            project.DTE.ItemOperations.OpenFile(headerPath);
         }
     }
 }
