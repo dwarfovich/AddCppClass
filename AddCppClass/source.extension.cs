@@ -9,10 +9,10 @@ namespace Dwarfovich.AddCppClass
     {
         public const string Id = "AddCppClass.955bd0cf-81d1-4f82-999c-84bda7eb9730";
         public const string Name = "AddCppClass";
-        public const string Description = @"Empty VSIX Project.";
+        public const string Description = @"Simple extension that provides convenient dialog to add C++ classes";
         public const string Language = "en-US";
         public const string Version = "1.0";
-        public const string Author = "Qrop";
+        public const string Author = "Dwarfovich";
         public const string Tags = "";
     }
 }
