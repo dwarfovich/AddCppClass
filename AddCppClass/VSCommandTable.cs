@@ -12,8 +12,8 @@ namespace Dwarfovich.AddCppClass
     /// </summary>
     internal sealed partial class PackageGuids
     {
-        public const string testIconString = "b8cf8b42-0f17-4e76-b925-b1608f399014";
-        public static Guid testIcon = new Guid(testIconString);
+        public const string iconString = "b8cf8b42-0f17-4e76-b925-b1608f399014";
+        public static Guid icon = new Guid(iconString);
 
         public const string AddCppClassString = "a21a05fe-1b28-4faa-ba1f-83394176f032";
         public static Guid AddCppClass = new Guid(AddCppClassString);
@@ -23,7 +23,7 @@ namespace Dwarfovich.AddCppClass
     /// </summary>
     internal sealed partial class PackageIds
     {
-        public const int testIcon1 = 0x0001;
+        public const int icon1 = 0x0001;
         public const int AddCppClassCommand = 0x0100;
     }
 }

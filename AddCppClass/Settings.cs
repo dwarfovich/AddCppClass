@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Windows;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -70,6 +71,11 @@ namespace Dwarfovich.AddCppClass
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = "pch.h";
         public Settings() { }
+        public Settings(string className, FilenameStyle style, string headerExtension) {
+            this.className = className;
+            filenameStyle = style;
+            AddMostRecentHeaderExtension(headerExtension);
+        }
 
         public string RecentHeaderExtension()
         {

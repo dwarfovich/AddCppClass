@@ -21,7 +21,7 @@ namespace Dwarfovich.AddCppClass
         private ClassSettingsErrorsCollection errors = new();
         private bool shiftEnabled = false;
         private readonly string title = "Add C++ class";
-        private readonly string defaultClassName = "MyClass";
+        private readonly string defaultclassName = "MyClass";
         private readonly string errorMessageBeginning = "Error message: ";
         public AddCppClassDialog()
         {
@@ -43,14 +43,14 @@ namespace Dwarfovich.AddCppClass
             InitializeComponent();
             AssignKeyHandlers();
             Title = title;
-            ClassNameTextBox.Text = defaultClassName;
+            classNameTextBox.Text = defaultclassName;
         }
 
         private void AssignKeyHandlers()
         {
-            ClassNameTextBox.PreviewKeyDown += ClassNameKeyDownPreviewHandler;
-            ClassNameTextBox.PreviewKeyUp += ClassNameKeyUpPreviewHandler;
-            ClassNameTextBox.KeyDown += ClassNameKeyDownHandler;
+            classNameTextBox.PreviewKeyDown += classNameKeyDownPreviewHandler;
+            classNameTextBox.PreviewKeyUp += classNameKeyUpPreviewHandler;
+            classNameTextBox.KeyDown += classNameKeyDownHandler;
             NamespaceCombo.PreviewKeyDown += NamespaceKeyDownPreviewHandler;
             NamespaceCombo.PreviewKeyUp += NamespaceKeyUpPreviewHandler;
             NamespaceCombo.KeyDown += NamespaceKeyDownHandler;
@@ -255,7 +255,7 @@ namespace Dwarfovich.AddCppClass
             }
 
         }
-        private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
+        private void classNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
             if (textBox == null)
@@ -265,7 +265,7 @@ namespace Dwarfovich.AddCppClass
 
             if (textBox != null)
             {
-                if (ClassGenerator.IsValidClassName(textBox.Text))
+                if (ClassGenerator.IsValidclassName(textBox.Text))
                 {
                     settings.className = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                     (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
@@ -279,7 +279,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void ClassNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void classNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ComboBox combo = sender as ComboBox;
             if (combo == null)
@@ -381,7 +381,7 @@ namespace Dwarfovich.AddCppClass
                 AddError(textBox, "Implementation file name is invalid");
             }
         }
-        private void ClassNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
+        private void classNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
@@ -397,7 +397,7 @@ namespace Dwarfovich.AddCppClass
                 e.Handled = false;
             }
         }
-        private void ClassNameKeyDownHandler(object sender, KeyEventArgs e)
+        private void classNameKeyDownHandler(object sender, KeyEventArgs e)
         {
             TextBox textBox = sender as TextBox;
             if (textBox == null)
@@ -437,7 +437,7 @@ namespace Dwarfovich.AddCppClass
                 e.Handled = true;
             }
         }
-        private void ClassNameKeyUpPreviewHandler(object sender, KeyEventArgs e)
+        private void classNameKeyUpPreviewHandler(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
@@ -599,7 +599,7 @@ namespace Dwarfovich.AddCppClass
 
         private void SaveSettings()
         {
-            settings.className = ClassNameTextBox.Text;
+            settings.className = classNameTextBox.Text;
             settings.AddMostRecentNamespace(NamespaceCombo.Text);
 
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;

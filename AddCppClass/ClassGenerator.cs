@@ -68,7 +68,7 @@ namespace Dwarfovich.AddCppClass
             }
 
         }
-        public static bool IsValidClassName(string name)
+        public static bool IsValidclassName(string name)
         {
             return fileNameRegex.IsMatch(name);
         }
