@@ -10,7 +10,8 @@ namespace Dwarfovich.AddCppClass
     public class ClassAdder
     {
         private static readonly DTE2 dte = AddCppClassPackage.dte;
-        
+        private static readonly string defaultHeaderFilter = "Header Files";
+        private static readonly string defaultImplementationFilter = "Source Files";
         private static XDocument CreateFilterXmlDocument()
         {
             XDocument doc = new XDocument(new XDeclaration("1.0", "utf-8", null));
@@ -41,12 +42,17 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("namespace " + ns + " {");
                 }
-                writer.Write(Environment.NewLine);
+                if(settings.mostRecentNamespaceTokenized.Length > 0)
+                {
+                    writer.Write(Environment.NewLine);
+                }
+
                 writer.WriteLine("class " + settings.className + " {");
                 writer.WriteLine("public:");
                 writer.WriteLine("private:");
                 writer.WriteLine("};");
-                if(settings.mostRecentNamespaceTokenized.Length > 0)
+                
+                if (settings.mostRecentNamespaceTokenized.Length > 0)
                 {
                     writer.Write(Environment.NewLine);
                 }
@@ -128,7 +134,8 @@ namespace Dwarfovich.AddCppClass
         {
             XElement filterItemGroup = GetFilterItemGroup(doc, ns);
             string[] filterTokens = path.Split('\\');
-            if(filterTokens.Length == 0 || String.IsNullOrEmpty(filterTokens.First())) {
+            if (filterTokens.Length == 0 || String.IsNullOrEmpty(filterTokens.First()))
+            {
                 return;
             }
 
@@ -154,7 +161,7 @@ namespace Dwarfovich.AddCppClass
             var filePath = Path.Combine(newFilterPath, fileName);
             foreach (var fileFilter in itemGroupElements)
             {
-              fileFilter.Descendants(ns + clElement).Where(el => (string)el.Attribute("Include") == filePath).Remove();
+                fileFilter.Descendants(ns + clElement).Where(el => (string)el.Attribute("Include") == filePath).Remove();
             }
             XElement newItemGroup = new XElement(ns + "ItemGroup");
             XElement clCompileElement = new XElement(ns + clElement, new XAttribute("Include", filePath));
@@ -182,10 +189,24 @@ namespace Dwarfovich.AddCppClass
             var ns = doc.Root.GetDefaultNamespace();
             AddFilter(doc, ns, settings.RecentImplementationSubfolder());
             AddFilter(doc, ns, settings.RecentHeaderSubfolder());
-            ReplaceHeaderFileFilter(doc, ns, settings, settings.RecentHeaderSubfolder());
+            if(String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
+            {
+                ReplaceHeaderFileFilter(doc, ns, settings, defaultHeaderFilter);
+            } else
+            {
+                ReplaceHeaderFileFilter(doc, ns, settings, settings.RecentHeaderSubfolder());
+            }
             if (settings.hasImplementationFile)
             {
-                ReplaceImplementationFileFilter(doc, ns, settings, settings.RecentImplementationSubfolder());
+                if (String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
+                {
+                    ReplaceImplementationFileFilter(doc, ns, settings, defaultImplementationFilter);
+                }
+                else
+                {
+                    ReplaceImplementationFileFilter(doc, ns, settings, settings.RecentImplementationSubfolder());
+                }
+                
             }
             doc.Save(filterFilePath);
         }
