@@ -19,14 +19,7 @@ namespace Dwarfovich.AddCppClass
             var activeProject = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
             if (activeProject is null)
             {
-                if (dte.Solution is null)
-                {
-                    return "";
-                }
-                else
-                {
-                    return Path.Combine(new FileInfo(dte.Solution.FullName).DirectoryName, extensionConfigFile);
-                }
+                return "";
             }
             else
             {
