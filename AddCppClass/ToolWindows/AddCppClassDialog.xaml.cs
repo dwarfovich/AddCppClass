@@ -6,11 +6,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
-using System.Windows.Shapes;
 using AddCppClass;
-using static System.Net.Mime.MediaTypeNames;
-using System;
 
 namespace Dwarfovich.AddCppClass
 {
