@@ -985,7 +985,7 @@ namespace Dwarfovich.AddCppClass
                     var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
                     if (canInsert)
                     {
-                        textBox.Text = textBox.Text.Insert(caretPos, "\\");
+                        textBox.Text = textBox.Text.Insert(caretPos, "/");
                         textBox.CaretIndex = caretPos + 1;
                     }
                     e.Handled = true;
@@ -1049,7 +1049,7 @@ namespace Dwarfovich.AddCppClass
             if ((bool)checkBox.IsChecked)
             {
                 PrecompiledHeader.IsEnabled = true;
-                if (ClassGenerator.IsValidSubfolder(PrecompiledHeader.Text))
+                if (ClassGenerator.IsValidPrecompiledHeaderPath(PrecompiledHeader.Text))
                 {
                     RemoveError(PrecompiledHeader);
                 }
@@ -1070,7 +1070,7 @@ namespace Dwarfovich.AddCppClass
             TextBox textBox = sender as TextBox;
             if (textBox != null)
             {
-                if (ClassGenerator.IsValidSubfolder(textBox.Text))
+                if (ClassGenerator.IsValidPrecompiledHeaderPath(textBox.Text))
                 {
                     RemoveError(sender);
                 }

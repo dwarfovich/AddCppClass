@@ -1,8 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.IO;
-using Dwarfovich.AddCppClass;
 using System.Linq;
-using System;
+using System.Security;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -75,9 +74,9 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidSubfolder(string subfolder)
         {
-            if (String.IsNullOrEmpty(subfolder))
+            if (String.IsNullOrWhiteSpace(subfolder))
             {
-                return true;
+                return false;
             }
 
             try
@@ -88,7 +87,7 @@ namespace Dwarfovich.AddCppClass
             }
             catch
             {
-                return false;
+                return false; 
             }
         }
 
@@ -97,6 +96,19 @@ namespace Dwarfovich.AddCppClass
             return filename.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
         }
 
+        public static bool IsValidPrecompiledHeaderPath(string path)
+        {
+            string pathWithDirSeparators = path.Replace('/', Path.DirectorySeparatorChar);
+            var pos = pathWithDirSeparators.LastIndexOf(Path.DirectorySeparatorChar);
+            if (pos == -1)
+            {
+                return IsValidFilename(pathWithDirSeparators);
+            }
+            else
+            {
+                return IsValidSubfolder(pathWithDirSeparators.Substring(0, pos)) && IsValidFilename(pathWithDirSeparators.Substring(pos + 1));
+            }
+        }
         public static bool IsValidHeaderExtension(string extension)
         {
             if (String.IsNullOrEmpty(extension))
@@ -104,7 +116,7 @@ namespace Dwarfovich.AddCppClass
                 return false;
             }
 
-            if(extension.First() != '.')
+            if (extension.First() != '.')
             {
                 return false;
             }
