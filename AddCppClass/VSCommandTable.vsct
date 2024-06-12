@@ -11,6 +11,8 @@
             <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0100" type="Button">
                 <Parent guid="guidSHLMainMenu" id="IDG_VS_PROJ_MISCADD" />
                 <Icon guid="icon" id="icon1" />
+                <CommandFlag>DynamicVisibility</CommandFlag>
+                <CommandFlag>DefaultInvisible</CommandFlag>
                 <Strings>
                     <ButtonText>Add C++ Class...</ButtonText>
                 </Strings>

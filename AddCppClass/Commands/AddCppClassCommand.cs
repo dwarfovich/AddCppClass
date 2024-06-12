@@ -5,13 +5,30 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
 using Newtonsoft.Json;
 using AddCppClass;
+using System.ComponentModel.Design;
 
 namespace Dwarfovich.AddCppClass
 {
     [Command(PackageIds.AddCppClassCommand)]
-    internal sealed class AddCppClassCommand : BaseCommand<AddCppClassCommand>
+    internal sealed class AddCppClassCommand
     {
+        public static readonly Guid CommandSet = new Guid(PackageGuids.AddCppClassString);
+
         private static readonly string extensionConfigFile = "AddCppClass.config.json";
+
+        public static AddCppClassCommand Instance
+        {
+            get;
+            private set;
+        }
+
+        private AddCppClassCommand(AsyncPackage package, OleMenuCommandService commandService)
+        {
+            var commandId = new CommandID(PackageGuids.AddCppClass, PackageIds.AddCppClassCommand);
+            var menuItem = new OleMenuCommand(Execute, commandId);
+            menuItem.BeforeQueryStatus += new EventHandler(OnBeforeQueryStatus);
+            commandService.AddCommand(menuItem);
+        }
         private static string SettingsPath(DTE2 dte)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -48,7 +65,7 @@ namespace Dwarfovich.AddCppClass
                 _ = VS.MessageBox.Show("Error occured while loading AddCppClass settings", "Error message: " + ex.Message, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
                 return new Settings();
             }
-         
+
             return settings;
         }
 
@@ -57,7 +74,7 @@ namespace Dwarfovich.AddCppClass
             ThreadHelper.ThrowIfNotOnUIThread();
 
             string settingsPath = SettingsPath(AddCppClassPackage.dte);
-            if(String.IsNullOrEmpty(settingsPath))
+            if (String.IsNullOrEmpty(settingsPath))
             {
                 _ = VS.MessageBox.Show("Error occured while saving AddCppClass settings", "Couldn't get settings file path. Settings will not be saved.", OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
             }
@@ -67,9 +84,10 @@ namespace Dwarfovich.AddCppClass
                 File.WriteAllText(settingsPath, json);
             }
         }
-        protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
+
+        private void Execute(object sender, EventArgs e)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             var settings = GetSettings();
             var dialog = new AddCppClassDialog(settings);
@@ -80,6 +98,28 @@ namespace Dwarfovich.AddCppClass
             {
                 SaveSettings(dialog.settings);
             }
+        }
+        private void OnBeforeQueryStatus(object sender, EventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var command = sender as OleMenuCommand;
+            var project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            if (command == null || project == null)
+            {
+                return;
+            }
+
+            command.Visible = (project.CodeModel.Language == CodeModelLanguageConstants.vsCMLanguageMC)
+                           || (project.CodeModel.Language == CodeModelLanguageConstants.vsCMLanguageVC);
+        }
+
+        public static async Task InitializeAsync(AsyncPackage package)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+
+            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            Instance = new AddCppClassCommand(package, commandService);
         }
     }
 }

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using AddCppClass;
 
 namespace Dwarfovich.AddCppClass
@@ -13,12 +12,14 @@ namespace Dwarfovich.AddCppClass
     public partial class AddCppClassDialog : DialogWindow
     {
         public Settings settings { get; private set; } = new();
+
         private ClassGenerator generator = new();
         private ClassSettingsErrorsCollection errors = new();
         private bool shiftEnabled = false;
         private readonly string title = "Add C++ class";
         private readonly string defaultclassName = "MyClass";
         private readonly string errorMessageBeginning = "Error message: ";
+
         public AddCppClassDialog()
         {
             InitializeGui();
@@ -37,38 +38,10 @@ namespace Dwarfovich.AddCppClass
         private void InitializeGui()
         {
             InitializeComponent();
-            AssignKeyHandlers();
             Title = title;
             classNameTextBox.Text = defaultclassName;
         }
 
-        private void AssignKeyHandlers()
-        {
-            classNameTextBox.PreviewKeyDown += classNameKeyDownPreviewHandler;
-            classNameTextBox.PreviewKeyUp += classNameKeyUpPreviewHandler;
-            classNameTextBox.KeyDown += classNameKeyDownHandler;
-            NamespaceCombo.PreviewKeyDown += NamespaceKeyDownPreviewHandler;
-            NamespaceCombo.PreviewKeyUp += NamespaceKeyUpPreviewHandler;
-            NamespaceCombo.KeyDown += NamespaceKeyDownHandler;
-            HeaderSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
-            HeaderSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
-            HeaderSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
-            ImplementationSubfolderCombo.PreviewKeyDown += SubfolderKeyDownPreviewHandler;
-            ImplementationSubfolderCombo.PreviewKeyUp += SubfolderKeyUpPreviewHandler;
-            ImplementationSubfolderCombo.KeyDown += SubfolderKeyDownHandler;
-            HeaderFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
-            HeaderFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
-            HeaderFilename.KeyDown += FileKeyDownHandler;
-            ImplementationFilename.PreviewKeyDown += FileKeyDownPreviewHandler;
-            ImplementationFilename.PreviewKeyUp += FileKeyUpPreviewHandler;
-            ImplementationFilename.KeyDown += FileKeyDownHandler;
-            HeaderExtensionCombo.PreviewKeyDown += HeaderExtensionKeyDownPreviewHandler;
-            HeaderExtensionCombo.PreviewKeyUp += HeaderExtensionKeyUpPreviewHandler;
-            HeaderExtensionCombo.KeyDown += HeaderExtensionKeyDownHandler;
-            PrecompiledHeader.PreviewKeyDown += PrecompiledHeaderKeyDownPreviewHandler;
-            PrecompiledHeader.PreviewKeyUp += PrecompiledHeaderKeyUpPreviewHandler;
-            PrecompiledHeader.KeyDown += PrecompiledHeaderKeyDownHandler;
-        }
         private void LoadSettings(Settings settings)
         {
             this.settings = settings;
@@ -168,62 +141,6 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private bool IsColon(Key key)
-        {
-            return (key == Key.Oem1 || key == Key.OemSemicolon || key == Key.D6) && shiftEnabled;
-        }
-        private bool CanInsertNamespaceDelimiter(string text, int caretPos)
-        {
-            if (String.IsNullOrEmpty(text))
-            {
-                return true;
-            }
-            int previousPos = caretPos - 1;
-            int nextPos = caretPos + 1 < text.Length ? caretPos + 1 : -1;
-
-            if (previousPos < 0 || text[previousPos] != ':')
-            {
-                if (nextPos == -1 || (text[nextPos] != ':'))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsDigit(Key key)
-        {
-            return (key >= Key.D0 && key <= Key.D9 && !shiftEnabled)
-                || (key >= Key.NumPad0 && key <= Key.NumPad9 && !Utils.Keyboard.IsNumlockActive());
-        }
-
-        private bool IsUnderline(Key key)
-        {
-            return key == Key.OemMinus && shiftEnabled;
-        }
-        private bool IsPathSeparator(Key key)
-        {
-            return key == Key.OemBackslash || key == Key.Divide || (key == Key.OemQuestion && !shiftEnabled) || key == Key.Oem5;
-        }
-        private bool IsPeriod(Key key)
-        {
-            return key == Key.OemPeriod;
-        }
-        private bool IsLetter(Key key)
-        {
-            return key >= Key.A && key <= Key.Z;
-        }
-        private bool IsNavigationKey(Key key)
-        {
-            return key == Key.Left
-                || key == Key.Up
-                || key == Key.Right
-                || key == Key.Down
-                || key == Key.Home
-                || key == Key.End;
-        }
-
         private void RemoveError(Object source)
         {
             bool hasOtherErrors = errors.RemoveError(source);
@@ -236,7 +153,7 @@ namespace Dwarfovich.AddCppClass
 
         private void SetErrorMessage(string message)
         {
-            if(ErrorMessage != null)
+            if (ErrorMessage != null)
             {
                 ErrorMessage.Content = errorMessageBeginning + message;
             }
@@ -377,220 +294,20 @@ namespace Dwarfovich.AddCppClass
                 AddError(textBox, "Implementation file name is invalid");
             }
         }
-        private void classNameKeyDownPreviewHandler(object sender, KeyEventArgs e)
+
+        private string ConformSubfoler(string subfoler)
         {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            if (String.IsNullOrEmpty(subfoler))
             {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
-            else
-            {
-                e.Handled = false;
-            }
-        }
-        private void classNameKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            if (textBox == null)
-            {
-                throw new InvalidCastException("Sender should be a TextBox");
+                return "";
             }
 
-            var caretPos = textBox.CaretIndex;
-            if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0)
+            if (subfoler.EndsWith("\\") || subfoler.EndsWith("/"))
             {
-                if (IsDigit(e.Key))
-                {
-                    e.Handled = true;
-                    return;
-                }
+                subfoler = subfoler.Remove(subfoler.Length - 1);
             }
 
-            if (IsUnderline(e.Key)
-                || IsLetter(e.Key)
-                || IsNavigationKey(e.Key))
-            {
-                e.Handled = false;
-            }
-            else if (IsDigit(e.Key))
-            {
-                if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0)
-                {
-                    e.Handled = true;
-                }
-                else
-                {
-                    e.Handled = false;
-                }
-            }
-            else
-            {
-                e.Handled = true;
-            }
-        }
-        private void classNameKeyUpPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = false;
-            }
-        }
-
-        private void NamespaceKeyDownPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Delete)
-            {
-                ComboBox combo = sender as ComboBox;
-                if (combo == null)
-                {
-                    throw new InvalidCastException("Sender should be a ComboBox");
-                }
-
-                var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
-                if (textBox == null)
-                {
-                    throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
-                }
-
-                var caretPos = textBox.CaretIndex;
-                if (caretPos < textBox.Text.Length && textBox.Text[caretPos] == ':')
-                {
-                    if (caretPos + 1 < textBox.Text.Length - 1 && textBox.Text[caretPos + 1] == ':')
-                    {
-                        textBox.Text = textBox.Text.Remove(caretPos, 2);
-                    }
-                    else if (caretPos - 1 >= 0 && textBox.Text[caretPos - 1] == ':')
-                    {
-                        textBox.Text = textBox.Text.Remove(caretPos - 1, 2);
-                        textBox.CaretIndex = caretPos - 1;
-                    }
-                    e.Handled = true;
-                }
-                else
-                {
-                    e.Handled = false;
-                }
-            }
-            else if (e.Key == Key.Back)
-            {
-                ComboBox combo = sender as ComboBox;
-                if (combo == null)
-                {
-                    throw new InvalidCastException("Sender should be a ComboBox");
-                }
-
-                var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
-                if (textBox == null)
-                {
-                    throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
-                }
-
-                var caretPos = textBox.CaretIndex;
-                if (caretPos < textBox.Text.Length && textBox.Text[caretPos] == ':')
-                {
-                    if (caretPos - 1 >= 0 && textBox.Text[caretPos - 1] == ':')
-                    {
-                        textBox.Text = textBox.Text.Remove(caretPos - 1, 2);
-                        textBox.CaretIndex = caretPos - 1;
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        e.Handled = false;
-                    }
-                }
-                else if (caretPos == textBox.Text.Length || textBox.Text[caretPos] != ':')
-                {
-                    if (caretPos - 1 >= 0 && textBox.Text[caretPos - 1] == ':')
-                    {
-                        textBox.Text = textBox.Text.Remove(caretPos - 2, 2);
-                        textBox.CaretIndex = caretPos - 2;
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        e.Handled = false;
-                    }
-                }
-                else
-                {
-                    e.Handled = false;
-                }
-            }
-        }
-        private void NamespaceKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            ComboBox combo = sender as ComboBox;
-            if (combo == null)
-            {
-                throw new InvalidCastException("Sender should be a ComboBox");
-            }
-
-            var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
-            if (textBox == null)
-            {
-                throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
-            }
-
-            var caretPos = textBox.CaretIndex;
-            if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0) // First symbol cann't be a digit.
-            {
-                if (IsDigit(e.Key))
-                {
-                    e.Handled = true;
-                    return;
-                }
-            }
-
-            if (IsColon(e.Key))
-            {
-                var canInsert = CanInsertNamespaceDelimiter(textBox.Text, caretPos);
-                if (canInsert)
-                {
-                    textBox.Text = textBox.Text.Insert(caretPos, "::"); ;
-                    textBox.CaretIndex = caretPos + 2;
-                }
-                e.Handled = true;
-                return;
-            }
-
-            if (IsDigit(e.Key))
-            {
-                e.Handled = (caretPos == 0 || textBox.Text[caretPos - 1] == ':');
-                return;
-            }
-
-            if (IsUnderline(e.Key)
-                || IsLetter(e.Key)
-                || IsNavigationKey(e.Key))
-            {
-                e.Handled = false;
-            }
-            else
-            {
-                e.Handled = true;
-            }
-        }
-        private void NamespaceKeyUpPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = false;
-            }
+            return subfoler;
         }
 
         private void SaveSettings()
@@ -685,14 +402,17 @@ namespace Dwarfovich.AddCppClass
             try
             {
                 ClassAdder.AddClass(settings);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 var errorMessage = "Oops! An error occured while adding class, error message: " + ex.Message + ". Please fix the error and commit it to AddCppClass project on GitHub)";
                 bool closeDialog = VS.MessageBox.Show("Error", errorMessage, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL) == VSConstants.MessageBoxResult.IDCANCEL;
                 if (closeDialog)
                 {
                     DialogResult = false;
                     Close();
-                } else
+                }
+                else
                 {
                     return;
                 }
@@ -790,223 +510,6 @@ namespace Dwarfovich.AddCppClass
 
             return false;
         }
-        private void SubfolderKeyDownPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void SubfolderKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key))
-            {
-                e.Handled = false;
-            }
-            else if (IsPathSeparator(e.Key))
-            {
-                ComboBox combo = sender as ComboBox;
-                if (combo == null)
-                {
-                    throw new InvalidCastException("Sender should be a TextBox");
-                }
-
-                var textBox = (TextBox)combo.Template.FindName("PART_EditableTextBox", combo);
-                if (textBox == null)
-                {
-                    throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
-                }
-
-                var caretPos = textBox.CaretIndex;
-                if (String.IsNullOrEmpty(textBox.Text) || caretPos == 0) // First symbol cann't be a path separator.
-                {
-                    if (IsPathSeparator(e.Key))
-                    {
-                        e.Handled = true;
-                        return;
-                    }
-                }
-
-                if (IsPathSeparator(e.Key))
-                {
-                    var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
-                    if (canInsert)
-                    {
-                        textBox.Text = textBox.Text.Insert(caretPos, "\\"); ;
-                        textBox.CaretIndex = caretPos + 1;
-                    }
-                    e.Handled = true;
-                    return;
-                }
-
-            }
-            else
-            {
-                e.Handled = true;
-            }
-        }
-        private void SubfolderKeyUpPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = false;
-            }
-        }
-
-        private void FileKeyDownPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
-        }
-        private void FileKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key))
-            {
-                e.Handled = false;
-            }
-            else
-            {
-                e.Handled = true;
-            }
-        }
-        private void FileKeyUpPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = false;
-            }
-        }
-
-        private void HeaderExtensionKeyDownPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
-        }
-        private void HeaderExtensionKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key))
-            {
-                e.Handled = false;
-            }
-            else if (e.Key == Key.Back)
-            {
-                TextBox textBox = sender as TextBox;
-                if (textBox == null)
-                {
-                    throw new InvalidCastException("Sender should be a TextBox");
-                }
-
-                var caretPos = textBox.CaretIndex;
-                if (caretPos == 1 && caretPos - 1 > 0 && textBox.Text[caretPos - 1] == '.')
-                {
-                    e.Handled = true;
-                }
-                else
-                {
-                    e.Handled = false;
-                }
-            }
-            else if (e.Key == Key.Delete)
-            {
-                TextBox textBox = sender as TextBox;
-                if (textBox == null)
-                {
-                    throw new InvalidCastException("Sender should be a TextBox");
-                }
-
-                var caretPos = textBox.CaretIndex;
-                if (caretPos == 0)
-                {
-                    e.Handled = true;
-                }
-                else
-                {
-                    e.Handled = false;
-                }
-            }
-            else
-            {
-                e.Handled = true;
-            }
-        }
-        private void HeaderExtensionKeyUpPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = false;
-            }
-        }
-
-        private void PrecompiledHeaderKeyDownPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = true;
-
-            }
-            else if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
-        }
-        private void PrecompiledHeaderKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if (IsDigit(e.Key) || IsLetter(e.Key) || IsUnderline(e.Key) || IsPeriod(e.Key) || IsPathSeparator(e.Key))
-            {
-                if (IsPathSeparator(e.Key))
-                {
-                    var textBox = sender as TextBox;
-                    if (textBox == null)
-                    {
-                        throw new InvalidCastException("Couldn't get TextBox part of ComboBox");
-                    }
-
-                    var caretPos = textBox.CaretIndex;
-                    var canInsert = CanInsertPathSeparator(textBox.Text, caretPos);
-                    if (canInsert)
-                    {
-                        textBox.Text = textBox.Text.Insert(caretPos, "/");
-                        textBox.CaretIndex = caretPos + 1;
-                    }
-                    e.Handled = true;
-                }
-                else
-                {
-                    e.Handled = false;
-                }
-            }
-            else
-            {
-                e.Handled = true;
-            }
-        }
-        private void PrecompiledHeaderKeyUpPreviewHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-            {
-                shiftEnabled = false;
-            }
-        }
 
         private void HasImplementationFileCheckChanged(object sender, EventArgs e)
         {
@@ -1085,7 +588,7 @@ namespace Dwarfovich.AddCppClass
         {
             _ = VS.MessageBox.Show(caption, text, OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK);
         }
-        
+
         private void UseSingleFolderInfoButtonDown(object sender, EventArgs e)
         {
             ShowInfoMessage("Use single subfolder", "If this checkbox is checked implementation file would be created in the same folder as header file");
@@ -1093,7 +596,7 @@ namespace Dwarfovich.AddCppClass
 
         private void CreateFiltersInfoButtonDown(object sender, EventArgs e)
         {
-            ShowInfoMessage("Create filters", "If this checkbox is checked filters with corresponding files would be added to the project. For example, file with path \"src/header.h\" will added to filter \"src\".");
+            ShowInfoMessage("Create filters", "If this checkbox is checked filters with corresponding files would be added to the project. For example, file with path \"MyFolder/header.h\" will added to filter \"MyFolder\".");
         }
 
         private void HeaderExtensionInfoButtonDown(object sender, EventArgs e)
