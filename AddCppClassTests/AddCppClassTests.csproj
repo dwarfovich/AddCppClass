@@ -125,7 +125,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="ClassGeneratorTests.cs" />
+    <Compile Include="ClassFacilitiesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

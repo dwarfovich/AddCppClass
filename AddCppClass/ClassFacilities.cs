@@ -5,11 +5,12 @@ using System.Security;
 
 namespace Dwarfovich.AddCppClass
 {
-    public class ClassGenerator
+    public class ClassFacilities
     {
         private string filename = "";
-        private static readonly Regex fileNameRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
-        public ClassGenerator()
+        private static readonly Regex namespaceRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
+        //private static readonly Regex fileNameRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
+        public ClassFacilities()
         {
         }
         public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
@@ -67,9 +68,42 @@ namespace Dwarfovich.AddCppClass
             }
 
         }
-        public static bool IsValidclassName(string name)
+
+        public static bool IsLatinLetter(char c)
         {
-            return fileNameRegex.IsMatch(name);
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        }
+        public static bool IsValidClassName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            if (!IsLatinLetter(name.First()) && name.First() != '_')
+            {
+                return false;
+            }
+
+            for (int i = 1; i < name.Length; i++)
+            {
+                if (!IsLatinLetter(name[i]) && !Char.IsDigit(name[i]) && name[i] != '_')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool IsValidNamespace(string ns)
+        {
+            if (ns is null)
+            {
+                return false;
+            }
+
+            return namespaceRegex.IsMatch(ns);
         }
 
         public static bool IsValidSubfolder(string subfolder)
@@ -87,7 +121,7 @@ namespace Dwarfovich.AddCppClass
             }
             catch
             {
-                return false; 
+                return false;
             }
         }
 

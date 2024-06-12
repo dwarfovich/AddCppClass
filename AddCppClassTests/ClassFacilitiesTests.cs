@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace Dwarfovich.AddCppClass.Tests
 {
     [TestClass()]
-    public class ClassGeneratorTests
+    public class ClassFacilitiesTests
     {
         [TestMethod()]
         public void GenerateSnakeCaseHeaderFilenameTestValidness()
         {
-            AddCppClass.ClassGenerator classGenerator = new AddCppClass.ClassGenerator();
+            AddCppClass.ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
             AddCppClass.Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.SnakeCase, headerExtension: ".h");
             Assert.AreEqual("", classGenerator.GenerateFilename(classSettings));
@@ -57,7 +57,7 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void GenerateCamelCaseFilenameTestValidness()
         {
-            AddCppClass.ClassGenerator classGenerator = new AddCppClass.ClassGenerator();
+            AddCppClass.ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
             AddCppClass.Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.CamelCase, headerExtension: ".hpp");
             Assert.AreEqual(classSettings.className, classGenerator.GenerateFilename(classSettings));
@@ -100,7 +100,7 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void GenerateLowerCaseFilenameTestValidness()
         {
-            AddCppClass.ClassGenerator classGenerator = new AddCppClass.ClassGenerator();
+            AddCppClass.ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
             AddCppClass.Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.LowerCase, headerExtension: ".hpp");
             Assert.AreEqual("", classGenerator.GenerateFilename(classSettings));
@@ -141,32 +141,43 @@ namespace Dwarfovich.AddCppClass.Tests
         }
 
         [TestMethod()]
-        public void IsValidclassNameTest()
+        public void IsValidСlassNameTest()
         {
-            Assert.IsTrue(ClassGenerator.IsValidclassName("a"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("SuperClass"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("a1"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("a1a"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("a11a22"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("ABRA3K122"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("_123_"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("_ABRA3K122"));
-            Assert.IsTrue(ClassGenerator.IsValidclassName("_1_B_RA3K122__"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("a"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("SuperClass"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("a1"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("a1a"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("a11a22"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("ABRA3K122"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("_123_"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("__ABRA3K122"));
+            Assert.IsTrue(ClassFacilities.IsValidClassName("_1_B_RA3K122__"));
         }
 
         [TestMethod()]
-        public void IsInvalidclassNameTest()
+        public void IsInvalidСlassNameTest()
         {
-            Assert.IsFalse(ClassGenerator.IsValidclassName(""));
-            Assert.IsFalse(ClassGenerator.IsValidclassName(" "));
-            Assert.IsFalse(ClassGenerator.IsValidclassName("1"));
-            Assert.IsFalse(ClassGenerator.IsValidclassName("0abc"));
-            Assert.IsFalse(ClassGenerator.IsValidclassName("a a"));
-            Assert.IsFalse(ClassGenerator.IsValidclassName(" asbgt"));
-            Assert.IsFalse(ClassGenerator.IsValidclassName(" 1"));
-            Assert.IsFalse(ClassGenerator.IsValidclassName("_ _"));
-            Assert.IsFalse(ClassGenerator.IsValidclassName("a "));
-            Assert.IsFalse(ClassGenerator.IsValidclassName("abra746 "));
+            Assert.IsFalse(ClassFacilities.IsValidClassName(""));
+            Assert.IsFalse(ClassFacilities.IsValidClassName(" "));
+            Assert.IsFalse(ClassFacilities.IsValidClassName("1"));
+            Assert.IsFalse(ClassFacilities.IsValidClassName("0abc"));
+            Assert.IsFalse(ClassFacilities.IsValidClassName("a a"));
+            Assert.IsFalse(ClassFacilities.IsValidClassName(" asbgt"));
+            Assert.IsFalse(ClassFacilities.IsValidClassName(" 1"));
+            Assert.IsFalse(ClassFacilities.IsValidClassName("_ _"));
+            Assert.IsFalse(ClassFacilities.IsValidClassName("a "));
+            Assert.IsFalse(ClassFacilities.IsValidClassName("abra746 "));
+        }
+
+        [TestMethod()]
+        public void IsValidNamespaceTest()
+        {
+            Assert.IsFalse(ClassFacilities.IsValidNamespace(""));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("a"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("a1_"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_9p_"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_qwe::q"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_::_q::p091_::as_"));
         }
     }
 }

@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ClassGenerator.cs" />
+    <Compile Include="ClassFacilities.cs" />
     <Compile Include="ClassAdder.cs" />
     <Compile Include="ClassSettingsErrorsCollection.cs" />
     <Compile Include="Settings.cs" />

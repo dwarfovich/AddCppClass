@@ -13,7 +13,7 @@ namespace Dwarfovich.AddCppClass
     {
         public Settings settings { get; private set; } = new();
 
-        private ClassGenerator generator = new();
+        private ClassFacilities generator = new();
         private ClassSettingsErrorsCollection errors = new();
         private bool shiftEnabled = false;
         private readonly string title = "Add C++ class";
@@ -178,7 +178,7 @@ namespace Dwarfovich.AddCppClass
 
             if (textBox != null)
             {
-                if (ClassGenerator.IsValidclassName(textBox.Text))
+                if (ClassFacilities.IsValidClassName(textBox.Text))
                 {
                     settings.className = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
                     (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
@@ -209,7 +209,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassGenerator.IsValidSubfolder(comboBox.Text))
+            if (ClassFacilities.IsValidSubfolder(comboBox.Text))
             {
                 RemoveError(comboBox);
                 if (settings.useSingleSubfolder)
@@ -230,7 +230,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassGenerator.IsValidSubfolder(comboBox.Text))
+            if (ClassFacilities.IsValidSubfolder(comboBox.Text))
             {
                 RemoveError(comboBox);
             }
@@ -248,7 +248,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassGenerator.IsValidHeaderExtension(comboBox.Text))
+            if (ClassFacilities.IsValidHeaderExtension(comboBox.Text))
             {
                 RemoveError(comboBox);
                 settings.AddMostRecentHeaderExtension(comboBox.Text);
@@ -268,7 +268,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassGenerator.IsValidFilename(textBox.Text))
+            if (ClassFacilities.IsValidFilename(textBox.Text))
             {
                 RemoveError(textBox);
             }
@@ -285,7 +285,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassGenerator.IsValidFilename(textBox.Text))
+            if (ClassFacilities.IsValidFilename(textBox.Text))
             {
                 RemoveError(textBox);
             }
@@ -443,7 +443,7 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-                if (ClassGenerator.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                if (ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
                 {
                     RemoveError(ImplementationSubfolderCombo);
                 }
@@ -464,7 +464,7 @@ namespace Dwarfovich.AddCppClass
 
             if ((bool)checkBox.IsChecked)
             {
-                if (ClassGenerator.IsValidSubfolder(HeaderSubfolderCombo.Text))
+                if (ClassFacilities.IsValidSubfolder(HeaderSubfolderCombo.Text))
                 {
                     RemoveError(HeaderSubfolderCombo);
                 }
@@ -472,7 +472,7 @@ namespace Dwarfovich.AddCppClass
                 {
                     AddError(HeaderSubfolderCombo, "Header subfolder is invalid");
                 }
-                if (ClassGenerator.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                if (ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
                 {
                     RemoveError(ImplementationSubfolderCombo);
                 }
@@ -525,11 +525,11 @@ namespace Dwarfovich.AddCppClass
 
             if ((bool)checkBox.IsChecked)
             {
-                if (!ClassGenerator.IsValidFilename(ImplementationFilename.Text))
+                if (!ClassFacilities.IsValidFilename(ImplementationFilename.Text))
                 {
                     AddError(ImplementationFilename, "Implementation file name is invalid");
                 }
-                if (!ClassGenerator.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                if (!ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
                 {
                     AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
                 }
@@ -552,7 +552,7 @@ namespace Dwarfovich.AddCppClass
             if ((bool)checkBox.IsChecked)
             {
                 PrecompiledHeader.IsEnabled = true;
-                if (ClassGenerator.IsValidPrecompiledHeaderPath(PrecompiledHeader.Text))
+                if (ClassFacilities.IsValidPrecompiledHeaderPath(PrecompiledHeader.Text))
                 {
                     RemoveError(PrecompiledHeader);
                 }
@@ -573,7 +573,7 @@ namespace Dwarfovich.AddCppClass
             TextBox textBox = sender as TextBox;
             if (textBox != null)
             {
-                if (ClassGenerator.IsValidPrecompiledHeaderPath(textBox.Text))
+                if (ClassFacilities.IsValidPrecompiledHeaderPath(textBox.Text))
                 {
                     RemoveError(sender);
                 }
