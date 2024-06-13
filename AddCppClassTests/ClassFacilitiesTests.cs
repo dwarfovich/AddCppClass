@@ -172,12 +172,37 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsValidNamespaceTest()
         {
-            Assert.IsFalse(ClassFacilities.IsValidNamespace(""));
-            Assert.IsFalse(ClassFacilities.IsValidNamespace("a"));
-            Assert.IsFalse(ClassFacilities.IsValidNamespace("a1_"));
-            Assert.IsFalse(ClassFacilities.IsValidNamespace("_9p_"));
-            Assert.IsFalse(ClassFacilities.IsValidNamespace("_qwe::q"));
-            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_::_q::p091_::as_"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace(""));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("a"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("::a"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("a1_"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("_9p_"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("::_9p_"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("_qwe::q"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("::_qwe::q"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("_q4_::_q::p091_::as_"));
+            Assert.IsTrue(ClassFacilities.IsValidNamespace("::_q4_::_q::p091_::as_"));
+        }
+
+        [TestMethod()]
+        public void IsInvalidNamespaceTest()
+        {
+            Assert.IsFalse(ClassFacilities.IsValidNamespace(" "));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("::"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace(":a"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("a::"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("a:"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("::a1_::"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("::_:"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_9p_::a::"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_qwe:::q"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_::_q::p0 91_::as_"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_::::p0"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_:: ::p0"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_:p0"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace(":_q4_::p0"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_::p0:"));
+            Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_:: :p0"));
         }
     }
 }

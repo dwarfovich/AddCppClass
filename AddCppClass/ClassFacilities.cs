@@ -8,7 +8,7 @@ namespace Dwarfovich.AddCppClass
     public class ClassFacilities
     {
         private string filename = "";
-        private static readonly Regex namespaceRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
+        private static readonly Regex namespaceRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z_\d]*::)*([a-zA-Z_][a-zA-Z_\d]*)$");
         //private static readonly Regex fileNameRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
         public ClassFacilities()
         {
@@ -101,6 +101,16 @@ namespace Dwarfovich.AddCppClass
             if (ns is null)
             {
                 return false;
+            }
+
+            if(ns == "::")
+            {
+                return false;
+            }
+
+            if(ns.Length == 0)
+            {
+                return true;
             }
 
             return namespaceRegex.IsMatch(ns);
