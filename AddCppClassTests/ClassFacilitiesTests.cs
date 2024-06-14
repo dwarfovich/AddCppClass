@@ -204,5 +204,119 @@ namespace Dwarfovich.AddCppClass.Tests
             Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_::p0:"));
             Assert.IsFalse(ClassFacilities.IsValidNamespace("_q4_:: :p0"));
         }
+
+        [TestMethod()]
+        public void IsValidSubfolderTest()
+        {
+            Assert.IsTrue(ClassFacilities.IsValidSubfolder("a"));
+            Assert.IsTrue(ClassFacilities.IsValidSubfolder("a\\b"));
+            Assert.IsTrue(ClassFacilities.IsValidSubfolder("a\\_3_\\t5"));
+            Assert.IsTrue(ClassFacilities.IsValidSubfolder("a\\_3_\\t5kf\\za\\_1"));
+        }
+
+        [TestMethod()]
+        public void IsInvalidSubfolderTest()
+        {
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder(" "));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder(" a"));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder("a "));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder("a a"));
+        }
+
+        [TestMethod()]
+        public void ConformSubfolderTest()
+        {
+            Assert.AreEqual("", ClassFacilities.ConformSubfolder(String.Empty));
+            Assert.AreEqual("", ClassFacilities.ConformSubfolder(""));
+            Assert.AreEqual("a",ClassFacilities.ConformSubfolder("a"));
+            Assert.AreEqual("a",ClassFacilities.ConformSubfolder("/a"));
+            Assert.AreEqual("a",ClassFacilities.ConformSubfolder("a/"));
+            Assert.AreEqual("a", ClassFacilities.ConformSubfolder("/a/"));
+            Assert.AreEqual("a", ClassFacilities.ConformSubfolder("\\a"));
+            Assert.AreEqual("a", ClassFacilities.ConformSubfolder("a\\"));
+            Assert.AreEqual("a", ClassFacilities.ConformSubfolder("\\a\\"));
+            Assert.AreEqual("a\\b",ClassFacilities.ConformSubfolder("/a/b/"));
+            Assert.AreEqual("a\\b\\c",ClassFacilities.ConformSubfolder("/a/b/c/"));
+            Assert.AreEqual("a\\b\\c", ClassFacilities.ConformSubfolder("\\a\\b\\c\\"));
+        }
+
+        [TestMethod()]
+        public void IsValidPrecompiledHeaderPathTest()
+        {
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath(""));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath(".a"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("q/.a"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("q\\.a"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a2/pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a2\\pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("\\a2\\pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("/a2\\pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("/_\\a/2\\_pch.h"));
+        }
+
+        [TestMethod()]
+        public void IsInvalidPrecompiledHeaderPathTest()
+        {
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a/"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a//"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a\\\\"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\\\a"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("//a"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/a/"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a/"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a\\"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/a\\"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a."));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/a."));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a."));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a.\\"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a./"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath(" "));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath(" a"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a "));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a a"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a a/q"));
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a a/q q"));
+        }
+
+        public void ConformPrecompiledHeaderPathTest()
+        {
+            Assert.AreEqual("", ClassFacilities.ConformPrecompiledHeaderPath(String.Empty));
+            Assert.AreEqual("a", ClassFacilities.ConformPrecompiledHeaderPath("a"));
+            Assert.AreEqual("a.h", ClassFacilities.ConformPrecompiledHeaderPath("a.h"));
+            Assert.AreEqual("a", ClassFacilities.ConformPrecompiledHeaderPath("/a"));
+            Assert.AreEqual("a", ClassFacilities.ConformPrecompiledHeaderPath("\\a"));
+            Assert.AreEqual("a/a.h", ClassFacilities.ConformPrecompiledHeaderPath("\\a\\a.h"));
+            Assert.AreEqual("_/_a/a.h", ClassFacilities.ConformPrecompiledHeaderPath("_\\_a/a.h"));
+        }
+
+        [TestMethod()]
+        public void IsValidFileExtensionTest()
+        {
+            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".a"));
+            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".ab3_"));
+            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".0ab3_Z"));
+            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".a.b"));
+            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".a.b_._d.4"));
+        }
+
+        [TestMethod()]
+        public void IsInvalidFileExtensionTest()
+        {
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(string.Empty));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(" "));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension("."));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".."));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d."));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d.a."));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension("d a"));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d a"));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d.a "));
+            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(" .pch"));
+        }
     }
 }

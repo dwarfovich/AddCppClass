@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using AddCppClass;
+using Community.VisualStudio.Toolkit;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -295,55 +296,31 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private string ConformSubfoler(string subfoler)
-        {
-            if (String.IsNullOrEmpty(subfoler))
-            {
-                return "";
-            }
-
-            if (subfoler.EndsWith("\\") || subfoler.EndsWith("/"))
-            {
-                subfoler = subfoler.Remove(subfoler.Length - 1);
-            }
-
-            return subfoler;
-        }
-
         private void SaveSettings()
         {
             settings.className = classNameTextBox.Text;
             settings.AddMostRecentNamespace(NamespaceCombo.Text);
 
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
-
-            if (HeaderSubfolderCombo.Text.EndsWith("\\"))
+            string conformedSubfolder = ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text);
+            settings.AddMostRecentHeaderSubfolder(conformedSubfolder);
+            if (!settings.useSingleSubfolder)
             {
-                HeaderSubfolderCombo.Text = HeaderSubfolderCombo.Text.Remove(HeaderSubfolderCombo.Text.Length - 1);
+                settings.AddMostRecentImplementationSubfolder(ClassFacilities.ConformSubfolder(ImplementationSubfolderCombo.Text));
             }
-            settings.AddMostRecentHeaderSubfolder(HeaderSubfolderCombo.Text);
-            if (settings.useSingleSubfolder)
-            {
-                settings.AddMostRecentImplementationSubfolder(HeaderSubfolderCombo.Text);
-                settings.AddMostRecentImplementationSubfolder(settings.RecentHeaderSubfolder());
-            }
-            else
-            {
-                if (ImplementationSubfolderCombo.Text.EndsWith("\\"))
-                {
-                    ImplementationSubfolderCombo.Text = ImplementationSubfolderCombo.Text.Remove(ImplementationSubfolderCombo.Text.Length - 1);
-                }
-                settings.AddMostRecentImplementationSubfolder(ImplementationSubfolderCombo.Text);
-            }
-
             settings.headerFilename = HeaderFilename.Text;
-            settings.implementationFilename = ImplementationFilename.Text;
             settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
+            settings.implementationFilename = ImplementationFilename.Text;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
+            settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
+            if (settings.includePrecompiledHeader) { 
+                settings.precompiledHeader = ClassFacilities.ConformPrecompiledHeaderPath(PrecompiledHeader.Text);
+            }
+            else {
+                settings.precompiledHeader = "";
+            }
 
             settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
-            settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
-            settings.precompiledHeader = PrecompiledHeader.Text;
         }
 
         private bool CheckFiles()

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Security;
+using System;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -9,7 +10,9 @@ namespace Dwarfovich.AddCppClass
     {
         private string filename = "";
         private static readonly Regex namespaceRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z_\d]*::)*([a-zA-Z_][a-zA-Z_\d]*)$");
-        //private static readonly Regex fileNameRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z\d_]*::)*([a-zA-Z_][a-zA-Z\d_]*)$");
+        private static readonly Regex fileNameRegex = new(@"([a-zA-Z_\-\d]*.)*([a-zA-Z_\-\d])$");
+        private static readonly Regex fileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
+
         public ClassFacilities()
         {
         }
@@ -103,12 +106,12 @@ namespace Dwarfovich.AddCppClass
                 return false;
             }
 
-            if(ns == "::")
+            if (ns == "::")
             {
                 return false;
             }
 
-            if(ns.Length == 0)
+            if (ns.Length == 0)
             {
                 return true;
             }
@@ -116,9 +119,35 @@ namespace Dwarfovich.AddCppClass
             return namespaceRegex.IsMatch(ns);
         }
 
+        public static string ConformSubfolder(string subfolder)
+        {
+            if (String.IsNullOrEmpty(subfolder))
+            {
+                return "";
+            }
+
+            if (subfolder.EndsWith("\\") || subfolder.EndsWith("/"))
+            {
+                subfolder = subfolder.Remove(subfolder.Length - 1);
+            }
+            if (subfolder.StartsWith("\\") || subfolder.StartsWith("/"))
+            {
+                subfolder = subfolder.Remove(0, 1);
+            }
+
+            subfolder = subfolder.Replace("/", "\\");
+
+            return subfolder;
+        }
+
         public static bool IsValidSubfolder(string subfolder)
         {
             if (String.IsNullOrWhiteSpace(subfolder))
+            {
+                return false;
+            }
+
+            if (subfolder.Any(Char.IsWhiteSpace))
             {
                 return false;
             }
@@ -137,40 +166,61 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidFilename(string filename)
         {
-            return filename.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+            return fileNameRegex.IsMatch(filename);
+        }
+
+        public static string ConformPrecompiledHeaderPath(string path)
+        {
+            if (String.IsNullOrEmpty(path))
+            {
+                return "";
+            }
+
+            if (path.StartsWith("\\") || path.StartsWith("/"))
+            {
+                path = path.Remove(0, 1);
+            }
+
+            path = path.Replace("\\", "/");
+            var pos = path.LastIndexOf('/');
+            if (pos == -1)
+            {
+                return path;
+            }
+            else
+            {
+                return ConformSubfolder(path.Substring(0, pos)) + '/' + path.Substring(pos + 1);
+            }
         }
 
         public static bool IsValidPrecompiledHeaderPath(string path)
         {
-            string pathWithDirSeparators = path.Replace('/', Path.DirectorySeparatorChar);
-            var pos = pathWithDirSeparators.LastIndexOf(Path.DirectorySeparatorChar);
+            if (path.Any(Char.IsWhiteSpace))
+            {
+                return false;
+            }
+
+            if (path== string.Empty)
+            {
+                return true;
+            }
+
+            var separatorPos = path.LastIndexOf(Path.DirectorySeparatorChar);
+            var slashPos = path.LastIndexOf('/');
+            var pos = Math.Max(separatorPos, slashPos);
             if (pos == -1)
             {
-                return IsValidFilename(pathWithDirSeparators);
+                return IsValidFilename(path);
             }
             else
             {
-                return IsValidSubfolder(pathWithDirSeparators.Substring(0, pos)) && IsValidFilename(pathWithDirSeparators.Substring(pos + 1));
+                return IsValidSubfolder(ConformSubfolder(path.Substring(0, pos)))
+                    && IsValidFilename(path.Substring(pos + 1));
             }
         }
         public static bool IsValidHeaderExtension(string extension)
         {
-            if (String.IsNullOrEmpty(extension))
-            {
-                return false;
-            }
-
-            if (extension.First() != '.')
-            {
-                return false;
-            }
-
-            if (extension.Any(Char.IsWhiteSpace))
-            {
-                return false;
-            }
-
-            return extension.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+            return fileExtensionRegex.IsMatch(extension);
         }
     }
 }
