@@ -14,9 +14,8 @@ namespace Dwarfovich.AddCppClass
     {
         public Settings settings { get; private set; } = new();
 
-        private ClassFacilities generator = new();
+        private ClassFacilities classFacilities = new();
         private ClassSettingsErrorsCollection errors = new();
-        private bool shiftEnabled = false;
         private readonly string title = "Add C++ class";
         private readonly string defaultclassName = "MyClass";
         private readonly string errorMessageBeginning = "Error message: ";
@@ -136,7 +135,7 @@ namespace Dwarfovich.AddCppClass
                 if (button.GroupName == "filenameStyleGroup")
                 {
                     UpdateFilenameStyleSettings(button);
-                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
+                    (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
                 }
                 UpdateFilenameTextBoxes();
             }
@@ -169,7 +168,7 @@ namespace Dwarfovich.AddCppClass
             }
 
         }
-        private void classNameChangedEventHandler(object sender, TextChangedEventArgs args)
+        private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
             if (textBox == null)
@@ -182,7 +181,7 @@ namespace Dwarfovich.AddCppClass
                 if (ClassFacilities.IsValidClassName(textBox.Text))
                 {
                     settings.className = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
-                    (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenames(settings);
+                    (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
                     UpdateFilenameTextBoxes();
                     RemoveError(textBox);
                 }
@@ -193,7 +192,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void classNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void ClassNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ComboBox combo = sender as ComboBox;
             if (combo == null)
@@ -253,7 +252,7 @@ namespace Dwarfovich.AddCppClass
             {
                 RemoveError(comboBox);
                 settings.AddMostRecentHeaderExtension(comboBox.Text);
-                (settings.headerFilename, settings.implementationFilename) = generator.GenerateFilenamesForChangedExtension(settings);
+                (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenamesForChangedExtension(settings);
                 UpdateFilenameTextBoxes();
             }
             else
@@ -465,27 +464,6 @@ namespace Dwarfovich.AddCppClass
             }
 
             settings.createFilters = (bool)checkBox.IsChecked;
-        }
-
-        private bool CanInsertPathSeparator(string text, int caretPos)
-        {
-            if (String.IsNullOrEmpty(text))
-            {
-                return false;
-            }
-
-            int previousPos = caretPos - 1;
-            int nextPos = caretPos + 1 < text.Length ? caretPos + 1 : -1;
-
-            if (previousPos < 0 || text[previousPos] != '\\' && text[previousPos] != '.')
-            {
-                if (nextPos == -1 || (text[nextPos] != '\\'))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void HasImplementationFileCheckChanged(object sender, EventArgs e)
