@@ -16,6 +16,12 @@ namespace Dwarfovich.AddCppClass
         LowerCase
     };
 
+    public enum IncludeGuard
+    {
+        PragmaOnce,
+        Ifndef
+    };
+
     public class Settings
     {
         [JsonIgnore]
@@ -48,6 +54,7 @@ namespace Dwarfovich.AddCppClass
                 _mostRecentNamespaceTokenized = value;
             }
         }
+        [JsonConverter(typeof(StringEnumConverter))]
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions = 10;
         [JsonProperty]
@@ -70,6 +77,8 @@ namespace Dwarfovich.AddCppClass
         public bool autoSaveSettings { get; set; } = true;
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = "pch.h";
+        [JsonConverter(typeof(StringEnumConverter))]
+        public IncludeGuard includeGuardStyle { get; set; } = IncludeGuard.PragmaOnce;
         public Settings() { }
         public Settings(string className, FilenameStyle style, string headerExtension) {
             this.className = className;

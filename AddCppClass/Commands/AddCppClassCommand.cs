@@ -69,7 +69,7 @@ namespace Dwarfovich.AddCppClass
             return settings;
         }
 
-        private void SaveSettings(Settings settings)
+        private void SaveSettingsToFile(Settings settings)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -94,9 +94,9 @@ namespace Dwarfovich.AddCppClass
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;
             bool result = (bool)dialog.ShowModal();
-            if (result && dialog.ShouldSaveSettings())
+            if (result && dialog.ShouldSaveSettingsToFile())
             {
-                SaveSettings(dialog.settings);
+                SaveSettingsToFile(dialog.settings);
             }
         }
         private void OnBeforeQueryStatus(object sender, EventArgs e)

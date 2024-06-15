@@ -195,14 +195,9 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidPrecompiledHeaderPath(string path)
         {
-            if (path.Any(Char.IsWhiteSpace))
+            if (string.IsNullOrEmpty(path) || path.Any(Char.IsWhiteSpace))
             {
                 return false;
-            }
-
-            if (path== string.Empty)
-            {
-                return true;
             }
 
             var separatorPos = path.LastIndexOf(Path.DirectorySeparatorChar);

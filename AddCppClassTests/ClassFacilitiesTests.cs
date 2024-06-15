@@ -1,10 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Dwarfovich.AddCppClass;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dwarfovich.AddCppClass.Tests
 {
@@ -243,7 +238,6 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsValidPrecompiledHeaderPathTest()
         {
-            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath(""));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath(".a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("q/.a"));
@@ -259,6 +253,7 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsInvalidPrecompiledHeaderPathTest()
         {
+            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath(""));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a/"));

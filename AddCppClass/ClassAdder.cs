@@ -33,11 +33,26 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
+        private static string GenerateIfndefGuardFilenameToken(Settings settings)
+        {
+            return settings.headerFilename.ToUpper().Replace('.', '_');
+        }
         private static void PopulateHeaderFile(FileStream fileStream, Settings settings)
         {
             using (var writer = new StreamWriter(fileStream))
             {
-                writer.WriteLine("#pragma once" + Environment.NewLine);
+                string ifndefGuardFilenameToken = "";
+                if (settings.includeGuardStyle == IncludeGuard.PragmaOnce)
+                {
+                    writer.WriteLine("#pragma once" + Environment.NewLine);
+                } else
+                {
+                    ifndefGuardFilenameToken = GenerateIfndefGuardFilenameToken(settings);
+                    writer.WriteLine("#ifndef " + ifndefGuardFilenameToken);
+                    writer.WriteLine("#define " + ifndefGuardFilenameToken);
+                }
+                writer.Write(Environment.NewLine);
+
                 foreach (string ns in settings.mostRecentNamespaceTokenized)
                 {
                     writer.WriteLine("namespace " + ns + " {");
@@ -59,6 +74,11 @@ namespace Dwarfovich.AddCppClass
                 for (int i = settings.mostRecentNamespaceTokenized.Count() - 1; i >= 0; --i)
                 {
                     writer.WriteLine("} // namespace " + settings.mostRecentNamespaceTokenized[i]);
+                }
+                if (settings.includeGuardStyle == IncludeGuard.Ifndef)
+                {
+                    writer.Write(Environment.NewLine);
+                    writer.WriteLine("#endif // " + ifndefGuardFilenameToken);
                 }
             }
         }

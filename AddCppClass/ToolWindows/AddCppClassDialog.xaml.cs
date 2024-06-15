@@ -6,7 +6,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using AddCppClass;
-using Community.VisualStudio.Toolkit;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -75,6 +74,14 @@ namespace Dwarfovich.AddCppClass
             {
                 PrecompiledHeader.IsEnabled = false;
             }
+            if(settings.includeGuardStyle == IncludeGuard.PragmaOnce)
+            {
+                PragmaOnceGuardStyle.IsChecked = true;
+            }
+            else
+            {
+                IfndefGuardStyle.IsChecked = true;
+            }
 
             AutosaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
         }
@@ -111,7 +118,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void UpdateFilenameStyleSettings(RadioButton button)
+        private void SaveFilenameStyleSettings(RadioButton button)
         {
             if (button.Content.ToString() == "CamelCase")
             {
@@ -127,20 +134,29 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void RadioButtonChecked(object sender, EventArgs e)
+        private void SaveIncludeGuardStyleSettings()
+        {
+            if ((bool)PragmaOnceGuardStyle.IsChecked)
+            {
+                settings.includeGuardStyle = IncludeGuard.PragmaOnce;
+            }
+            else
+            {
+                settings.includeGuardStyle = IncludeGuard.Ifndef;
+            }
+        }
+
+        private void FilenameStyleRadioButtonChecked(object sender, EventArgs e)
         {
             RadioButton button = sender as RadioButton;
             if (button != null && (bool)button.IsChecked)
             {
-                if (button.GroupName == "filenameStyleGroup")
-                {
-                    UpdateFilenameStyleSettings(button);
-                    (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
-                }
+                SaveFilenameStyleSettings(button);
+                (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
                 UpdateFilenameTextBoxes();
             }
         }
-
+        
         private void RemoveError(Object source)
         {
             bool hasOtherErrors = errors.RemoveError(source);
@@ -180,7 +196,7 @@ namespace Dwarfovich.AddCppClass
             {
                 if (ClassFacilities.IsValidClassName(textBox.Text))
                 {
-                    settings.className = textBox.Text.Substring(textBox.Text.LastIndexOf(':') + 1);
+                    settings.className = textBox.Text;
                     (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
                     UpdateFilenameTextBoxes();
                     RemoveError(textBox);
@@ -192,15 +208,27 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void ClassNameComboSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void NamespaceChangedEventHandler(object sender, TextChangedEventArgs args)
         {
-            ComboBox combo = sender as ComboBox;
-            if (combo == null)
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox == null)
             {
-                return;
+                throw new InvalidCastException("Sender should be a ComboBox");
+            }
+            TextBox textBox = (TextBox)comboBox.Template.FindName("PART_EditableTextBox", comboBox);
+            if (textBox != null)
+            {
+                if (ClassFacilities.IsValidNamespace(textBox.Text))
+                {
+                    RemoveError(textBox);
+                }
+                else
+                {
+                    AddError(textBox, "Namespace is invalid.");
+                }
             }
         }
-
+        
         private void HeaderSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             ComboBox comboBox = sender as ComboBox;
@@ -318,6 +346,7 @@ namespace Dwarfovich.AddCppClass
             else {
                 settings.precompiledHeader = "";
             }
+            SaveIncludeGuardStyleSettings();
 
             settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
         }
@@ -397,7 +426,7 @@ namespace Dwarfovich.AddCppClass
             Close();
         }
 
-        public bool ShouldSaveSettings()
+        public bool ShouldSaveSettingsToFile()
         {
             return settings.autoSaveSettings;
         }
