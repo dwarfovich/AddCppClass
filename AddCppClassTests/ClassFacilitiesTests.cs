@@ -9,9 +9,9 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void GenerateSnakeCaseHeaderFilenameTestValidness()
         {
-            AddCppClass.ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
+            ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
-            AddCppClass.Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.SnakeCase, headerExtension: ".h");
+            Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.SnakeCase, headerExtension: ".h");
             Assert.AreEqual("", classGenerator.GenerateFilename(classSettings));
             classSettings.className = "1";
             Assert.AreEqual("1", classGenerator.GenerateFilename(classSettings));
@@ -52,9 +52,9 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void GenerateCamelCaseFilenameTestValidness()
         {
-            AddCppClass.ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
+            ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
-            AddCppClass.Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.CamelCase, headerExtension: ".hpp");
+            Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.CamelCase, headerExtension: ".hpp");
             Assert.AreEqual(classSettings.className, classGenerator.GenerateFilename(classSettings));
             classSettings.className = "1";
             Assert.AreEqual(classSettings.className, classGenerator.GenerateFilename(classSettings));
@@ -95,9 +95,9 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void GenerateLowerCaseFilenameTestValidness()
         {
-            AddCppClass.ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
+            ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
-            AddCppClass.Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.LowerCase, headerExtension: ".hpp");
+            Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.LowerCase, headerExtension: ".hpp");
             Assert.AreEqual("", classGenerator.GenerateFilename(classSettings));
             classSettings.className = "1";
             Assert.AreEqual("1", classGenerator.GenerateFilename(classSettings));
@@ -203,6 +203,7 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsValidSubfolderTest()
         {
+            Assert.IsTrue(ClassFacilities.IsValidSubfolder(string.Empty));
             Assert.IsTrue(ClassFacilities.IsValidSubfolder("a"));
             Assert.IsTrue(ClassFacilities.IsValidSubfolder("a\\b"));
             Assert.IsTrue(ClassFacilities.IsValidSubfolder("a\\_3_\\t5"));
@@ -244,7 +245,9 @@ namespace Dwarfovich.AddCppClass.Tests
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("q\\.a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("pch.hpp"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a2/pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("//a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a2\\pch.hpp"));
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("\\\\a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("\\a2\\pch.hpp"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("/a2\\pch.hpp"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("/_\\a/2\\_pch.h"));
@@ -259,8 +262,6 @@ namespace Dwarfovich.AddCppClass.Tests
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a/"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a//"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a\\\\"));
-            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\\\a"));
-            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("//a"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/a/"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a/"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\a\\"));

@@ -3,9 +3,17 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System;
+using Microsoft.VisualStudio.Shell.Interop;
+using System.Collections.Generic;
+using Community.VisualStudio.Toolkit;
 
 namespace Dwarfovich.AddCppClass
 {
+    public class SettingErrors
+    {
+        public string settingName = "";
+        public List<string> invalidValues = new ();
+    }
     public class ClassFacilities
     {
         private string filename = "";
@@ -72,6 +80,74 @@ namespace Dwarfovich.AddCppClass
 
         }
 
+
+        //private class ComboBoxErrorsData
+        //{
+        //    public ComboBoxErrorsData(string settingName, Func<string, bool> validateFunction)
+        //    {
+        //        this.settingName = settingName;
+        //        this.validateFunction = validateFunction;
+        //    }
+        //    public void Reset(string settingName, Func<string, bool> validateFunction)
+        //    {
+        //        this.settingName = settingName;
+        //        this.validateFunction = validateFunction;
+        //        errors.Clear();
+        //    }
+        //    public string settingName { get; set; }
+        //    public List<string> errors { get; set; } = new List<string>();
+        //    public Func<string, bool> validateFunction { get; set; }
+        //    public bool CheckValue(string value)
+        //    {
+        //        bool isValid = validateFunction(value);
+        //        if (!isValid)
+        //        {
+        //            errors.Add(value);
+        //        }
+        //        return isValid;
+        //    }
+        //    public void ShowErrorMessageIfNeeded()
+        //    {
+        //        string message = "The setting \"" + settingName + "\" has one or more incorrect values in config file: " + Environment.NewLine;
+        //        foreach (var error in errors)
+        //        {
+        //            message += '\"' + error + '\"' + Environment.NewLine;
+        //        }
+        //        message += "These values will be ignored.";
+        //        if (errors.Count > 0)
+        //        {
+        //            VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+        //        }
+        //    }
+        //}
+
+        //ComboBoxErrorsData errorData = new ComboBoxErrorsData("namespace", (str) => ClassFacilities.IsValidNamespace(str));
+        // errorData.Reset("recent header extensions", (str) => ClassFacilities.IsValidHeaderExtension(str));
+        //errorData.Reset("recent header subfolders", (str) => ClassFacilities.IsValidSubfolder(str));
+        //errorData.Reset("recent implementation subfolders", (str) => ClassFacilities.IsValidSubfolder(str));
+        //errorData.Reset("precompiled header", (str) => ClassFacilities.IsValidPrecompiledHeaderPath(str));
+        static private SettingErrors ConformStringList(List<string> list, string settingName, Func<string, bool> validateFunction)
+        {
+            SettingErrors errors = new ();
+            errors.settingName = settingName;
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (!validateFunction(list[i]))
+                {
+                    errors.invalidValues.Add(list[i]);
+                }
+            }
+
+            return errors;
+        }
+        static public List<SettingErrors> ConformSettings(ref Settings settings)
+        {
+            List <SettingErrors> errors = new ();
+            List<string> values = settings.recentNamespaces;
+            var settingErrors = ConformStringList(out values, "recent namespaces", IsValidNamespace);
+
+            return errors;
+        }
         public static bool IsLatinLetter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
@@ -142,9 +218,9 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidSubfolder(string subfolder)
         {
-            if (String.IsNullOrWhiteSpace(subfolder))
+            if (String.IsNullOrEmpty(subfolder))
             {
-                return false;
+                return true;
             }
 
             if (subfolder.Any(Char.IsWhiteSpace))
