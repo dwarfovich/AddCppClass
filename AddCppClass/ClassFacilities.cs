@@ -1,18 +1,14 @@
 ﻿using System.Text.RegularExpressions;
 using System.IO;
 using System.Linq;
-using System.Security;
-using System;
-using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
-using Community.VisualStudio.Toolkit;
 
 namespace Dwarfovich.AddCppClass
 {
-    public class SettingErrors
+    public class SettingError
     {
         public string settingName = "";
-        public List<string> invalidValues = new ();
+        public List<string> invalidValues = new();
     }
     public class ClassFacilities
     {
@@ -21,9 +17,6 @@ namespace Dwarfovich.AddCppClass
         private static readonly Regex fileNameRegex = new(@"([a-zA-Z_\-\d]*.)*([a-zA-Z_\-\d])$");
         private static readonly Regex fileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
 
-        public ClassFacilities()
-        {
-        }
         public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
             return (filename + classSettings.RecentHeaderExtension(), filename + classSettings.implementationExtension);
@@ -80,71 +73,81 @@ namespace Dwarfovich.AddCppClass
 
         }
 
-
-        //private class ComboBoxErrorsData
-        //{
-        //    public ComboBoxErrorsData(string settingName, Func<string, bool> validateFunction)
-        //    {
-        //        this.settingName = settingName;
-        //        this.validateFunction = validateFunction;
-        //    }
-        //    public void Reset(string settingName, Func<string, bool> validateFunction)
-        //    {
-        //        this.settingName = settingName;
-        //        this.validateFunction = validateFunction;
-        //        errors.Clear();
-        //    }
-        //    public string settingName { get; set; }
-        //    public List<string> errors { get; set; } = new List<string>();
-        //    public Func<string, bool> validateFunction { get; set; }
-        //    public bool CheckValue(string value)
-        //    {
-        //        bool isValid = validateFunction(value);
-        //        if (!isValid)
-        //        {
-        //            errors.Add(value);
-        //        }
-        //        return isValid;
-        //    }
-        //    public void ShowErrorMessageIfNeeded()
-        //    {
-        //        string message = "The setting \"" + settingName + "\" has one or more incorrect values in config file: " + Environment.NewLine;
-        //        foreach (var error in errors)
-        //        {
-        //            message += '\"' + error + '\"' + Environment.NewLine;
-        //        }
-        //        message += "These values will be ignored.";
-        //        if (errors.Count > 0)
-        //        {
-        //            VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
-        //        }
-        //    }
-        //}
-
-        //ComboBoxErrorsData errorData = new ComboBoxErrorsData("namespace", (str) => ClassFacilities.IsValidNamespace(str));
-        // errorData.Reset("recent header extensions", (str) => ClassFacilities.IsValidHeaderExtension(str));
-        //errorData.Reset("recent header subfolders", (str) => ClassFacilities.IsValidSubfolder(str));
-        //errorData.Reset("recent implementation subfolders", (str) => ClassFacilities.IsValidSubfolder(str));
-        //errorData.Reset("precompiled header", (str) => ClassFacilities.IsValidPrecompiledHeaderPath(str));
-        static private SettingErrors ConformStringList(List<string> list, string settingName, Func<string, bool> validateFunction)
+        public static string[] TokenizeNamespace(string ns)
         {
-            SettingErrors errors = new ();
+            if (String.IsNullOrEmpty(ns))
+            {
+                return [];
+            }
+            else
+            {
+                return ns.Split(new[] { "::" }, StringSplitOptions.None);
+            }
+
+        }
+
+        static private SettingError ConformStringList(ref List<string> list, string settingName, Func<string, bool> validateFunction)
+        {
+            SettingError errors = new();
             errors.settingName = settingName;
             for (int i = list.Count - 1; i >= 0; i--)
             {
                 if (!validateFunction(list[i]))
                 {
                     errors.invalidValues.Add(list[i]);
+                    list.RemoveAt(i);
                 }
             }
 
             return errors;
         }
-        static public List<SettingErrors> ConformSettings(ref Settings settings)
+
+        static private void ConformStringList(ref Settings target, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
         {
-            List <SettingErrors> errors = new ();
-            List<string> values = settings.recentNamespaces;
-            var settingErrors = ConformStringList(out values, "recent namespaces", IsValidNamespace);
+            SettingError settingErrors = new();
+            settingErrors.settingName = settingName;
+            var list = target.GetType().GetProperty(settingName).GetValue(target) as List<string>;
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (!validateFunction(list[i]))
+                {
+                    settingErrors.invalidValues.Add(list[i]);
+                    list.RemoveAt(i);
+                }
+            }
+
+            target.GetType().GetProperty(settingName).SetValue(target, list);
+            if (settingErrors.invalidValues.Count > 0)
+            {
+                errors.Add(settingErrors);
+            }
+        }
+
+        static private void ConformPrecompiledHeaderPath(ref Settings target, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
+        {
+            SettingError settingErrors = new();
+            settingErrors.settingName = settingName;
+            var path = target.GetType().GetProperty(settingName).GetValue(target) as string;
+            if (!validateFunction(path))
+            {
+                settingErrors.invalidValues.Add(path);
+                target.GetType().GetProperty(settingName).SetValue(target, "");
+            }
+            if (settingErrors.invalidValues.Count > 0)
+            {
+                errors.Add(settingErrors);
+            }
+        }
+
+        static public List<SettingError> ConformSettings(ref Settings settings)
+        {
+            List<SettingError> errors = new();
+
+            ConformStringList(ref settings, nameof(Settings.recentNamespaces), IsValidNamespace, ref errors);
+            ConformStringList(ref settings, nameof(Settings.recentHeaderExtensions), IsValidHeaderExtension, ref errors);
+            ConformStringList(ref settings, nameof(Settings.recentHeaderSubfolders), IsValidSubfolder, ref errors);
+            ConformStringList(ref settings, nameof(Settings.recentImplementationSubfolders), IsValidSubfolder, ref errors);
+            ConformPrecompiledHeaderPath(ref settings, nameof(Settings.precompiledHeader), IsValidPrecompiledHeaderPath, ref errors);
 
             return errors;
         }

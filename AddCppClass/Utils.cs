@@ -68,21 +68,7 @@ namespace Dwarfovich.AddCppClass.Utils
             list[0] = item;
         }
     }
-    public static class ClassUtils
-    {
-        public static string[] TokenizeNamespace(string ns)
-        {
-            if (String.IsNullOrEmpty(ns))
-            {
-                return [];
-            }
-            else
-            {
-                return ns.Split(new[] { "::" }, StringSplitOptions.None);
-            }
-
-        }
-    }
+        
     public static class Keyboard
     {
         public static bool IsNumlockActive()

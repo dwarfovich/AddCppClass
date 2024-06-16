@@ -6,6 +6,8 @@ using System.IO;
 using Newtonsoft.Json;
 using AddCppClass;
 using System.ComponentModel.Design;
+using Community.VisualStudio.Toolkit;
+using System.Collections.Generic;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -85,11 +87,27 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
+        private void ShowSettingErrorMessage(SettingError settingError)
+        {
+            string message = "The setting \"" + settingError.settingName + "\" has one or more incorrect values in config file: " + Environment.NewLine;
+            foreach (var value in settingError.invalidValues)
+            {
+                message += '\"' + value + '\"' + Environment.NewLine;
+            }
+            message += "These values will be ignored.";
+            VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+        }
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var settings = GetSettings();
+            var errors = ClassFacilities.ConformSettings(ref settings);
+            foreach (var error in errors)
+            {
+                ShowSettingErrorMessage(error);
+            }
+
             var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;

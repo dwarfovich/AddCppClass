@@ -61,7 +61,7 @@ namespace Dwarfovich.AddCppClass
 
             
             PopulateComboBox(HeaderSubfolderCombo, settings.recentHeaderSubfolders, settings.maxRecentHeaderSubfolders);
-            PopulateComboBox(ImplementationSubfolderCombo, settings.recentImplementationSubfolders, errorData, settings.maxRecentImplementationSubfolders);
+            PopulateComboBox(ImplementationSubfolderCombo, settings.recentImplementationSubfolders, settings.maxRecentImplementationSubfolders);
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
             if (settings.useSingleSubfolder)
             {

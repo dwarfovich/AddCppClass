@@ -27,38 +27,38 @@ namespace Dwarfovich.AddCppClass
         [JsonIgnore]
         public string className { get; set; } = "";
         public int maxRecentNamespaces = 10;
-        public List<string> recentNamespaces { get; private set; }  = new List<string> { };
-        [JsonIgnore]
-        private string[] _mostRecentNamespaceTokenized = [];
-        [JsonIgnore]
-        public string[] mostRecentNamespaceTokenized
-        {
-            get
-            {
-                if (_mostRecentNamespaceTokenized == null || _mostRecentNamespaceTokenized.Length == 0)
-                {
-                    if (recentNamespaces == null || recentNamespaces.Count == 0)
-                    {
-                        return [];
-                    }
-                    else
-                    {
-                        _mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(recentNamespaces.First());
-                    }
-                }
+        public List<string> recentNamespaces { get; set; }  = new List<string> { };
+        //[JsonIgnore]
+       // private string[] _mostRecentNamespaceTokenized = [];
+        //[JsonIgnore]
+        //public string[] mostRecentNamespaceTokenized
+        //{
+        //    get
+        //    {
+        //        if (_mostRecentNamespaceTokenized == null || _mostRecentNamespaceTokenized.Length == 0)
+        //        {
+        //            if (recentNamespaces == null || recentNamespaces.Count == 0)
+        //            {
+        //                return [];
+        //            }
+        //            else
+        //            {
+        //                _mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(recentNamespaces.First());
+        //            }
+        //        }
 
-                return _mostRecentNamespaceTokenized;
-            }
-            private set
-            {
-                _mostRecentNamespaceTokenized = value;
-            }
-        }
+        //        return _mostRecentNamespaceTokenized;
+        //    }
+        //    private set
+        //    {
+        //        _mostRecentNamespaceTokenized = value;
+        //    }
+        //}
         [JsonConverter(typeof(StringEnumConverter))]
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions = 10;
         [JsonProperty]
-        public List<string> recentHeaderExtensions = new List<string> { ".h", ".hpp" };
+        public List<string> recentHeaderExtensions { get; set; } = new List<string> { ".h", ".hpp" };
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
@@ -69,11 +69,11 @@ namespace Dwarfovich.AddCppClass
         public bool hasImplementationFile { get; set; } = true;
         public bool createFilters { get; set; } = true;
         public int maxRecentHeaderSubfolders { get; set; } = 10;
-        [JsonProperty]
-        public List<string> recentHeaderSubfolders = new List<string> {};
+        //[JsonProperty]
+        public List<string> recentHeaderSubfolders { get; set; } = new List<string> {};
         public int maxRecentImplementationSubfolders { get; set; } = 10;
-        [JsonProperty]
-        public List<string> recentImplementationSubfolders = new List<string> { };
+        //[JsonProperty]
+        public List<string> recentImplementationSubfolders { get; set; } = new List<string> { };
         public bool autoSaveSettings { get; set; } = true;
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = "pch.h";
@@ -86,6 +86,10 @@ namespace Dwarfovich.AddCppClass
             AddMostRecentHeaderExtension(headerExtension);
         }
 
+        public string RecentNamespace()
+        {
+            return recentNamespaces.FirstOrValue("");
+        }
         public string RecentHeaderExtension()
         {
             return recentHeaderExtensions.FirstOrValue(".h");
@@ -101,7 +105,7 @@ namespace Dwarfovich.AddCppClass
         public void AddMostRecentNamespace(string ns)
         {
             recentNamespaces.AddFrontValue(ns, maxRecentNamespaces);
-            mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(ns);
+            //mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(ns);
         }
 
         public void AddMostRecentHeaderExtension(string extension)

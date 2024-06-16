@@ -1,4 +1,5 @@
 ﻿using AddCppClass;
+using Dwarfovich.AddCppClass.Utils;
 using EnvDTE;
 using EnvDTE80;
 using System.IO;
@@ -53,11 +54,12 @@ namespace Dwarfovich.AddCppClass
                 }
                 writer.Write(Environment.NewLine);
 
-                foreach (string ns in settings.mostRecentNamespaceTokenized)
+                string[] tokens = ClassFacilities.TokenizeNamespace(settings.RecentNamespace());
+                foreach (string token in tokens)
                 {
-                    writer.WriteLine("namespace " + ns + " {");
+                    writer.WriteLine("namespace " + token + " {");
                 }
-                if(settings.mostRecentNamespaceTokenized.Length > 0)
+                if(tokens.Length > 0)
                 {
                     writer.Write(Environment.NewLine);
                 }
@@ -67,13 +69,13 @@ namespace Dwarfovich.AddCppClass
                 writer.WriteLine("private:");
                 writer.WriteLine("};");
                 
-                if (settings.mostRecentNamespaceTokenized.Length > 0)
+                if (tokens.Length > 0)
                 {
                     writer.Write(Environment.NewLine);
                 }
-                for (int i = settings.mostRecentNamespaceTokenized.Count() - 1; i >= 0; --i)
+                for (int i = tokens.Count() - 1; i >= 0; --i)
                 {
-                    writer.WriteLine("} // namespace " + settings.mostRecentNamespaceTokenized[i]);
+                    writer.WriteLine("} // namespace " + tokens[i]);
                 }
                 if (settings.includeGuardStyle == IncludeGuard.Ifndef)
                 {
