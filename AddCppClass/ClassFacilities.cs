@@ -13,7 +13,7 @@ namespace Dwarfovich.AddCppClass
     public class ClassFacilities
     {
         private string filename = "";
-        private static readonly Regex namespaceRegex = new(@"^(::)?([a-zA-Z_][a-zA-Z_\d]*::)*([a-zA-Z_][a-zA-Z_\d]*)$");
+        private static readonly Regex namespaceRegex = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
         private static readonly Regex fileNameRegex = new(@"([a-zA-Z_\-\d]*.)*([a-zA-Z_\-\d])$");
         private static readonly Regex fileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
 
@@ -83,7 +83,6 @@ namespace Dwarfovich.AddCppClass
             {
                 return ns.Split(new[] { "::" }, StringSplitOptions.None);
             }
-
         }
 
         static private SettingError ConformStringList(ref List<string> list, string settingName, Func<string, bool> validateFunction)
@@ -180,17 +179,7 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidNamespace(string ns)
         {
-            if (ns is null)
-            {
-                return false;
-            }
-
-            if (ns == "::")
-            {
-                return false;
-            }
-
-            if (ns.Length == 0)
+            if (string.IsNullOrEmpty(ns))
             {
                 return true;
             }
