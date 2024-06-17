@@ -19,6 +19,7 @@ namespace Dwarfovich.AddCppClass
         private readonly string defaultclassName = "MyClass";
         private readonly string errorMessageBeginning = "Error message: ";
 
+
         public AddCppClassDialog()
         {
             InitializeGui();
@@ -28,10 +29,10 @@ namespace Dwarfovich.AddCppClass
 
         public AddCppClassDialog(Settings settings)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             InitializeGui();
 
             LoadSettings(settings);
-            errors.Clear();
         }
 
         private void InitializeGui()
@@ -43,6 +44,8 @@ namespace Dwarfovich.AddCppClass
 
         private void LoadSettings(Settings settings)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             this.settings = settings;
 
             switch (settings.filenameStyle)
@@ -54,12 +57,16 @@ namespace Dwarfovich.AddCppClass
             }
 
             PopulateComboBox(NamespaceCombo, settings.recentNamespaces, settings.maxRecentNamespaces);
+            if(ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text))
+            {
+                AddError(ErrorType.ClassExists);
+            }
             PopulateComboBox(HeaderExtensionCombo, settings.recentHeaderExtensions, settings.maxRecentHeaderExtensions, ".h");
 
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             HasImplementationFileCheckBox.IsChecked = settings.hasImplementationFile;
 
-            
+
             PopulateComboBox(HeaderSubfolderCombo, settings.recentHeaderSubfolders, settings.maxRecentHeaderSubfolders);
             PopulateComboBox(ImplementationSubfolderCombo, settings.recentImplementationSubfolders, settings.maxRecentImplementationSubfolders);
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
@@ -159,13 +166,13 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void RemoveError(Object source)
+        private void RemoveError(ErrorType type)
         {
-            bool hasOtherErrors = errors.RemoveError(source);
+            bool hasOtherErrors = errors.RemoveError(type);
             if (AddClassButton != null)
             {
                 AddClassButton.IsEnabled = !hasOtherErrors;
-                SetErrorMessage(errors.NextMessage());
+                SetErrorMessage(errors.MessageForLastError());
             }
         }
 
@@ -176,18 +183,22 @@ namespace Dwarfovich.AddCppClass
                 ErrorMessage.Content = errorMessageBeginning + message;
             }
         }
-        private void AddError(Object source, string message)
+        private void AddError(ErrorType type)
         {
-            errors.AddError(source, message);
-            SetErrorMessage(message);
-            if (AddClassButton != null)
+            bool added = errors.AddError(type);
+            if (added)
             {
-                AddClassButton.IsEnabled = false;
+                SetErrorMessage(errors.MessageForLastError());
+                if (AddClassButton != null)
+                {
+                    AddClassButton.IsEnabled = false;
+                }
             }
-
         }
         private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             TextBox textBox = sender as TextBox;
             if (textBox == null)
             {
@@ -201,17 +212,27 @@ namespace Dwarfovich.AddCppClass
                     settings.className = textBox.Text;
                     (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
                     UpdateFilenameTextBoxes();
-                    RemoveError(textBox);
+                    RemoveError(ErrorType.InvalidClassName);
+                    if (ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text))
+                    {
+                        AddError(ErrorType.ClassExists);
+                    }
+                    else
+                    {
+                        RemoveError(ErrorType.ClassExists);
+                    }
                 }
                 else
                 {
-                    AddError(textBox, "Class name is invalid.");
+                    AddError(ErrorType.InvalidClassName);
                 }
             }
         }
 
         private void NamespaceChangedEventHandler(object sender, TextChangedEventArgs args)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             ComboBox comboBox = sender as ComboBox;
             if (comboBox == null)
             {
@@ -222,11 +243,19 @@ namespace Dwarfovich.AddCppClass
             {
                 if (ClassFacilities.IsValidNamespace(textBox.Text))
                 {
-                    RemoveError(textBox);
+                    RemoveError(ErrorType.InvalidNamespace);
+                    if (ClassFacilities.ClassExists(textBox.Text, classNameTextBox.Text))
+                    {
+                        AddError(ErrorType.ClassExists);
+                    }
+                    else
+                    {
+                        RemoveError(ErrorType.ClassExists);
+                    }
                 }
                 else
                 {
-                    AddError(textBox, "Namespace is invalid.");
+                    AddError(ErrorType.InvalidNamespace);
                 }
             }
         }
@@ -239,9 +268,9 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassFacilities.IsValidSubfolder(comboBox.Text))
+            if (ClassFacilities.IsValidSubfolder(ClassFacilities.ConformSubfolder(comboBox.Text)))
             {
-                RemoveError(comboBox);
+                RemoveError(ErrorType.InvalidHeaderSubfolder);
                 if (settings.useSingleSubfolder)
                 {
                     ImplementationSubfolderCombo.Text = comboBox.Text;
@@ -249,7 +278,7 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-                AddError(comboBox, "Header subfolder is invalid");
+                AddError(ErrorType.InvalidHeaderSubfolder);
             }
         }
         private void ImplementationSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -260,13 +289,13 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassFacilities.IsValidSubfolder(comboBox.Text))
+            if (ClassFacilities.IsValidSubfolder(ClassFacilities.ConformSubfolder(comboBox.Text)))
             {
-                RemoveError(comboBox);
+                RemoveError(ErrorType.InvalidImplementationSubfolder);
             }
             else
             {
-                AddError(comboBox, "Implementation subfolder is invalid");
+                AddError(ErrorType.InvalidImplementationSubfolder);
             }
         }
 
@@ -280,14 +309,14 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidHeaderExtension(comboBox.Text))
             {
-                RemoveError(comboBox);
+                RemoveError(ErrorType.InvalidHeaderExtension);
                 settings.AddMostRecentHeaderExtension(comboBox.Text);
                 (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenamesForChangedExtension(settings);
                 UpdateFilenameTextBoxes();
             }
             else
             {
-                AddError(comboBox, "Header extension is invalid");
+                AddError(ErrorType.InvalidHeaderExtension);
             }
         }
         private void HeaderFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -300,11 +329,11 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidFilename(textBox.Text))
             {
-                RemoveError(textBox);
+                RemoveError(ErrorType.InvalidHeaderFilename);
             }
             else
             {
-                AddError(textBox, "Header file name is invalid");
+                AddError(ErrorType.InvalidHeaderFilename);
             }
         }
         private void ImplementationFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -317,11 +346,11 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidFilename(textBox.Text))
             {
-                RemoveError(textBox);
+                RemoveError(ErrorType.InvalidImplementationFilename);
             }
             else
             {
-                AddError(textBox, "Implementation file name is invalid");
+                AddError(ErrorType.InvalidImplementationFilename);
             }
         }
 
@@ -401,6 +430,13 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            bool classExists = ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text);
+            if (classExists)
+            {
+                VS.MessageBox.Show("Error", "Class already exists", OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+                return;
+            }
+
             bool result = CheckFiles();
             if (!result)
             {
@@ -447,18 +483,18 @@ namespace Dwarfovich.AddCppClass
             ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
             if ((bool)checkBox.IsChecked)
             {
-                RemoveError(ImplementationSubfolderCombo);
+                RemoveError(ErrorType.InvalidHeaderSubfolder);
                 ImplementationSubfolderCombo.Text = HeaderSubfolderCombo.Text;
             }
             else
             {
                 if (ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
                 {
-                    RemoveError(ImplementationSubfolderCombo);
+                    RemoveError(ErrorType.InvalidImplementationSubfolder);
                 }
                 else
                 {
-                    AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
+                    AddError(ErrorType.InvalidImplementationSubfolder);
                 }
             }
         }
@@ -475,25 +511,25 @@ namespace Dwarfovich.AddCppClass
             {
                 if (ClassFacilities.IsValidSubfolder(HeaderSubfolderCombo.Text))
                 {
-                    RemoveError(HeaderSubfolderCombo);
+                    RemoveError(ErrorType.InvalidHeaderSubfolder);
                 }
                 else
                 {
-                    AddError(HeaderSubfolderCombo, "Header subfolder is invalid");
+                    AddError(ErrorType.InvalidHeaderSubfolder);
                 }
                 if (ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
                 {
-                    RemoveError(ImplementationSubfolderCombo);
+                    RemoveError(ErrorType.InvalidImplementationSubfolder);
                 }
                 else
                 {
-                    AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
+                    AddError(ErrorType.InvalidImplementationSubfolder);
                 }
             }
             else
             {
-                RemoveError(HeaderSubfolderCombo);
-                RemoveError(ImplementationSubfolderCombo);
+                RemoveError(ErrorType.InvalidHeaderSubfolder);
+                RemoveError(ErrorType.InvalidImplementationSubfolder);
             }
 
             settings.createFilters = (bool)checkBox.IsChecked;
@@ -515,17 +551,17 @@ namespace Dwarfovich.AddCppClass
             {
                 if (!ClassFacilities.IsValidFilename(ImplementationFilename.Text))
                 {
-                    AddError(ImplementationFilename, "Implementation file name is invalid");
+                    AddError(ErrorType.InvalidImplementationFilename);
                 }
                 if (!ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
                 {
-                    AddError(ImplementationSubfolderCombo, "Implementation subfolder is invalid");
+                    AddError(ErrorType.InvalidImplementationSubfolder);
                 }
             }
             else
             {
-                RemoveError(ImplementationFilename);
-                RemoveError(ImplementationSubfolderCombo);
+                RemoveError(ErrorType.InvalidImplementationFilename);
+                RemoveError(ErrorType.InvalidImplementationSubfolder);
             }
         }
 
@@ -542,17 +578,17 @@ namespace Dwarfovich.AddCppClass
                 PrecompiledHeader.IsEnabled = true;
                 if (ClassFacilities.IsValidPrecompiledHeaderPath(PrecompiledHeader.Text))
                 {
-                    RemoveError(PrecompiledHeader);
+                    RemoveError(ErrorType.InvalidPrecompiledHeader);
                 }
                 else
                 {
-                    AddError(PrecompiledHeader, "Precompiled header file name is invalid");
+                    AddError(ErrorType.InvalidPrecompiledHeader);
                 }
             }
             else
             {
                 PrecompiledHeader.IsEnabled = false;
-                RemoveError(PrecompiledHeader);
+                RemoveError(ErrorType.InvalidPrecompiledHeader);
             }
         }
 
@@ -563,11 +599,11 @@ namespace Dwarfovich.AddCppClass
             {
                 if (ClassFacilities.IsValidPrecompiledHeaderPath(textBox.Text))
                 {
-                    RemoveError(sender);
+                    RemoveError(ErrorType.InvalidPrecompiledHeader);
                 }
                 else
                 {
-                    AddError(sender, "Precompiled header file name is invalid");
+                    AddError(ErrorType.InvalidPrecompiledHeader);
                 }
             }
         }

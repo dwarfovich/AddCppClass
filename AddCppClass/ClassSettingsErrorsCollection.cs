@@ -6,26 +6,58 @@ using System.Threading.Tasks;
 
 namespace Dwarfovich.AddCppClass
 {
+    public enum ErrorType
+    {
+        InvalidClassName,
+        ClassExists,
+        InvalidNamespace,
+        InvalidPrecompiledHeader,
+        InvalidHeaderFilename,
+        InvalidImplementationFilename,
+        InvalidHeaderExtension,
+        InvalidHeaderSubfolder,
+        InvalidImplementationSubfolder
+    };
+
     public class ClassSettingsErrorsCollection
     {
-        private Dictionary<Object, string> errors = new ();
+
+        private Dictionary<ErrorType, string> errorMessages = new(){
+            {ErrorType.InvalidClassName, "Invalid class name"},
+            {ErrorType.ClassExists, "Class already exists"},
+            {ErrorType.InvalidNamespace, "Invalid namespace"},
+            {ErrorType.InvalidPrecompiledHeader, "Invalid precompiled header"},
+            {ErrorType.InvalidHeaderFilename, "Invalid header filename"},
+            {ErrorType.InvalidImplementationFilename, "Invalid implementation filename"},
+            {ErrorType.InvalidHeaderExtension, "Invalid header extension"},
+            {ErrorType.InvalidHeaderSubfolder, "Invalid header subfolder"},
+            {ErrorType.InvalidImplementationSubfolder, "Invalid implementation subfolder"}
+            };
+
+        private List<ErrorType> errors = new();
 
         public void Clear()
         {
             errors.Clear();
         }
-        public void AddError(Object source, string message)
+        public bool AddError(ErrorType type)
         {
-            errors[source] = message;
+            if (!errors.Contains(type))
+            {
+                errors.Add(type);
+                return true;
+            }
+
+            return false;
         }
 
-        public bool RemoveError(Object source)
+        public bool RemoveError(ErrorType type)
         {
-            errors.Remove(source);
+            errors.Remove(type);
             return errors.Count != 0;
         }
 
-        public string NextMessage()
+        public string MessageForLastError()
         {
             if (errors.Count == 0)
             {
@@ -33,7 +65,7 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-                return errors.First().Value;
+                return errorMessages[errors.Last()];
             }
         }
     }

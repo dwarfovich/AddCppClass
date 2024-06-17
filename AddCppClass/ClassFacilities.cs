@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using AddCppClass;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -13,9 +14,6 @@ namespace Dwarfovich.AddCppClass
     public class ClassFacilities
     {
         private string filename = "";
-        private static readonly Regex namespaceRegex = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
-        private static readonly Regex fileNameRegex = new(@"([a-zA-Z_\-\d]*.)*([a-zA-Z_\-\d])$");
-        private static readonly Regex fileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
 
         public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
@@ -85,27 +83,20 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        static private SettingError ConformStringList(ref List<string> list, string settingName, Func<string, bool> validateFunction)
+        static public bool ClassExists(string ns, string className)
         {
-            SettingError errors = new();
-            errors.settingName = settingName;
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
-                if (!validateFunction(list[i]))
-                {
-                    errors.invalidValues.Add(list[i]);
-                    list.RemoveAt(i);
-                }
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
+            EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            string fullName = string.IsNullOrEmpty(ns) ? className :  ns + "::" + className;
+            var ce = project.CodeModel.CodeTypeFromFullName(fullName);
 
-            return errors;
+            return ce != null;
         }
-
-        static private void ConformStringList(ref Settings target, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
+        static private void ConformStringList(ref Settings settings, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
         {
             SettingError settingErrors = new();
             settingErrors.settingName = settingName;
-            var list = target.GetType().GetProperty(settingName).GetValue(target) as List<string>;
+            var list = settings.GetType().GetProperty(settingName).GetValue(settings) as List<string>;
             for (int i = list.Count - 1; i >= 0; i--)
             {
                 if (!validateFunction(list[i]))
@@ -115,24 +106,24 @@ namespace Dwarfovich.AddCppClass
                 }
             }
 
-            target.GetType().GetProperty(settingName).SetValue(target, list);
+            settings.GetType().GetProperty(settingName).SetValue(settings, list);
             if (settingErrors.invalidValues.Count > 0)
             {
                 errors.Add(settingErrors);
             }
         }
 
-        static private void ConformPrecompiledHeaderPath(ref Settings target, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
+        static private void ConformPrecompiledHeaderPath(ref Settings settings, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
         {
             SettingError settingErrors = new();
             settingErrors.settingName = settingName;
-            var path = target.GetType().GetProperty(settingName).GetValue(target) as string;
+            var path = settings.GetType().GetProperty(settingName).GetValue(settings) as string;
             if (!validateFunction(path))
             {
                 settingErrors.invalidValues.Add(path);
-                target.GetType().GetProperty(settingName).SetValue(target, "");
+                settings.GetType().GetProperty(settingName).SetValue(settings, "pch.h");
             }
-            if (settingErrors.invalidValues.Count > 0)
+            if (settingErrors.invalidValues.Count > 0 && settings.includePrecompiledHeader)
             {
                 errors.Add(settingErrors);
             }
@@ -161,20 +152,7 @@ namespace Dwarfovich.AddCppClass
                 return false;
             }
 
-            if (!IsLatinLetter(name.First()) && name.First() != '_')
-            {
-                return false;
-            }
-
-            for (int i = 1; i < name.Length; i++)
-            {
-                if (!IsLatinLetter(name[i]) && !Char.IsDigit(name[i]) && name[i] != '_')
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return Settings.classNameRegex.IsMatch(name);
         }
 
         public static bool IsValidNamespace(string ns)
@@ -184,7 +162,7 @@ namespace Dwarfovich.AddCppClass
                 return true;
             }
 
-            return namespaceRegex.IsMatch(ns);
+            return Settings.namespaceRegex.IsMatch(ns);
         }
 
         public static string ConformSubfolder(string subfolder)
@@ -215,7 +193,7 @@ namespace Dwarfovich.AddCppClass
                 return true;
             }
 
-            if (subfolder.Any(Char.IsWhiteSpace))
+            if (!Settings.subfolderRegex.IsMatch(subfolder))
             {
                 return false;
             }
@@ -234,7 +212,7 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidFilename(string filename)
         {
-            return fileNameRegex.IsMatch(filename);
+            return Settings.fileNameRegex.IsMatch(filename);
         }
 
         public static string ConformPrecompiledHeaderPath(string path)
@@ -263,9 +241,9 @@ namespace Dwarfovich.AddCppClass
 
         public static bool IsValidPrecompiledHeaderPath(string path)
         {
-            if (string.IsNullOrEmpty(path) || path.Any(Char.IsWhiteSpace))
+            if (string.IsNullOrEmpty(path))
             {
-                return false;
+                return true;
             }
 
             var separatorPos = path.LastIndexOf(Path.DirectorySeparatorChar);
@@ -283,7 +261,7 @@ namespace Dwarfovich.AddCppClass
         }
         public static bool IsValidHeaderExtension(string extension)
         {
-            return fileExtensionRegex.IsMatch(extension);
+            return Settings.fileExtensionRegex.IsMatch(extension);
         }
     }
 }

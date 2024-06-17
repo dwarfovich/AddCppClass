@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace Dwarfovich.AddCppClass
@@ -24,36 +25,31 @@ namespace Dwarfovich.AddCppClass
 
     public class Settings
     {
-        [JsonIgnore]
+        public static readonly Regex defaultClassNameRegex = new(@"^[a-zA-Z_][a-zA-Z_\d]*$");
+        public static readonly Regex defaultNamespaceRegex = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
+        public static readonly Regex defaultFileNameRegex = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
+        public static readonly Regex defaultHeaderExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
+        public static readonly Regex defaultSubfolderRegex = new(@"^([\\/]?)([a-zA-Z\-_\d]+[\\/]?)+$");
+
+        [JsonProperty]
+        public static Regex classNameRegex { get; set; } = defaultClassNameRegex;
+        public bool ShouldSerializeclassNamespaceRegex() { return classNameRegex != defaultClassNameRegex; }
+        [JsonProperty]
+        public static Regex namespaceRegex { get; set; } = defaultNamespaceRegex;
+        public bool ShouldSerializenamespaceRegex() { return namespaceRegex != defaultNamespaceRegex; }
+        [JsonProperty]
+        public static Regex fileNameRegex { get; set; } = defaultFileNameRegex;
+        public bool ShouldSerializefileNameRegex() { return fileNameRegex != defaultFileNameRegex; }
+        [JsonProperty]
+        public static Regex fileExtensionRegex { get; set; } = defaultHeaderExtensionRegex;
+        public bool ShouldSerializefileExtensionRegex() { return fileExtensionRegex != defaultHeaderExtensionRegex; }
+        [JsonProperty]
+        public static Regex subfolderRegex { get; set; } = defaultSubfolderRegex;
+        public bool ShouldSerializesubfolderRegex() { return subfolderRegex != defaultSubfolderRegex; }
+
         public string className { get; set; } = "";
         public int maxRecentNamespaces = 10;
-        public List<string> recentNamespaces { get; set; }  = new List<string> { };
-        //[JsonIgnore]
-       // private string[] _mostRecentNamespaceTokenized = [];
-        //[JsonIgnore]
-        //public string[] mostRecentNamespaceTokenized
-        //{
-        //    get
-        //    {
-        //        if (_mostRecentNamespaceTokenized == null || _mostRecentNamespaceTokenized.Length == 0)
-        //        {
-        //            if (recentNamespaces == null || recentNamespaces.Count == 0)
-        //            {
-        //                return [];
-        //            }
-        //            else
-        //            {
-        //                _mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(recentNamespaces.First());
-        //            }
-        //        }
-
-        //        return _mostRecentNamespaceTokenized;
-        //    }
-        //    private set
-        //    {
-        //        _mostRecentNamespaceTokenized = value;
-        //    }
-        //}
+        public List<string> recentNamespaces { get; set; } = new List<string> { };
         [JsonConverter(typeof(StringEnumConverter))]
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions = 10;
@@ -70,7 +66,7 @@ namespace Dwarfovich.AddCppClass
         public bool createFilters { get; set; } = true;
         public int maxRecentHeaderSubfolders { get; set; } = 10;
         //[JsonProperty]
-        public List<string> recentHeaderSubfolders { get; set; } = new List<string> {};
+        public List<string> recentHeaderSubfolders { get; set; } = new List<string> { };
         public int maxRecentImplementationSubfolders { get; set; } = 10;
         //[JsonProperty]
         public List<string> recentImplementationSubfolders { get; set; } = new List<string> { };
@@ -80,7 +76,8 @@ namespace Dwarfovich.AddCppClass
         [JsonConverter(typeof(StringEnumConverter))]
         public IncludeGuard includeGuardStyle { get; set; } = IncludeGuard.PragmaOnce;
         public Settings() { }
-        public Settings(string className, FilenameStyle style, string headerExtension) {
+        public Settings(string className, FilenameStyle style, string headerExtension)
+        {
             this.className = className;
             filenameStyle = style;
             AddMostRecentHeaderExtension(headerExtension);

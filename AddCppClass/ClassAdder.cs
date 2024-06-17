@@ -45,8 +45,9 @@ namespace Dwarfovich.AddCppClass
                 string ifndefGuardFilenameToken = "";
                 if (settings.includeGuardStyle == IncludeGuard.PragmaOnce)
                 {
-                    writer.WriteLine("#pragma once" + Environment.NewLine);
-                } else
+                    writer.WriteLine("#pragma once");
+                }
+                else
                 {
                     ifndefGuardFilenameToken = GenerateIfndefGuardFilenameToken(settings);
                     writer.WriteLine("#ifndef " + ifndefGuardFilenameToken);
@@ -59,7 +60,7 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("namespace " + token + " {");
                 }
-                if(tokens.Length > 0)
+                if (tokens.Length > 0)
                 {
                     writer.Write(Environment.NewLine);
                 }
@@ -68,7 +69,7 @@ namespace Dwarfovich.AddCppClass
                 writer.WriteLine("public:");
                 writer.WriteLine("private:");
                 writer.WriteLine("};");
-                
+
                 if (tokens.Length > 0)
                 {
                     writer.Write(Environment.NewLine);
@@ -183,17 +184,40 @@ namespace Dwarfovich.AddCppClass
         {
             var itemGroupElements = doc.Root.Elements(ns + "ItemGroup");
             var filePath = Path.Combine(newFilterPath, fileName);
-            foreach (var fileFilter in itemGroupElements)
+            XElement itemGroupWithClElement = null;
+            foreach (var itemGroupElement in itemGroupElements)
             {
-                fileFilter.Descendants(ns + clElement).Where(el => (string)el.Attribute("Include") == filePath).Remove();
+                var descendants = itemGroupElement.Descendants(ns + clElement);
+                if (descendants.Any())
+                {
+                    if (itemGroupWithClElement == null)
+                    {
+                        itemGroupWithClElement = itemGroupElement;
+                    }
+                }
+                foreach (var descendant in descendants)
+                {
+                    if((string)descendant.Attribute("Include") == filePath)
+                    {
+                        descendant.Remove();
+                        break;
+                    }
+                }
             }
-            XElement newItemGroup = new XElement(ns + "ItemGroup");
+            XElement itemGroup;
+            if(itemGroupWithClElement == null)
+            {
+                itemGroup = new XElement(ns + "ItemGroup");
+                doc.Root.Add(itemGroup);
+            } else
+            {
+                itemGroup = itemGroupWithClElement;
+            }
             XElement clCompileElement = new XElement(ns + clElement, new XAttribute("Include", filePath));
-            newItemGroup.Add(clCompileElement);
+            itemGroup.Add(clCompileElement);
             XElement fileFilterElement = new XElement(ns + "Filter");
             fileFilterElement.Add(newFilterPath);
             clCompileElement.Add(fileFilterElement);
-            doc.Root.Add(newItemGroup);
         }
         private static void ReplaceHeaderFileFilter(XDocument doc, XNamespace ns, Settings settings, string newFilterPath)
         {
@@ -211,26 +235,34 @@ namespace Dwarfovich.AddCppClass
             string filterFilePath = project.FullName + ".filters";
             var doc = OpenFilterXmlDocument(filterFilePath);
             var ns = doc.Root.GetDefaultNamespace();
-            AddFilter(doc, ns, settings.RecentImplementationSubfolder());
             AddFilter(doc, ns, settings.RecentHeaderSubfolder());
-            if(String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
+            AddFilter(doc, ns, settings.RecentImplementationSubfolder());
+            if (String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
             {
                 ReplaceHeaderFileFilter(doc, ns, settings, defaultHeaderFilter);
-            } else
+            }
+            else
             {
                 ReplaceHeaderFileFilter(doc, ns, settings, settings.RecentHeaderSubfolder());
             }
             if (settings.hasImplementationFile)
             {
-                if (String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
+                if (settings.useSingleSubfolder)
                 {
-                    ReplaceImplementationFileFilter(doc, ns, settings, defaultImplementationFilter);
+                    ReplaceImplementationFileFilter(doc, ns, settings, settings.RecentHeaderSubfolder());
                 }
                 else
                 {
-                    ReplaceImplementationFileFilter(doc, ns, settings, settings.RecentImplementationSubfolder());
+                    if (String.IsNullOrEmpty(settings.RecentImplementationSubfolder()))
+                    {
+                        ReplaceImplementationFileFilter(doc, ns, settings, defaultImplementationFilter);
+                    }
+                    else
+                    {
+                        ReplaceImplementationFileFilter(doc, ns, settings, settings.RecentImplementationSubfolder());
+                    }
                 }
-                
+
             }
             doc.Save(filterFilePath);
         }

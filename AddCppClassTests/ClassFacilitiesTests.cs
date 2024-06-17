@@ -215,6 +215,10 @@ namespace Dwarfovich.AddCppClass.Tests
             Assert.IsFalse(ClassFacilities.IsValidSubfolder(" a"));
             Assert.IsFalse(ClassFacilities.IsValidSubfolder("a "));
             Assert.IsFalse(ClassFacilities.IsValidSubfolder("a a"));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder(" "));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder(" a/a"));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder("a /fe"));
+            Assert.IsFalse(ClassFacilities.IsValidSubfolder("a /a"));
         }
 
         [TestMethod()]
@@ -237,6 +241,7 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsValidPrecompiledHeaderPathTest()
         {
+            Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath(""));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath(".a"));
             Assert.IsTrue(ClassFacilities.IsValidPrecompiledHeaderPath("q/.a"));
@@ -254,7 +259,6 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsInvalidPrecompiledHeaderPathTest()
         {
-            Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath(""));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("/"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("\\"));
             Assert.IsFalse(ClassFacilities.IsValidPrecompiledHeaderPath("a/"));
