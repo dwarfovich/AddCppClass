@@ -24,8 +24,16 @@ namespace Dwarfovich.AddCppClass
         public static readonly Regex defaultClassNameRegex = new(@"^[a-zA-Z_][a-zA-Z_\d]*$");
         public static readonly Regex defaultNamespaceRegex = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
         public static readonly Regex defaultFileNameRegex = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
-        public static readonly Regex defaultHeaderExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
+        public static readonly Regex defaultFileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
         public static readonly Regex defaultSubfolderRegex = new(@"^([\\/]?)([a-zA-Z\-_\d]+[\\/]?)+$");
+
+        public Settings() { }
+        public Settings(string className, FilenameStyle style, string headerExtension)
+        {
+            this.className = className;
+            filenameStyle = style;
+            AddMostRecentHeaderExtension(headerExtension);
+        }
 
         [JsonProperty]
         public static Regex classNameRegex { get; set; } = defaultClassNameRegex;
@@ -37,8 +45,8 @@ namespace Dwarfovich.AddCppClass
         public static Regex fileNameRegex { get; set; } = defaultFileNameRegex;
         public bool ShouldSerializefileNameRegex() { return fileNameRegex != defaultFileNameRegex; }
         [JsonProperty]
-        public static Regex fileExtensionRegex { get; set; } = defaultHeaderExtensionRegex;
-        public bool ShouldSerializefileExtensionRegex() { return fileExtensionRegex != defaultHeaderExtensionRegex; }
+        public static Regex fileExtensionRegex { get; set; } = defaultFileExtensionRegex;
+        public bool ShouldSerializefileExtensionRegex() { return fileExtensionRegex != defaultFileExtensionRegex; }
         [JsonProperty]
         public static Regex subfolderRegex { get; set; } = defaultSubfolderRegex;
         public bool ShouldSerializesubfolderRegex() { return subfolderRegex != defaultSubfolderRegex; }
@@ -71,13 +79,6 @@ namespace Dwarfovich.AddCppClass
         public string precompiledHeader { get; set; } = "pch.h";
         [JsonConverter(typeof(StringEnumConverter))]
         public IncludeGuard includeGuardStyle { get; set; } = IncludeGuard.PragmaOnce;
-        public Settings() { }
-        public Settings(string className, FilenameStyle style, string headerExtension)
-        {
-            this.className = className;
-            filenameStyle = style;
-            AddMostRecentHeaderExtension(headerExtension);
-        }
 
         public string RecentNamespace()
         {
@@ -98,7 +99,6 @@ namespace Dwarfovich.AddCppClass
         public void AddMostRecentNamespace(string ns)
         {
             recentNamespaces.AddFrontValue(ns, maxRecentNamespaces);
-            //mostRecentNamespaceTokenized = ClassUtils.TokenizeNamespace(ns);
         }
 
         public void AddMostRecentHeaderExtension(string extension)
