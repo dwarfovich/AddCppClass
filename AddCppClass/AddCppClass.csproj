@@ -51,6 +51,7 @@
     <Compile Include="ClassFacilities.cs" />
     <Compile Include="ClassAdder.cs" />
     <Compile Include="ClassSettingsErrorsCollection.cs" />
+    <Compile Include="SettingError.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

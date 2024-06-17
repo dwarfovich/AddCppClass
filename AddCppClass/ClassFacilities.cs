@@ -6,11 +6,6 @@ using AddCppClass;
 
 namespace Dwarfovich.AddCppClass
 {
-    public class SettingError
-    {
-        public string settingName = "";
-        public List<string> invalidValues = new();
-    }
     public class ClassFacilities
     {
         private string filename = "";
