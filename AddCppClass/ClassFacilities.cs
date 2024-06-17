@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Collections.Generic;
 using AddCppClass;
 
@@ -82,7 +80,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
-            string fullName = string.IsNullOrEmpty(ns) ? className :  ns + "::" + className;
+            string fullName = string.IsNullOrEmpty(ns) ? className : ns + "::" + className;
             var ce = project.CodeModel.CodeTypeFromFullName(fullName);
 
             return ce != null;
@@ -136,10 +134,7 @@ namespace Dwarfovich.AddCppClass
 
             return errors;
         }
-        public static bool IsLatinLetter(char c)
-        {
-            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-        }
+
         public static bool IsValidClassName(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -167,16 +162,8 @@ namespace Dwarfovich.AddCppClass
                 return "";
             }
 
-            if (subfolder.EndsWith("\\") || subfolder.EndsWith("/"))
-            {
-                subfolder = subfolder.Remove(subfolder.Length - 1);
-            }
-            if (subfolder.StartsWith("\\") || subfolder.StartsWith("/"))
-            {
-                subfolder = subfolder.Remove(0, 1);
-            }
-
-            subfolder = subfolder.Replace("/", "\\");
+            subfolder = subfolder.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            subfolder = subfolder.Trim(Path.AltDirectorySeparatorChar);
 
             return subfolder;
         }
@@ -195,7 +182,7 @@ namespace Dwarfovich.AddCppClass
 
             try
             {
-                string testPath = Path.Combine(Environment.CurrentDirectory, subfolder);
+                string testPath = Path.Combine(Environment.CurrentDirectory, subfolder.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar));
                 string fullPath = Path.GetFullPath(subfolder);
                 return fullPath == testPath;
             }
@@ -217,20 +204,16 @@ namespace Dwarfovich.AddCppClass
                 return "";
             }
 
-            if (path.StartsWith("\\") || path.StartsWith("/"))
-            {
-                path = path.Remove(0, 1);
-            }
-
-            path = path.Replace("\\", "/");
-            var pos = path.LastIndexOf('/');
+            var dirPos = path.LastIndexOf(Path.DirectorySeparatorChar);
+            var altDirPos = path.LastIndexOf(Path.AltDirectorySeparatorChar);
+            var pos = Math.Max(dirPos, altDirPos);
             if (pos == -1)
             {
                 return path;
             }
             else
             {
-                return ConformSubfolder(path.Substring(0, pos)) + '/' + path.Substring(pos + 1);
+                return ConformSubfolder(path.Substring(0, pos)) + Path.AltDirectorySeparatorChar + path.Substring(pos + 1);
             }
         }
 
@@ -241,16 +224,15 @@ namespace Dwarfovich.AddCppClass
                 return true;
             }
 
-            var separatorPos = path.LastIndexOf(Path.DirectorySeparatorChar);
-            var slashPos = path.LastIndexOf('/');
-            var pos = Math.Max(separatorPos, slashPos);
+            var pos = Math.Max(path.LastIndexOf(Path.DirectorySeparatorChar),
+                               path.LastIndexOf(Path.AltDirectorySeparatorChar));
             if (pos == -1)
             {
                 return IsValidFilename(path);
             }
             else
             {
-                return IsValidSubfolder(ConformSubfolder(path.Substring(0, pos)))
+                return IsValidSubfolder(path.Substring(0, pos))
                     && IsValidFilename(path.Substring(pos + 1));
             }
         }

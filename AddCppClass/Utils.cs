@@ -1,10 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents;
 using System.Windows.Input;
 using EnvDTE80;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace Dwarfovich.AddCppClass.Utils
@@ -69,12 +67,19 @@ namespace Dwarfovich.AddCppClass.Utils
         }
     }
         
-    public static class Keyboard
+    public static class Path
     {
-        public static bool IsNumlockActive()
+        public static string ToWindowsStylePath(string path)
         {
-            return System.Windows.Input.Keyboard.IsKeyToggled(Key.NumLock);
+            return path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
         }
+
+        public static string TolinuxStylePath(string path)
+        {
+            return path.Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+        }
+
+
     }
 
     public static class Solution

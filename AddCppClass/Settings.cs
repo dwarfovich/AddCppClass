@@ -25,7 +25,7 @@ namespace Dwarfovich.AddCppClass
         public static readonly Regex defaultNamespaceRegex = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
         public static readonly Regex defaultFileNameRegex = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
         public static readonly Regex defaultFileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
-        public static readonly Regex defaultSubfolderRegex = new(@"^([\\/]?)([a-zA-Z\-_\d]+[\\/]?)+$");
+        public static readonly Regex defaultSubfolderRegex = new(@"^([a-zA-Z\-_\d]+)([\\/][a-zA-Z\-_\d]+)*$");
 
         public Settings() { }
         public Settings(string className, FilenameStyle style, string headerExtension)

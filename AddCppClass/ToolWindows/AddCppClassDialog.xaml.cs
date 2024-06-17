@@ -268,7 +268,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassFacilities.IsValidSubfolder(ClassFacilities.ConformSubfolder(comboBox.Text)))
+            if (ClassFacilities.IsValidSubfolder(comboBox.Text))
             {
                 RemoveError(ErrorType.InvalidHeaderSubfolder);
                 if (settings.useSingleSubfolder)
@@ -289,7 +289,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassFacilities.IsValidSubfolder(ClassFacilities.ConformSubfolder(comboBox.Text)))
+            if (ClassFacilities.IsValidSubfolder(comboBox.Text))
             {
                 RemoveError(ErrorType.InvalidImplementationSubfolder);
             }
@@ -360,8 +360,7 @@ namespace Dwarfovich.AddCppClass
             settings.AddMostRecentNamespace(NamespaceCombo.Text);
 
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
-            string conformedSubfolder = ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text);
-            settings.AddMostRecentHeaderSubfolder(conformedSubfolder);
+            settings.AddMostRecentHeaderSubfolder(ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text));
             if (!settings.useSingleSubfolder)
             {
                 settings.AddMostRecentImplementationSubfolder(ClassFacilities.ConformSubfolder(ImplementationSubfolderCombo.Text));
@@ -391,7 +390,7 @@ namespace Dwarfovich.AddCppClass
             EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
-            string headerPath = System.IO.Path.Combine(projectPath, HeaderSubfolderCombo.Text, HeaderFilename.Text);
+            string headerPath = Path.Combine(projectPath, HeaderSubfolderCombo.Text, HeaderFilename.Text);
             string message = "";
             if (File.Exists(headerPath))
             {
@@ -415,7 +414,7 @@ namespace Dwarfovich.AddCppClass
 
             if ((bool)IncludePrecompiledHeaderCheckBox.IsChecked)
             {
-                string precompiledHeaderPath = System.IO.Path.Combine(projectPath, PrecompiledHeader.Text);
+                string precompiledHeaderPath = Path.Combine(projectPath, PrecompiledHeader.Text);
                 if (!File.Exists(precompiledHeaderPath))
                 {
                     message = "Precompiled header at path \"" + precompiledHeaderPath + "\" doesn't exist. Proceed anyway?";
