@@ -82,11 +82,21 @@
         <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Implementation subfolder" Grid.Row="2" VerticalContentAlignment="Center" Padding="0"/>
         <ComboBox Grid.Column="3" Name="ImplementationSubfolderCombo" TextBoxBase.TextChanged="ImplementationSubfolderChangedEventHandler" IsEditable="True" Grid.Row="3" Grid.ColumnSpan="2"/>
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2">
-            <CheckBox Content="Create filters based on subfolder" Name="CreateFiltersCheckBox" Checked="CreateFiltersCheckChanged" Unchecked="CreateFiltersCheckChanged" IsChecked="True" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Create filters" Name="CreateFiltersCheckBox" Checked="CreateFiltersCheckChanged" Unchecked="CreateFiltersCheckChanged" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Use subfolder as filter" Name="UseSubfolderAsFilterCheckBox" Checked="UseSubfolderAsFilterCheckChanged" Unchecked="UseSubfolderAsFilterCheckChanged" VerticalContentAlignment="Center"/>
+            <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2">
+            <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Header filter" VerticalContentAlignment="Center" Padding="0"/>
+            <CheckBox Content="Use single filter" Name="UseSingleFilterCheckBox" Checked="UseSingleFilterCheckChanged" Unchecked="UseSingleFilterCheckChanged" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" Grid.Row="6" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
+        <ComboBox Grid.Column="3" Name="HeaderFilter" TextBoxBase.TextChanged="HeaderFilterChangedEventHandler" IsEditable="True" Grid.Row="6" Grid.ColumnSpan="2"/>
+        <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Implementation filter" Grid.Row="7" VerticalContentAlignment="Center" Padding="0"/>
+        <ComboBox Grid.Column="3" Name="ImplementationFilter" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="8" Grid.ColumnSpan="2"/>
+
+        <StackPanel Orientation="Vertical" Grid.Row="10" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" >
                 <CheckBox Content="Save settings" Name="AutosaveSettingsCheckBox"/>
             </StackPanel>

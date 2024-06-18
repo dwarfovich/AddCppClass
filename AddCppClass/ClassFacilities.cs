@@ -240,5 +240,14 @@ namespace Dwarfovich.AddCppClass
         {
             return Settings.fileExtensionRegex.IsMatch(extension);
         }
+        public static bool IsValidFilter(string filter)
+        {
+            if (String.IsNullOrEmpty(filter))
+            {
+                return true;
+            }
+
+            return Settings.filterRegex.IsMatch(filter);
+        }
     }
 }

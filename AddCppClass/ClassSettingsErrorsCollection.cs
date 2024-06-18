@@ -16,7 +16,9 @@ namespace Dwarfovich.AddCppClass
         InvalidImplementationFilename,
         InvalidHeaderExtension,
         InvalidHeaderSubfolder,
-        InvalidImplementationSubfolder
+        InvalidImplementationSubfolder,
+        InvalidHeaderFilter,
+        InvalidImplementationFilter
     };
 
     public class ClassSettingsErrorsCollection
@@ -31,7 +33,9 @@ namespace Dwarfovich.AddCppClass
             {ErrorType.InvalidImplementationFilename, "Invalid implementation filename"},
             {ErrorType.InvalidHeaderExtension, "Invalid header extension"},
             {ErrorType.InvalidHeaderSubfolder, "Invalid header subfolder"},
-            {ErrorType.InvalidImplementationSubfolder, "Invalid implementation subfolder"}
+            {ErrorType.InvalidImplementationSubfolder, "Invalid implementation subfolder"},
+            {ErrorType.InvalidHeaderFilter, "Invalid header filter"},
+            {ErrorType.InvalidImplementationFilter, "Invalid implementation filter"}
             };
 
         private List<ErrorType> errors = new();

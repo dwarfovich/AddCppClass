@@ -26,6 +26,7 @@ namespace Dwarfovich.AddCppClass
         public static readonly Regex defaultFileNameRegex = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
         public static readonly Regex defaultFileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
         public static readonly Regex defaultSubfolderRegex = new(@"^([a-zA-Z\-_\d]+)([\\/][a-zA-Z\-_\d]+)*$");
+        public static readonly Regex defaultFilterRegex = defaultSubfolderRegex;
 
         public Settings() { }
         public Settings(string className, FilenameStyle style, string headerExtension)
@@ -50,6 +51,9 @@ namespace Dwarfovich.AddCppClass
         [JsonProperty]
         public static Regex subfolderRegex { get; set; } = defaultSubfolderRegex;
         public bool ShouldSerializesubfolderRegex() { return subfolderRegex != defaultSubfolderRegex; }
+        [JsonProperty]
+        public static Regex filterRegex { get; set; } = defaultFilterRegex;
+        public bool ShouldSerializefilterRegex() { return filterRegex != defaultFilterRegex; }
 
         public string className { get; set; } = "";
         public int maxRecentNamespaces = 10;
