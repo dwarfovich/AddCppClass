@@ -19,10 +19,13 @@ namespace Dwarfovich.AddCppClass
         private readonly string defaultclassName = "MyClass";
         private readonly string errorMessageBeginning = "Error message: ";
 
+        private bool headerFilterValidated = false;
+        private bool implementationFilterValidated = false;
+        private bool updatingFilterCheckBoxes = false;
+
         public AddCppClassDialog()
         {
             InitializeGui();
-            errors.Clear();
         }
 
         public AddCppClassDialog(Settings settings)
@@ -35,6 +38,8 @@ namespace Dwarfovich.AddCppClass
         private void InitializeGui()
         {
             InitializeComponent();
+            HeaderFilter.IsEnabledChanged += new(HeaderFilterEnabledChanged);
+            ImplementationFilter.IsEnabledChanged += new(ImplementationFilterEnabledChanged);
             Title = title;
             classNameTextBox.Text = defaultclassName;
         }
@@ -62,7 +67,6 @@ namespace Dwarfovich.AddCppClass
 
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             HasImplementationFileCheckBox.IsChecked = settings.hasImplementationFile;
-
 
             PopulateComboBox(HeaderSubfolderCombo, settings.recentHeaderSubfolders, settings.maxRecentHeaderSubfolders);
             PopulateComboBox(ImplementationSubfolderCombo, settings.recentImplementationSubfolders, settings.maxRecentImplementationSubfolders);
@@ -102,12 +106,9 @@ namespace Dwarfovich.AddCppClass
                     comboBox.Items.Add(values[i]);
                 }
             }
-            else
+            else if (spareValue != null)
             {
-                if (spareValue != null)
-                {
-                    comboBox.Items.Add(spareValue);
-                }
+                comboBox.Items.Add(spareValue);
             }
             comboBox.SelectedIndex = 0;
         }
@@ -278,15 +279,7 @@ namespace Dwarfovich.AddCppClass
                 AddError(ErrorType.InvalidHeaderSubfolder);
             }
 
-            if ((bool)CreateFiltersCheckBox.IsChecked && (bool)UseSubfolderAsFilterCheckBox.IsChecked)
-            {
-                HeaderFilter.Text = comboBox.Text;
-                if ((bool)UseSingleFilterCheckBox.IsChecked)
-                {
-                    ImplementationFilter.Text = comboBox.Text;
-                }
-            }
-            UpdateFilterControls();
+            UpdateFilters();
         }
         private void ImplementationSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
         {
@@ -312,7 +305,7 @@ namespace Dwarfovich.AddCppClass
                     ImplementationFilter.Text = comboBox.Text;
                 }
             }
-            UpdateFilterControls();
+            UpdateImplementationFilter();
         }
 
         private void HeaderExtensionChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -509,7 +502,6 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            settings.useSingleSubfolder = (bool)checkBox.IsChecked;
             ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
             if ((bool)checkBox.IsChecked)
             {
@@ -527,7 +519,6 @@ namespace Dwarfovich.AddCppClass
                     AddError(ErrorType.InvalidImplementationSubfolder);
                 }
             }
-            UpdateFilterControls();
         }
 
         private void HasImplementationFileCheckChanged(object sender, EventArgs e)
@@ -538,7 +529,6 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            settings.hasImplementationFile = (bool)checkBox.IsChecked;
             ImplementationFilename.IsEnabled = (bool)checkBox.IsChecked;
             ImplementationSubfolderCombo.IsEnabled = (bool)checkBox.IsChecked;
 
@@ -558,7 +548,7 @@ namespace Dwarfovich.AddCppClass
                 RemoveError(ErrorType.InvalidImplementationFilename);
                 RemoveError(ErrorType.InvalidImplementationSubfolder);
             }
-            
+
         }
 
         private void IncludePrecompiledHeaderCheckChanged(object sender, EventArgs e)
@@ -588,161 +578,117 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void UpdateFilterControls()
+        private void HeaderFilterEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            
+            headerFilterValidated = false;
+            UpdateFilters();
         }
-        private void CreateFiltersCheckChanged(object sender, EventArgs e)
+
+        private void ImplementationFilterEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var checkBox = sender as CheckBox;
-            if (checkBox is null)
+            implementationFilterValidated = false;
+            UpdateImplementationFilter();
+        }
+        private void OnAnyFilterCheckBoxChanged(object sender, EventArgs e)
+        {
+            if (updatingFilterCheckBoxes)
             {
                 return;
             }
-
-            if ((bool)checkBox.IsChecked)
+            updatingFilterCheckBoxes = true;
+            bool createFilters = (bool)CreateFiltersCheckBox.IsChecked;
+            UseSubfolderAsFilterCheckBox.IsEnabled = createFilters;
+            UseSingleFilterCheckBox.IsEnabled = createFilters;
+            HeaderFilter.IsEnabled = createFilters && !(bool)UseSubfolderAsFilterCheckBox.IsChecked;
+            ImplementationFilter.IsEnabled = createFilters && !(bool)UseSubfolderAsFilterCheckBox.IsChecked
+                                                       && !(bool)UseSingleFilterCheckBox.IsChecked;
+            if (createFilters)
             {
-                UseSingleFilterCheckBox.IsEnabled = true;
-                UseSubfolderAsFilterCheckBox.IsEnabled = true;
-
-                if ((bool)UseSubfolderAsFilterCheckBox.IsChecked)
-                {
-                    HeaderFilter.Text = HeaderSubfolderCombo.Text;
-                    HeaderFilter.IsEnabled = false;
-                }
-                else
-                {
-                    HeaderFilter.IsEnabled = true;
-                }
-                if (!(bool)UseSingleFilterCheckBox.IsChecked)
-                {
-                    ImplementationFilter.IsEnabled = !(bool)UseSubfolderAsFilterCheckBox.IsChecked;
-                    if ((bool)UseSubfolderAsFilterCheckBox.IsChecked)
-                    {
-                        ImplementationFilter.Text = ImplementationSubfolderCombo.Text;
-                    }
-                }
-
-                if (ClassFacilities.IsValidFilter(HeaderFilter.Text))
-                {
-                    RemoveError(ErrorType.InvalidHeaderFilter);
-                }
-                else
-                {
-                    AddError(ErrorType.InvalidHeaderFilter);
-                }
-
-                if (!(bool)UseSingleFilterCheckBox.IsChecked)
-                {
-                    if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
-                    {
-                        RemoveError(ErrorType.InvalidImplementationFilter);
-                    }
-                    else
-                    {
-                        AddError(ErrorType.InvalidImplementationFilter);
-                    }
-                }
+                UpdateFilters();
             }
             else
             {
-                UseSingleFilterCheckBox.IsEnabled = false;
-                UseSubfolderAsFilterCheckBox.IsEnabled = false;
-                HeaderFilter.IsEnabled = false;
-                ImplementationFilter.IsEnabled = false;
                 RemoveError(ErrorType.InvalidHeaderFilter);
                 RemoveError(ErrorType.InvalidImplementationFilter);
             }
-            UpdateFilterControls();
+            updatingFilterCheckBoxes = false;
         }
 
-        private void UseSubfolderAsFilterCheckChanged(object sender, EventArgs e)
+        private void ValidateImplementationFilterIfNeeded()
         {
-            var checkBox = sender as CheckBox;
-            if (checkBox is null)
+            if (implementationFilterValidated)
             {
                 return;
             }
 
-            if ((bool)checkBox.IsChecked)
+            if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
             {
-                HeaderFilter.IsEnabled = false;
-                ImplementationFilter.IsEnabled = false;
-
-                HeaderFilter.Text = HeaderSubfolderCombo.Text;
-                if (ClassFacilities.IsValidFilter(HeaderFilter.Text))
-                {
-                    RemoveError(ErrorType.InvalidHeaderFilter);
-                }
-                else
-                {
-                    AddError(ErrorType.InvalidHeaderFilter);
-                }
-                if (!(bool)UseSingleFilterCheckBox.IsChecked)
-                {
-                    ImplementationFilter.Text = ImplementationSubfolderCombo.Text;
-                    if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
-                    {
-                        RemoveError(ErrorType.InvalidImplementationFilter);
-                    }
-                    else
-                    {
-                        AddError(ErrorType.InvalidImplementationFilter);
-                    }
-                }
-            }
-            else
-            {
-                HeaderFilter.IsEnabled = true;
-                if (!(bool)UseSingleFilterCheckBox.IsChecked)
-                {
-                    ImplementationFilter.IsEnabled = true;
-                }
-            }
-            UpdateFilterControls();
-        }
-
-        private void UseSingleFilterCheckChanged(object sender, EventArgs e)
-        {
-            var checkBox = sender as CheckBox;
-            if (checkBox is null)
-            {
-                return;
-            }
-
-            if ((bool)checkBox.IsChecked)
-            {
-                ImplementationFilter.IsEnabled = false;
                 RemoveError(ErrorType.InvalidImplementationFilter);
             }
             else
             {
-                ImplementationFilter.IsEnabled = true;
-                if ((bool)UseSubfolderAsFilterCheckBox.IsChecked)
-                {
-                    ImplementationFilter.Text = ImplementationSubfolderCombo.Text;
-                }
-                if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
-                {
-                    RemoveError(ErrorType.InvalidImplementationFilter);
-                }
-                else
-                {
-                    AddError(ErrorType.InvalidImplementationFilter);
-                }
+                AddError(ErrorType.InvalidImplementationFilter);
             }
+            implementationFilterValidated = true;
+        }
+        private void ValidateHeaderFilterIfNeeded()
+        {
+            if (headerFilterValidated)
+            {
+                return;
+            }
+            if (ClassFacilities.IsValidFilter(HeaderFilter.Text))
+            {
+                RemoveError(ErrorType.InvalidHeaderFilter);
+            }
+            else
+            {
+                AddError(ErrorType.InvalidHeaderFilter);
+            }
+            headerFilterValidated = true;
+        }
+        private void UpdateImplementationFilter()
+        {
+            if (!(bool)CreateFiltersCheckBox.IsChecked)
+            {
+                return;
+            }
+            if ((bool)UseSingleFilterCheckBox.IsChecked)
+            {
+                ImplementationFilter.Text = HeaderFilter.Text;
+            }
+            else if ((bool)UseSubfolderAsFilterCheckBox.IsChecked)
+            {
+                ImplementationFilter.Text = ImplementationSubfolderCombo.Text;
+            }
+            ValidateImplementationFilterIfNeeded();
+        }
+        private void UpdateFilters()
+        {
+            if (!(bool)CreateFiltersCheckBox.IsChecked)
+            {
+                return;
+            }
+            if ((bool)UseSubfolderAsFilterCheckBox.IsChecked)
+            {
+                HeaderFilter.Text = HeaderSubfolderCombo.Text;
+            }
+            ValidateHeaderFilterIfNeeded();
+            UpdateImplementationFilter();
         }
 
         private void HeaderFilterChangedEventHandler(object sender, EventArgs e)
         {
-
+            headerFilterValidated = false;
+            ValidateHeaderFilterIfNeeded();
+            UpdateImplementationFilter();
         }
 
         private void ImplementationFilterChangedEventHandler(object sender, EventArgs e)
         {
-
+            implementationFilterValidated = false;
+            ValidateImplementationFilterIfNeeded();
         }
-        
 
         private void ShowInfoMessage(string caption, string text)
         {
