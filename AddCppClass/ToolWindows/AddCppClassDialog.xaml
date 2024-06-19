@@ -28,6 +28,9 @@
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition Height="85"/>
             <RowDefinition Height="60"/>
             <RowDefinition Height="3*"/>
@@ -97,7 +100,7 @@
         <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Implementation filter" Grid.Row="7" VerticalContentAlignment="Center" Padding="0"/>
         <ComboBox Grid.Column="3" Name="ImplementationFilter" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="8" Grid.ColumnSpan="2"/>
 
-        <StackPanel Orientation="Vertical" Grid.Row="10" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
+        <StackPanel Orientation="Vertical" Grid.Row="12" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" >
                 <CheckBox Content="Save settings" Name="AutoSaveSettingsCheckBox"/>
             </StackPanel>
@@ -109,7 +112,7 @@
         </StackPanel>
         <TextBox Grid.Column="1" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
 
-        <Grid Grid.Column="1" Grid.Row="10">
+        <Grid Grid.Column="1" Grid.Row="10" Grid.RowSpan="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
