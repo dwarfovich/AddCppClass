@@ -35,7 +35,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var activeProject = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            var activeProject = Utils.Solution.CurrentProject();
             if (activeProject is null)
             {
                 return "";
@@ -122,7 +122,7 @@ namespace Dwarfovich.AddCppClass
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var command = sender as OleMenuCommand;
-            var project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            var project = Utils.Solution.CurrentProject();
             if (command == null || project == null)
             {
                 return;

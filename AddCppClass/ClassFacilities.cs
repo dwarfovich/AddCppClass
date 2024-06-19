@@ -79,11 +79,10 @@ namespace Dwarfovich.AddCppClass
         static public bool ClassExists(string ns, string className)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            EnvDTE.Project project = Utils.Solution.CurrentProject();
             string fullName = string.IsNullOrEmpty(ns) ? className : ns + "::" + className;
-            var ce = project.CodeModel.CodeTypeFromFullName(fullName);
 
-            return ce != null;
+            return project.CodeModel.CodeTypeFromFullName(fullName) != null;
         }
         static private void ConformStringList(ref Settings settings, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
         {

@@ -258,7 +258,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            EnvDTE.Project project = Utils.Solution.CurrentProject(dte);
+            EnvDTE.Project project = Utils.Solution.CurrentProject();
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             string headerPath = CreateHeaderFile(project, settings, projectPath);

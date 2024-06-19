@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
-using EnvDTE80;
+using System.IO;
 using Newtonsoft.Json.Serialization;
+using AddCppClass;
 
 namespace Dwarfovich.AddCppClass.Utils
 {
@@ -66,7 +66,7 @@ namespace Dwarfovich.AddCppClass.Utils
             list[0] = item;
         }
     }
-        
+
     public static class Path
     {
         public static string ToWindowsStylePath(string path)
@@ -82,11 +82,11 @@ namespace Dwarfovich.AddCppClass.Utils
 
     public static class Solution
     {
-        public static EnvDTE.Project CurrentProject(DTE2 dte)
+        public static EnvDTE.Project CurrentProject()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            Array projects = dte.ActiveSolutionProjects as Array;
+            Array projects = AddCppClassPackage.dte.ActiveSolutionProjects as Array;
             if (projects != null && projects.Length != 0)
             {
                 return projects.GetValue(0) as EnvDTE.Project;
@@ -94,6 +94,26 @@ namespace Dwarfovich.AddCppClass.Utils
             else
             {
                 return null;
+            }
+        }
+
+        public static string CurrentProjectPath()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            EnvDTE.Project project = CurrentProject();
+            if (project == null)
+            {
+                return "";
+            }
+
+            try
+            {
+                return new FileInfo(project.FullName).DirectoryName;
+            }
+            catch
+            {
+                return "";
             }
         }
     }

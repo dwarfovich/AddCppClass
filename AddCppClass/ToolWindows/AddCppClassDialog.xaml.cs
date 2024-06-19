@@ -1,11 +1,13 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using AddCppClass;
+using EnvDTE;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -306,7 +308,7 @@ namespace Dwarfovich.AddCppClass
             if (ClassFacilities.IsValidSubfolder(comboBox.Text))
             {
                 RemoveError(ErrorType.InvalidHeaderSubfolder);
-                if (settings.useSingleSubfolder)
+                if ((bool)UseSingleSubfolderCheckBox.IsChecked)
                 {
                     ImplementationSubfolderCombo.Text = comboBox.Text;
                 }
@@ -419,7 +421,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            EnvDTE.Project project = Utils.Solution.CurrentProject(AddCppClassPackage.dte);
+            EnvDTE.Project project = Utils.Solution.CurrentProject();
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             string headerPath = Path.Combine(projectPath, HeaderSubfolderCombo.Text, HeaderFilename.Text);
@@ -508,9 +510,10 @@ namespace Dwarfovich.AddCppClass
             if (checkBox is null)
             {
                 return;
-            }
+            } 
 
             ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
+            SelectImplementationSubfolderButton.IsEnabled = !(bool)checkBox.IsChecked;
             if ((bool)checkBox.IsChecked)
             {
                 RemoveError(ErrorType.InvalidHeaderSubfolder);
@@ -698,6 +701,43 @@ namespace Dwarfovich.AddCppClass
             ValidateImplementationFilterIfNeeded();
         }
 
+        private void SelectSubfolderButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            Button button = sender as Button;
+            if (button == null)
+            {
+                return;
+            }
+
+            string path = Utils.Solution.CurrentProjectPath();
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+
+            if (dialog.FileName.StartsWith(path))
+            {
+                path = dialog.FileName.Substring(path.Length);
+            }
+            else
+            {
+                VS.MessageBox.Show("Warning", "Couldn't determine subfolder. Please ensure you are not leaving project folder", OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+                return;
+            }
+            bool isHeader = (button.Name == "SelectHeaderSubfolderButton");
+            if (isHeader)
+            {
+                HeaderSubfolderCombo.Text = ClassFacilities.ConformSubfolder(path);
+            }
+            else
+            {
+                ImplementationSubfolderCombo.Text = ClassFacilities.ConformSubfolder(path);
+            }
+        }
         private void ShowInfoMessage(string caption, string text)
         {
             _ = VS.MessageBox.Show(caption, text, OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK);

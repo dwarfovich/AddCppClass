@@ -9,7 +9,7 @@
                         toolkit:Themes.UseVsTheme="False"
                         mc:Ignorable="d"
                         ResizeMode="NoResize"
-                        Width="604"
+                        Width="684"
                         Height="470">
 
     <Window.Resources>
@@ -38,6 +38,7 @@
             <ColumnDefinition Width="12"/>
             <ColumnDefinition Width="42"/>
             <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="12"/>
         </Grid.ColumnDefinitions>
 
@@ -62,7 +63,7 @@
             <Label Content="Namespace"  Padding="0" VerticalContentAlignment="Center" />
         </StackPanel>
         <ComboBox Name="NamespaceCombo" Grid.Column="1" Grid.Row="3" TextBoxBase.TextChanged="NamespaceChangedEventHandler" IsEditable="True" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
-        
+
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="6">
             <Label Content="Header" VerticalContentAlignment="Center" Padding="0"/>
         </StackPanel>
@@ -107,7 +108,7 @@
             <CheckBox Content="Include precompiled header" Name="IncludePrecompiledHeaderCheckBox" Checked="IncludePrecompiledHeaderCheckChanged" Unchecked="IncludePrecompiledHeaderCheckChanged" VerticalAlignment="Center" Width="171" Height="16"/>
         </StackPanel>
         <TextBox Grid.Column="1" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
-        
+
         <Grid Grid.Column="1" Grid.Row="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
@@ -147,6 +148,9 @@
             <RadioButton Content="#ifndef ClassName" Name="IfndefGuardStyle" Tag="Ifndef" Grid.Row="2" GroupName="IncludeGuardStyleGroup" IsChecked="False" VerticalContentAlignment="Center"/>
         </Grid>
         <Label Name="ErrorMessage"  Grid.Column="1" Grid.Row="12" Grid.ColumnSpan="4" Content="Error message:" Padding="0" Margin="0,3,0,0"/>
-        
+
+        <Button Name="SelectHeaderSubfolderButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="1" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
+        <Button Name="SelectImplementationSubfolderButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="3" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
+
     </Grid>
 </platform:DialogWindow>
