@@ -38,7 +38,7 @@ namespace Dwarfovich.AddCppClass
 
         [JsonProperty]
         public static Regex classNameRegex { get; set; } = defaultClassNameRegex;
-        public bool ShouldSerializeclassNamespaceRegex() { return classNameRegex != defaultClassNameRegex; }
+        public bool ShouldSerializeclassNameRegex() { return classNameRegex != defaultClassNameRegex; }
         [JsonProperty]
         public static Regex namespaceRegex { get; set; } = defaultNamespaceRegex;
         public bool ShouldSerializenamespaceRegex() { return namespaceRegex != defaultNamespaceRegex; }
@@ -55,13 +55,13 @@ namespace Dwarfovich.AddCppClass
         public static Regex filterRegex { get; set; } = defaultFilterRegex;
         public bool ShouldSerializefilterRegex() { return filterRegex != defaultFilterRegex; }
 
+        [JsonIgnore]
         public string className { get; set; } = "";
-        public int maxRecentNamespaces = 10;
+        public int maxRecentNamespaces { get; set; } = 10;
         public List<string> recentNamespaces { get; set; } = new List<string> { };
         [JsonConverter(typeof(StringEnumConverter))]
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
-        public int maxRecentHeaderExtensions = 10;
-        [JsonProperty]
+        public int maxRecentHeaderExtensions { get; set; } = 10;
         public List<string> recentHeaderExtensions { get; set; } = new List<string> { ".h", ".hpp" };
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
@@ -69,21 +69,22 @@ namespace Dwarfovich.AddCppClass
         public string headerFilename { get; set; } = "";
         [JsonIgnore]
         public string implementationFilename { get; set; } = "";
-        public bool useSingleSubfolder { get; set; } = true;
         public bool hasImplementationFile { get; set; } = true;
-        public bool createFilters { get; set; } = true;
+        public bool useSingleSubfolder { get; set; } = true;
         public int maxRecentHeaderSubfolders { get; set; } = 10;
-        //[JsonProperty]
         public List<string> recentHeaderSubfolders { get; set; } = new List<string> { };
         public int maxRecentImplementationSubfolders { get; set; } = 10;
-        //[JsonProperty]
         public List<string> recentImplementationSubfolders { get; set; } = new List<string> { };
         public bool autoSaveSettings { get; set; } = true;
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = "pch.h";
         [JsonConverter(typeof(StringEnumConverter))]
         public IncludeGuard includeGuardStyle { get; set; } = IncludeGuard.PragmaOnce;
-
+        public bool createFilters { get; set; } = true;
+        public bool useSubfoldersAsFilters { get; set; } = true;
+        public bool useSingleFilter { get; set; } = true;
+        public List<string> recentHeaderFilters { get; set; } = new List<string> { };
+        public List<string> recentImplementationFilters { get; set; } = new List<string> { };
         public string RecentNamespace()
         {
             return recentNamespaces.FirstOrValue("");
@@ -104,7 +105,6 @@ namespace Dwarfovich.AddCppClass
         {
             recentNamespaces.AddFrontValue(ns, maxRecentNamespaces);
         }
-
         public void AddMostRecentHeaderExtension(string extension)
         {
             recentHeaderExtensions.AddFrontValue(extension, maxRecentHeaderExtensions);
