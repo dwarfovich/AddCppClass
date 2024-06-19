@@ -93,9 +93,46 @@ namespace Dwarfovich.AddCppClass
                 IfndefGuardStyle.IsChecked = true;
             }
 
-            AutosaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
+            PopulateComboBox(HeaderFilter, settings.recentHeaderFilters, settings.maxRecentHeaderFilters);
+            PopulateComboBox(ImplementationFilter, settings.recentImplementationFilters, settings.maxRecentImplementationFilters);
+            CreateFiltersCheckBox.IsChecked = settings.createFilters;
+            UseSubfolderAsFilterCheckBox.IsChecked = settings.useSubfoldersAsFilters;
+            UseSingleFilterCheckBox.IsChecked = settings.useSingleFilter;
+
+            AutoSaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
         }
 
+        private void SaveSettings()
+        {
+            settings.className = classNameTextBox.Text;
+            settings.SetNamespace(NamespaceCombo.Text);
+
+            settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
+            settings.SetHeaderSubfolder(ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text));
+            settings.SetImplementationSubfolder(ClassFacilities.ConformSubfolder(ImplementationSubfolderCombo.Text));
+            settings.headerFilename = HeaderFilename.Text;
+            settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
+            settings.implementationFilename = ImplementationFilename.Text;
+            settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
+            settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
+            if (settings.includePrecompiledHeader)
+            {
+                settings.precompiledHeader = ClassFacilities.ConformPrecompiledHeaderPath(PrecompiledHeader.Text);
+            }
+            else
+            {
+                settings.precompiledHeader = "";
+            }
+            SaveIncludeGuardStyleSettings();
+
+            settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
+            settings.useSubfoldersAsFilters = (bool)UseSubfolderAsFilterCheckBox.IsChecked;
+            settings.useSingleFilter = (bool)UseSingleFilterCheckBox.IsChecked;
+            settings.SetHeaderFilter(HeaderFilter.Text);
+            settings.SetImplementationFilter(ImplementationFilter.Text);
+
+            settings.autoSaveSettings = (bool)AutoSaveSettingsCheckBox.IsChecked;
+        }
         private void PopulateComboBox(ComboBox comboBox, List<string> values, int maxItems = 0, string spareValue = null)
         {
             comboBox.Items.Clear();
@@ -319,7 +356,7 @@ namespace Dwarfovich.AddCppClass
             if (ClassFacilities.IsValidHeaderExtension(comboBox.Text))
             {
                 RemoveError(ErrorType.InvalidHeaderExtension);
-                settings.AddMostRecentHeaderExtension(comboBox.Text);
+                settings.SetHeaderExtension(comboBox.Text);
                 (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenamesForChangedExtension(settings);
                 UpdateFilenameTextBoxes();
             }
@@ -378,35 +415,6 @@ namespace Dwarfovich.AddCppClass
                 }
             }
         }
-        private void SaveSettings()
-        {
-            settings.className = classNameTextBox.Text;
-            settings.AddMostRecentNamespace(NamespaceCombo.Text);
-
-            settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
-            settings.AddMostRecentHeaderSubfolder(ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text));
-            if (!settings.useSingleSubfolder)
-            {
-                settings.AddMostRecentImplementationSubfolder(ClassFacilities.ConformSubfolder(ImplementationSubfolderCombo.Text));
-            }
-            settings.headerFilename = HeaderFilename.Text;
-            settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
-            settings.implementationFilename = ImplementationFilename.Text;
-            settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
-            settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
-            if (settings.includePrecompiledHeader)
-            {
-                settings.precompiledHeader = ClassFacilities.ConformPrecompiledHeaderPath(PrecompiledHeader.Text);
-            }
-            else
-            {
-                settings.precompiledHeader = "";
-            }
-            SaveIncludeGuardStyleSettings();
-
-            settings.autoSaveSettings = (bool)AutosaveSettingsCheckBox.IsChecked;
-        }
-
         private bool CheckFiles()
         {
             ThreadHelper.ThrowIfNotOnUIThread();

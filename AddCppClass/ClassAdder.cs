@@ -53,7 +53,7 @@ namespace Dwarfovich.AddCppClass
                 }
                 writer.Write(Environment.NewLine);
 
-                string[] tokens = ClassFacilities.TokenizeNamespace(settings.RecentNamespace());
+                string[] tokens = ClassFacilities.TokenizeNamespace(settings.Namespace());
                 foreach (string token in tokens)
                 {
                     writer.WriteLine("namespace " + token + " {");
@@ -92,13 +92,13 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("#include \"" + settings.precompiledHeader + '\"');
                 }
-                if (String.IsNullOrEmpty(settings.RecentHeaderSubfolder()))
+                if (String.IsNullOrEmpty(settings.HeaderSubfolder()))
                 {
                     writer.WriteLine("#include \"" + settings.headerFilename + '\"');
                 }
                 else
                 {
-                    writer.WriteLine("#include \"" + settings.RecentHeaderSubfolder() + '/' + settings.headerFilename + '\"');
+                    writer.WriteLine("#include \"" + settings.HeaderSubfolder() + '/' + settings.headerFilename + '\"');
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string path = System.IO.Path.Combine(projectPath, settings.RecentHeaderSubfolder());
+            string path = System.IO.Path.Combine(projectPath, settings.HeaderSubfolder());
             Directory.CreateDirectory(path);
             path = System.IO.Path.Combine(path, settings.headerFilename);
             var fileStream = File.Create(path);
@@ -123,8 +123,8 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string path = settings.useSingleSubfolder ? System.IO.Path.Combine(projectPath, settings.RecentHeaderSubfolder())
-                                                      : System.IO.Path.Combine(projectPath, settings.RecentImplementationSubfolder());
+            string path = settings.useSingleSubfolder ? System.IO.Path.Combine(projectPath, settings.HeaderSubfolder())
+                                                      : System.IO.Path.Combine(projectPath, settings.ImplementationSubfolder());
             Directory.CreateDirectory(path);
             path = System.IO.Path.Combine(path, settings.implementationFilename);
             var fileStream = File.Create(path);
@@ -229,7 +229,7 @@ namespace Dwarfovich.AddCppClass
             string filterFilePath = project.FullName + ".filters";
             var doc = OpenFilterXmlDocument(filterFilePath);
             var ns = doc.Root.GetDefaultNamespace();
-            string headerSubfolder = Utils.Path.ToWindowsStylePath(settings.RecentHeaderSubfolder());
+            string headerSubfolder = Utils.Path.ToWindowsStylePath(settings.HeaderSubfolder());
             if (!string.IsNullOrEmpty(headerSubfolder))
             {
                 AddFilterPathItem(doc, ns, headerSubfolder);
@@ -240,7 +240,7 @@ namespace Dwarfovich.AddCppClass
             {
                 string implementationSubfolder = settings.useSingleSubfolder
                                            ? headerSubfolder
-                                           : Utils.Path.ToWindowsStylePath(settings.RecentImplementationSubfolder());
+                                           : Utils.Path.ToWindowsStylePath(settings.ImplementationSubfolder());
                 if (!string.IsNullOrEmpty(implementationSubfolder))
                 {
                     if (!settings.useSingleSubfolder)

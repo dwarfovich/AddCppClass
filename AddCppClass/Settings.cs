@@ -21,19 +21,22 @@ namespace Dwarfovich.AddCppClass
 
     public class Settings
     {
-        public static readonly Regex defaultClassNameRegex = new(@"^[a-zA-Z_][a-zA-Z_\d]*$");
-        public static readonly Regex defaultNamespaceRegex = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
-        public static readonly Regex defaultFileNameRegex = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
-        public static readonly Regex defaultFileExtensionRegex = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
-        public static readonly Regex defaultSubfolderRegex = new(@"^([a-zA-Z\-_\d]+)([\\/][a-zA-Z\-_\d]+)*$");
-        public static readonly Regex defaultFilterRegex = defaultSubfolderRegex;
+        public static readonly string defaultHeaderExtension = ".h";
+        public static readonly string defaultAltHeaderExtension = ".hpp";
+
+        public static Regex defaultClassNameRegex { get; } = new(@"^[a-zA-Z_][a-zA-Z_\d]*$");
+        public static Regex defaultNamespaceRegex { get; } = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
+        public static Regex defaultFileNameRegex { get; } = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
+        public static Regex defaultFileExtensionRegex { get; } = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
+        public static Regex defaultSubfolderRegex { get; } = new(@"^([a-zA-Z\-_\d]+)([\\/][a-zA-Z\-_\d]+)*$");
+        public static Regex defaultFilterRegex { get; } = defaultSubfolderRegex;
 
         public Settings() { }
         public Settings(string className, FilenameStyle style, string headerExtension)
         {
             this.className = className;
             filenameStyle = style;
-            AddMostRecentHeaderExtension(headerExtension);
+            SetHeaderExtension(headerExtension);
         }
 
         [JsonProperty]
@@ -62,7 +65,8 @@ namespace Dwarfovich.AddCppClass
         [JsonConverter(typeof(StringEnumConverter))]
         public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
         public int maxRecentHeaderExtensions { get; set; } = 10;
-        public List<string> recentHeaderExtensions { get; set; } = new List<string> { ".h", ".hpp" };
+        public List<string> recentHeaderExtensions { get; set; } = new List<string>
+        { defaultHeaderExtension, defaultAltHeaderExtension };
         [JsonIgnore]
         public string implementationExtension { get { return ".cpp"; } }
         [JsonIgnore]
@@ -83,39 +87,110 @@ namespace Dwarfovich.AddCppClass
         public bool createFilters { get; set; } = true;
         public bool useSubfoldersAsFilters { get; set; } = true;
         public bool useSingleFilter { get; set; } = true;
+        public int maxRecentHeaderFilters { get; set; } = 10;
         public List<string> recentHeaderFilters { get; set; } = new List<string> { };
+        public int maxRecentImplementationFilters { get; set; } = 10;
         public List<string> recentImplementationFilters { get; set; } = new List<string> { };
-        public string RecentNamespace()
+        public bool storeValuesUnconditiaonally { get; set; } = false;
+        public bool ShouldSerializestoreValuesUnconditiaonally() { return storeValuesUnconditiaonally = true; }
+        public string Namespace()
         {
             return recentNamespaces.FirstOrValue("");
         }
-        public string RecentHeaderExtension()
+        public void SetNamespace(string ns)
         {
-            return recentHeaderExtensions.FirstOrValue(".h");
+            recentNamespaces.SetFrontValue(ns, maxRecentNamespaces);
         }
-        public string RecentHeaderSubfolder()
+        public string HeaderExtension()
+        {
+            return recentHeaderExtensions.FirstOrValue(defaultHeaderExtension);
+        }
+        public void SetHeaderExtension(string extension)
+        {
+            recentHeaderExtensions.SetFrontValue(extension, maxRecentHeaderExtensions);
+        }
+        public string HeaderSubfolder()
         {
             return recentHeaderSubfolders.FirstOrValue("");
         }
-        public string RecentImplementationSubfolder()
+        public void SetHeaderSubfolder(string subfolder)
         {
-            return recentImplementationSubfolders.FirstOrValue("");
+            recentHeaderSubfolders.SetFrontValue(subfolder, maxRecentHeaderSubfolders);
         }
-        public void AddMostRecentNamespace(string ns)
+        public string ImplementationSubfolder()
         {
-            recentNamespaces.AddFrontValue(ns, maxRecentNamespaces);
+            if(storeValuesUnconditiaonally || !useSingleSubfolder)
+            {
+                return recentImplementationSubfolders.FirstOrValue("");
+            }
+            else
+            {
+                return recentHeaderSubfolders.FirstOrValue("");
+            }
         }
-        public void AddMostRecentHeaderExtension(string extension)
+        public void SetImplementationSubfolder(string subfolder)
         {
-            recentHeaderExtensions.AddFrontValue(extension, maxRecentHeaderExtensions);
+            if (storeValuesUnconditiaonally || !useSingleSubfolder)
+            {
+                recentImplementationSubfolders.SetFrontValue(subfolder, maxRecentImplementationSubfolders);
+            }
         }
-        public void AddMostRecentHeaderSubfolder(string subfolder)
+        public string HeaderFilter()
         {
-            recentHeaderSubfolders.AddFrontValue(subfolder, maxRecentHeaderSubfolders);
+            if (createFilters)
+            {
+                if (storeValuesUnconditiaonally)
+                {
+                    return recentHeaderFilters.FirstOrValue("");
+                }
+                else
+                {
+                    return (useSubfoldersAsFilters ? HeaderSubfolder() : recentHeaderFilters.FirstOrValue(""));
+                }
+            }
+
+            return "";
         }
-        public void AddMostRecentImplementationSubfolder(string subfolder)
+        public void SetHeaderFilter(string filter)
         {
-            recentImplementationSubfolders.AddFrontValue(subfolder, maxRecentImplementationSubfolders);
+            if (storeValuesUnconditiaonally || (createFilters && !useSubfoldersAsFilters))
+            {
+                recentHeaderFilters.SetFrontValue(filter, maxRecentHeaderFilters);
+            }
+        }
+        public string ImplementationFilter()
+        {
+            if (createFilters)
+            {
+                if (storeValuesUnconditiaonally)
+                {
+                    return recentImplementationFilters.FirstOrValue("");
+                }
+                else
+                {
+                    if (useSubfoldersAsFilters)
+                    {
+                        return useSingleFilter ? HeaderSubfolder() : ImplementationSubfolder();
+                    }
+                    else
+                    {
+                        return useSingleFilter ? HeaderFilter() : recentImplementationFilters.FirstOrValue("");
+                    }
+                }
+            }
+
+            return "";
+        }
+        private bool ShouldStoreImplementationFilter()
+        {
+            return storeValuesUnconditiaonally || (createFilters && !useSubfoldersAsFilters && !useSingleFilter);
+        }
+        public void SetImplementationFilter(string filter)
+        {
+            if (ShouldStoreImplementationFilter())
+            {
+                recentImplementationFilters.SetFrontValue(filter, maxRecentImplementationFilters);
+            }
         }
     }
 }

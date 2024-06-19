@@ -98,7 +98,7 @@
 
         <StackPanel Orientation="Vertical" Grid.Row="10" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" >
-                <CheckBox Content="Save settings" Name="AutosaveSettingsCheckBox"/>
+                <CheckBox Content="Save settings" Name="AutoSaveSettingsCheckBox"/>
             </StackPanel>
             <Button x:Name="AddClassButton" Click="AddClassButtonClicked" Content="Add class" Width="120" Height="35"  HorizontalAlignment="Left" Margin="0,4,0,0"/>
         </StackPanel>

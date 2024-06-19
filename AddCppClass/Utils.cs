@@ -40,7 +40,7 @@ namespace Dwarfovich.AddCppClass.Utils
                 return value;
             }
         }
-        public static void AddFrontValue<T>(this List<T> list, T value, int maxListCount)
+        public static void SetFrontValue<T>(this List<T> list, T value, int maxListCount)
         {
             var index = list.IndexOf(value);
             if (index == -1)
@@ -74,12 +74,10 @@ namespace Dwarfovich.AddCppClass.Utils
             return path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
         }
 
-        public static string TolinuxStylePath(string path)
+        public static string ToLinuxStylePath(string path)
         {
             return path.Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
         }
-
-
     }
 
     public static class Solution
