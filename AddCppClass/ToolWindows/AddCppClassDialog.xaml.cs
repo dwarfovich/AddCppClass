@@ -355,7 +355,7 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassFacilities.IsValidHeaderExtension(comboBox.Text))
+            if (ClassFacilities.IsValidExtension(comboBox.Text))
             {
                 RemoveError(ErrorType.InvalidHeaderExtension);
                 settings.SetHeaderExtension(comboBox.Text);

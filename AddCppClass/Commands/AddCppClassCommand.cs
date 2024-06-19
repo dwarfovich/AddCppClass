@@ -101,6 +101,27 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            var dte2 = AddCppClassPackage.dte as DTE2;
+            Array projects = AddCppClassPackage.dte.ActiveSolutionProjects as Array;
+            var project = projects.GetValue(0) as EnvDTE.Project;
+
+            var props = project.Properties;
+            string str = "";
+            string str2 = "";
+            foreach (Property p in props)
+            {
+                str += p.Name + "\n";
+                //str2 += p.Value.ToString() + "\n";
+                if(p.Name == "Filters")
+                {
+                    p.Value = "Hello";
+                }
+            }
+
+
+            return;
+
+
             var settings = GetSettings();
             var errors = ClassFacilities.ConformSettings(ref settings);
             foreach (var error in errors)

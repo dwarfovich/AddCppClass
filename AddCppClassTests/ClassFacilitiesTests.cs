@@ -308,26 +308,26 @@ namespace Dwarfovich.AddCppClass.Tests
         [TestMethod()]
         public void IsValidFileExtensionTest()
         {
-            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".a"));
-            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".ab3_"));
-            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".0ab3_Z"));
-            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".a.b"));
-            Assert.IsTrue(ClassFacilities.IsValidHeaderExtension(".a.b_._d.4"));
+            Assert.IsTrue(ClassFacilities.IsValidExtension(".a"));
+            Assert.IsTrue(ClassFacilities.IsValidExtension(".ab3_"));
+            Assert.IsTrue(ClassFacilities.IsValidExtension(".0ab3_Z"));
+            Assert.IsTrue(ClassFacilities.IsValidExtension(".a.b"));
+            Assert.IsTrue(ClassFacilities.IsValidExtension(".a.b_._d.4"));
         }
 
         [TestMethod()]
         public void IsInvalidFileExtensionTest()
         {
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(string.Empty));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(" "));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension("."));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".."));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d."));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d.a."));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension("d a"));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d a"));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(".d.a "));
-            Assert.IsFalse(ClassFacilities.IsValidHeaderExtension(" .pch"));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(string.Empty));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(" "));
+            Assert.IsFalse(ClassFacilities.IsValidExtension("."));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(".."));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(".d."));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(".d.a."));
+            Assert.IsFalse(ClassFacilities.IsValidExtension("d a"));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(".d a"));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(".d.a "));
+            Assert.IsFalse(ClassFacilities.IsValidExtension(" .pch"));
         }
     }
 }

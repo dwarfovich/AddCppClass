@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using AddCppClass;
+using EnvDTE;
+using VSLangProj;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -126,7 +128,7 @@ namespace Dwarfovich.AddCppClass
             List<SettingError> errors = new();
 
             ConformStringList(ref settings, nameof(Settings.recentNamespaces), IsValidNamespace, ref errors);
-            ConformStringList(ref settings, nameof(Settings.recentHeaderExtensions), IsValidHeaderExtension, ref errors);
+            ConformStringList(ref settings, nameof(Settings.recentHeaderExtensions), IsValidExtension, ref errors);
             ConformStringList(ref settings, nameof(Settings.recentHeaderSubfolders), IsValidSubfolder, ref errors);
             ConformStringList(ref settings, nameof(Settings.recentImplementationSubfolders), IsValidSubfolder, ref errors);
             ConformPrecompiledHeaderPath(ref settings, nameof(Settings.precompiledHeader), IsValidPrecompiledHeaderPath, ref errors);
@@ -165,6 +167,19 @@ namespace Dwarfovich.AddCppClass
             subfolder = subfolder.Trim(Path.AltDirectorySeparatorChar);
 
             return subfolder;
+        }
+
+        public static string ConformFilter(string filter)
+        {
+            if (String.IsNullOrEmpty(filter))
+            {
+                return "";
+            }
+
+            filter = filter.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            filter = filter.Trim(Path.AltDirectorySeparatorChar);
+
+            return filter;
         }
 
         public static bool IsValidSubfolder(string subfolder)
@@ -235,7 +250,7 @@ namespace Dwarfovich.AddCppClass
                     && IsValidFilename(path.Substring(pos + 1));
             }
         }
-        public static bool IsValidHeaderExtension(string extension)
+        public static bool IsValidExtension(string extension)
         {
             return Settings.fileExtensionRegex.IsMatch(extension);
         }

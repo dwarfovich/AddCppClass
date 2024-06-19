@@ -7,6 +7,10 @@ using AddCppClass;
 
 namespace Dwarfovich.AddCppClass.Utils
 {
+    public static class ListExtra
+    {
+        
+    }
     public class ListClearingContractResolver : DefaultContractResolver
     {
         protected override JsonArrayContract CreateArrayContract(Type objectType)
@@ -29,6 +33,26 @@ namespace Dwarfovich.AddCppClass.Utils
     }
     public static class ListExtensions
     {
+        public static void Resize<T>(this List<T> list, int size, T constructor = default(T))
+        {
+            int currentSize = list.Count;
+            if (size < currentSize)
+            {
+                list.RemoveRange(size, currentSize - size);
+            }
+            else if (size > currentSize)
+            {
+                list.AddRange(Enumerable.Repeat(constructor, size - currentSize));
+            }
+        }
+        public static void ShrinkToSize<T>(this List<T> list, int size)
+        {
+            int currentSize = list.Count;
+            if (size < currentSize)
+            {
+                list.RemoveRange(size, currentSize - size);
+            }
+        }
         public static T FirstOrValue<T>(this List<T> list, T value)
         {
             if (list.Count > 0)

@@ -19,10 +19,55 @@ namespace Dwarfovich.AddCppClass
         Ifndef
     };
 
+    public class StringListSetting
+    {
+        public int MaxValues { get; set; } = 10;
+        public List<string> Values { get; set; } = new List<string> { };
+        [JsonIgnore]
+        public Func<string, bool> ValidateFunction { get; set; }
+        [JsonIgnore]
+        public Func<string, string> ConformFunction { get; set; }
+
+        public void SetFrontValue(string value)
+        {
+            Values.SetFrontValue(value, MaxValues);
+        }
+        public SettingError Validate()
+        {
+            Values.ShrinkToSize(MaxValues);
+            SettingError errors = new();
+            for (int i = Values.Count - 1; i >= 0; i--)
+            {
+                if (ValidateFunction != null && !ValidateFunction(Values[i]))
+                {
+                    errors.invalidValues.Add(Values[i]);
+                    Values.RemoveAt(i);
+                }
+                else if (ConformFunction != null)
+                {
+                    Values[i] = ConformFunction(Values[i]);
+                }
+            }
+
+            return errors;
+        }
+    }
     public class Settings
     {
+        public StringListSetting _namespaces = new() { ValidateFunction = ClassFacilities.IsValidNamespace };
+        public StringListSetting _precompiledHeaders = new() { ValidateFunction = ClassFacilities.IsValidPrecompiledHeaderPath };
+        public StringListSetting _headerExtensions = new() { ValidateFunction = ClassFacilities.IsValidExtension, Values = { defaultHeaderExtension, defaultAltHeaderExtension } };
+        public StringListSetting _implementationExtensions = new() { ValidateFunction = ClassFacilities.IsValidExtension, Values = { defaultCppExtension } };
+        public StringListSetting _headerSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+        public StringListSetting _implementationSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+        public StringListSetting _headerFilters = new() { ValidateFunction = ClassFacilities.IsValidFilter, ConformFunction = ClassFacilities.ConformFilter };
+        public StringListSetting _implementationFilters = new() { ValidateFunction = ClassFacilities.IsValidFilter, ConformFunction = ClassFacilities.ConformFilter };
+        public StringListSetting _dedicatedHeaderSubfolder = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+        public StringListSetting _dedicatedCppSubfolder = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+
         public static readonly string defaultHeaderExtension = ".h";
         public static readonly string defaultAltHeaderExtension = ".hpp";
+        public static readonly string defaultCppExtension = ".cpp";
 
         public static Regex defaultClassNameRegex { get; } = new(@"^[a-zA-Z_][a-zA-Z_\d]*$");
         public static Regex defaultNamespaceRegex { get; } = new(@"^(([a-zA-Z_][a-zA-Z_\d]*::)*)([a-zA-Z_][a-zA-Z_\d]*)+$");
