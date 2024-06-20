@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
-using AddCppClass;
-using EnvDTE;
-using VSLangProj;
+using System.Linq;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -254,14 +252,16 @@ namespace Dwarfovich.AddCppClass
         {
             return Settings.fileExtensionRegex.IsMatch(extension);
         }
-        public static bool IsValidFilter(string filter)
+        public static string[] TokenizeFilter(string filter)
         {
-            if (String.IsNullOrEmpty(filter))
+            try
             {
-                return true;
+                return Settings.filterSplitRegex.Split(filter).Where(s => s != String.Empty).ToArray();
             }
-
-            return Settings.filterRegex.IsMatch(filter);
+            catch
+            {
+                return [];
+            }
         }
     }
 }

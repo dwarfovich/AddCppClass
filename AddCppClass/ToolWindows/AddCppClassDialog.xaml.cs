@@ -632,14 +632,14 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
-            {
-                RemoveError(ErrorType.InvalidImplementationFilter);
-            }
-            else
-            {
-                AddError(ErrorType.InvalidImplementationFilter);
-            }
+            //if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
+            //{
+            //    RemoveError(ErrorType.InvalidImplementationFilter);
+            //}
+            //else
+            //{
+            //    AddError(ErrorType.InvalidImplementationFilter);
+            //}
             implementationFilterValidated = true;
         }
         private void ValidateHeaderFilterIfNeeded()
@@ -648,14 +648,14 @@ namespace Dwarfovich.AddCppClass
             {
                 return;
             }
-            if (ClassFacilities.IsValidFilter(HeaderFilter.Text))
-            {
-                RemoveError(ErrorType.InvalidHeaderFilter);
-            }
-            else
-            {
-                AddError(ErrorType.InvalidHeaderFilter);
-            }
+            //if (ClassFacilities.IsValidFilter(HeaderFilter.Text))
+            //{
+            //    RemoveError(ErrorType.InvalidHeaderFilter);
+            //}
+            //else
+            //{
+            //    AddError(ErrorType.InvalidHeaderFilter);
+            //}
             headerFilterValidated = true;
         }
         private void UpdateImplementationFilter()

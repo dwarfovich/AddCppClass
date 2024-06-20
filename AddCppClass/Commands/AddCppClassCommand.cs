@@ -8,6 +8,11 @@ using AddCppClass;
 using System.ComponentModel.Design;
 using Community.VisualStudio.Toolkit;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using Microsoft.VisualStudio.VCProjectEngine;
+using System.Linq;
+using Microsoft.VisualStudio.Experimentation;
+using Microsoft.VisualStudio;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -97,30 +102,10 @@ namespace Dwarfovich.AddCppClass
             message += "These values will be ignored.";
             VS.MessageBox.Show("Warning", message, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
         }
+
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-
-            var dte2 = AddCppClassPackage.dte as DTE2;
-            Array projects = AddCppClassPackage.dte.ActiveSolutionProjects as Array;
-            var project = projects.GetValue(0) as EnvDTE.Project;
-
-            var props = project.Properties;
-            string str = "";
-            string str2 = "";
-            foreach (Property p in props)
-            {
-                str += p.Name + "\n";
-                //str2 += p.Value.ToString() + "\n";
-                if(p.Name == "Filters")
-                {
-                    p.Value = "Hello";
-                }
-            }
-
-
-            return;
-
 
             var settings = GetSettings();
             var errors = ClassFacilities.ConformSettings(ref settings);

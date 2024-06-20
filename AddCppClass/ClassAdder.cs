@@ -1,7 +1,12 @@
 ﻿using AddCppClass;
+using Community.VisualStudio.Toolkit;
 using Dwarfovich.AddCppClass.Utils;
 using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.VCProjectEngine;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -113,13 +118,13 @@ namespace Dwarfovich.AddCppClass
             var fileStream = File.Create(path);
             PopulateHeaderFile(fileStream, settings);
             fileStream.Close();
-            ProjectItems projectItems = project.ProjectItems;
-            projectItems.AddFromFile(path);
+            //ProjectItems projectItems = project.ProjectItems;
+            //projectItems.AddFromFile(path);
 
             return path;
         }
 
-        public static void CreateImplementationFile(EnvDTE.Project project, Settings settings, string projectPath)
+        public static string CreateImplementationFile(EnvDTE.Project project, Settings settings, string projectPath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -130,8 +135,10 @@ namespace Dwarfovich.AddCppClass
             var fileStream = File.Create(path);
             PopulateImplementationFile(fileStream, settings);
             fileStream.Close();
-            ProjectItems projectItems = project.ProjectItems;
-            projectItems.AddFromFile(path);
+            //ProjectItems projectItems = project.ProjectItems;
+            //projectItems.AddFromFile(path);
+
+            return path;
         }
 
         private static XElement GetFilterItemGroup(XDocument doc, XNamespace ns)
@@ -254,28 +261,124 @@ namespace Dwarfovich.AddCppClass
             doc.Save(filterFilePath);
         }
 
-        public static void AddClass(Settings settings)
+        public static VCFilter EnsureFilter(EnvDTE.Project project, Settings settings)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            EnvDTE.Project project = Utils.Solution.CurrentProject();
+            var vcProject = project.Object as VCProject;
+            var filters = vcProject.Filters as System.Collections.IEnumerable;
+
+            foreach (VCFilter filter in filters)
+            {
+                if (filter.Name == "Filter3")
+                {
+                    return filter.AddFilter(@"new filter") as VCFilter;
+                }
+            }
+            return null;
+        }
+
+        public static (string, string) CreateClassFiles(EnvDTE.Project project, Settings settings)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             string headerPath = CreateHeaderFile(project, settings, projectPath);
+            string cppPath = "";
             if (settings.hasImplementationFile)
             {
-                CreateImplementationFile(project, settings, projectPath);
+                cppPath = CreateImplementationFile(project, settings, projectPath);
             }
-            project.DTE.ExecuteCommand("File.SaveAll");
 
-            if (settings.createFilters)
+            return (headerPath, cppPath);
+        }
+
+        public static void AddFileToFilter(EnvDTE.Project project, string filePath, string filter)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            VCProject vcProject = project.Object as VCProject;
+            if (vcProject == null)
             {
-                CreateFilters(project, settings);
+                throw new Exception("Failed to convert EnvDTE.Project to VCProject");
             }
 
-            project.DTE.ExecuteCommand("Project.UnloadProject");
-            project.DTE.ExecuteCommand("Project.ReloadProject");
-            project.DTE.ItemOperations.OpenFile(headerPath);
+            filter = "Filter1";
+            var tokens = ClassFacilities.TokenizeFilter(filter);
+            if (tokens.Length == 0)
+            {
+                return;
+            }
+            //VCFilter targetFilter;
+            //var filters = vcProject.Filters as System.Collections.IEnumerable;
+            //for (int i = 0; i < tokens.Length; i++)
+            //{
+            //    targetFilter = filters.Cast<VCFilter>().FirstOrDefault(x => x.Name == tokens[i]);
+            //    if (targetFilter == null)
+            //    {
+            //        break;
+            //    }
+            //}
+
+            //VCProject p = Utils.Solution.CurrentProject().Object as VCProject;
+            //string str = @"`~!@#$%^&*()<>,.{}[]:""";
+            //var filters = p.Filters as System.Collections.IEnumerable;
+            //string m = "";
+            //foreach (VCFilter f in filters.Cast<VCFilter>())
+            //{
+            //    if (f.Name == str)
+            //    {
+            //        //VS.MessageBox.Show("Warning", "Found! " + str, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+            //    }
+            //    m += f.CanonicalName + "\n";
+            //}
+            //VS.MessageBox.Show("Warning", m, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+            return;
+        }
+        public static void AddClass(Settings settings)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            
+            var project = Utils.Solution.CurrentProject();
+            (var headerPath, var cppPath) = CreateClassFiles(project, settings);
+            var exceptions = new List<Exception>();
+            try
+            {
+                AddFileToFilter(project, headerPath, settings.HeaderFilter());
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+            finally
+            {
+                try
+                {
+                    AddFileToFilter(project, cppPath, settings.ImplementationFilter());
+                }
+                catch (Exception ex2)
+                {
+                    exceptions.Add(ex2);
+                }
+                finally
+                {
+                    if (exceptions.Count > 0)
+                    {
+                        throw new AggregateException(exceptions);
+                    }
+                }
+            }
+
+            //project.DTE.ExecuteCommand("File.SaveAll");
+
+            //if (settings.createFilters)
+            //{
+            //    CreateFilters(project, settings);
+            //}
+
+            //project.DTE.ExecuteCommand("Project.UnloadProject");
+            //project.DTE.ExecuteCommand("Project.ReloadProject");
+            //project.DTE.ItemOperations.OpenFile(headerPath);
         }
     }
 }

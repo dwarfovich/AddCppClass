@@ -60,8 +60,8 @@ namespace Dwarfovich.AddCppClass
         public StringListSetting _implementationExtensions = new() { ValidateFunction = ClassFacilities.IsValidExtension, Values = { defaultCppExtension } };
         public StringListSetting _headerSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
         public StringListSetting _implementationSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
-        public StringListSetting _headerFilters = new() { ValidateFunction = ClassFacilities.IsValidFilter, ConformFunction = ClassFacilities.ConformFilter };
-        public StringListSetting _implementationFilters = new() { ValidateFunction = ClassFacilities.IsValidFilter, ConformFunction = ClassFacilities.ConformFilter };
+        public StringListSetting _headerFilters = new();
+        public StringListSetting _implementationFilters = new();
         public StringListSetting _dedicatedHeaderSubfolder = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
         public StringListSetting _dedicatedCppSubfolder = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
 
@@ -74,7 +74,7 @@ namespace Dwarfovich.AddCppClass
         public static Regex defaultFileNameRegex { get; } = new(@"^([a-zA-Z_\-\d]*\.)*[a-zA-Z_\-\d]+$");
         public static Regex defaultFileExtensionRegex { get; } = new(@"^(\.?)([a-zA-Z_\d]+\.)*([a-zA-Z_\d]+)$");
         public static Regex defaultSubfolderRegex { get; } = new(@"^([a-zA-Z\-_\d]+)([\\/][a-zA-Z\-_\d]+)*$");
-        public static Regex defaultFilterRegex { get; } = defaultSubfolderRegex;
+        public static Regex defaultfilterSplitRegex { get; } = new(@"/(?!(/|\z))");
 
         public Settings() { }
         public Settings(string className, FilenameStyle style, string headerExtension)
@@ -100,8 +100,8 @@ namespace Dwarfovich.AddCppClass
         public static Regex subfolderRegex { get; set; } = defaultSubfolderRegex;
         public bool ShouldSerializesubfolderRegex() { return subfolderRegex != defaultSubfolderRegex; }
         [JsonProperty]
-        public static Regex filterRegex { get; set; } = defaultFilterRegex;
-        public bool ShouldSerializefilterRegex() { return filterRegex != defaultFilterRegex; }
+        public static Regex filterSplitRegex { get; set; } = defaultfilterSplitRegex;
+        public bool ShouldSerializefilterRegex() { return filterSplitRegex != defaultfilterSplitRegex; }
 
         [JsonIgnore]
         public string className { get; set; } = "";
