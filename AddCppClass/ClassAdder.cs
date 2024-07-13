@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -303,12 +304,15 @@ namespace Dwarfovich.AddCppClass
                 throw new Exception("Failed to convert EnvDTE.Project to VCProject");
             }
 
-            filter = "Filter1";
-            var tokens = ClassFacilities.TokenizeFilter(filter);
-            if (tokens.Length == 0)
-            {
-                return;
-            }
+            Regex r;
+            //r.Match()
+            //filter = "Filter1";
+            //var tokens = ClassFacilities.TokenizeFilter(filter);
+            //if (tokens.Length == 0)
+            //{
+            //    return;
+            //}
+            //VS.MessageBox.Show("Warning", "Ok", OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
             //VCFilter targetFilter;
             //var filters = vcProject.Filters as System.Collections.IEnumerable;
             //for (int i = 0; i < tokens.Length; i++)

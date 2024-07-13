@@ -107,6 +107,27 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            VCProject vcProject = Utils.Solution.CurrentProject().Object as VCProject;
+            if (vcProject == null)
+            {
+                throw new Exception("Failed to convert EnvDTE.Project to VCProject");
+            }
+
+            string m = "";
+            var filters = vcProject.Filters as System.Collections.IEnumerable;
+            foreach (var filter in filters.Cast<VCFilter>())
+            {
+                m += filter.CanonicalName + "\n";// + filter.Filters + "\n";
+            }
+            VS.MessageBox.Show("Warning", m, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+
+            //string filter = @"filter1\\filter2";
+            //VCFilter f = vcProject.AddFilter(filter) as VCFilter;
+
+            //f.AddFile(filePath);
+
+            //return;
+
             var settings = GetSettings();
             var errors = ClassFacilities.ConformSettings(ref settings);
             foreach (var error in errors)
