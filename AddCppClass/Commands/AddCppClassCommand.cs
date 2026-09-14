@@ -119,7 +119,7 @@ namespace Dwarfovich.AddCppClass
             {
                 m += filter.CanonicalName + "\n";// + filter.Filters + "\n";
             }
-            VS.MessageBox.Show("Warning", m, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+            //VS.MessageBox.Show("Warning", m, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
 
             //string filter = @"filter1\\filter2";
             //VCFilter f = vcProject.AddFilter(filter) as VCFilter;

@@ -29,6 +29,7 @@ namespace AddCppClass
 
             Logger.Initialize(this, Vsix.Name);
             Logger.Log("Hello, logger");
+            Logger.DumpSolution();
         }
     }
 }

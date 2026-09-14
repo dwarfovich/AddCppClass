@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="AddCppClass.955bd0cf-81d1-4f82-999c-84bda7eb9730" Version="1.0" Language="en-US" Publisher="Dwarfovich" />
+        <Identity Id="AddCppClass.955bd0cf-81d1-4f82-999c-84bda7eb9730" Version="1.0.1" Language="en-US" Publisher="Dwarfovich" />
         <DisplayName>AddCppClass</DisplayName>
         <Description xml:space="preserve">Simple extension that provides convenient dialog to add C++ classes</Description>
         <Icon>Resources\Icon.png</Icon>
         <PreviewImage>Resources\Icon.png</PreviewImage>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, )">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
