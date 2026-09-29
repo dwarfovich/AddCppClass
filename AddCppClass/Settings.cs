@@ -137,6 +137,10 @@ namespace Dwarfovich.AddCppClass
         public int maxRecentImplementationFilters { get; set; } = 10;
         public List<string> recentImplementationFilters { get; set; } = new List<string> { };
         public bool storeValuesUnconditiaonally { get; set; } = false;
+
+        [JsonProperty]
+        public Dictionary<string, string> filterToFolder { get; set; } = new Dictionary<string, string> { };
+
         public bool ShouldSerializestoreValuesUnconditiaonally() { return storeValuesUnconditiaonally = true; }
         public string Namespace()
         {

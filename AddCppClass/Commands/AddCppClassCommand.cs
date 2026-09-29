@@ -1,18 +1,19 @@
 ﻿global using Task = System.Threading.Tasks.Task;
+using AddCppClass;
+using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using EnvDTE80;
-using Microsoft.VisualStudio.Shell.Interop;
-using System.IO;
-using Newtonsoft.Json;
-using AddCppClass;
-using System.ComponentModel.Design;
-using Community.VisualStudio.Toolkit;
-using System.Collections.Generic;
-using System.Windows.Controls;
-using Microsoft.VisualStudio.VCProjectEngine;
-using System.Linq;
-using Microsoft.VisualStudio.Experimentation;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Experimentation;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.VCProjectEngine;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows.Controls;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -65,6 +66,7 @@ namespace Dwarfovich.AddCppClass
                     JsonSerializerSettings jsonSettings = new JsonSerializerSettings();
                     jsonSettings.ContractResolver = new Utils.ListClearingContractResolver();
                     settings = JsonConvert.DeserializeObject<Settings>(jsonString, jsonSettings);
+                    settings.filterToFolder ??= new Dictionary<string, string>();
                 }
             }
             catch (Exception ex)
@@ -113,6 +115,7 @@ namespace Dwarfovich.AddCppClass
                 throw new Exception("Failed to convert EnvDTE.Project to VCProject");
             }
 
+            Logger.Log("Hello, Execute()");
             string m = "";
             var filters = vcProject.Filters as System.Collections.IEnumerable;
             foreach (var filter in filters.Cast<VCFilter>())
@@ -133,6 +136,42 @@ namespace Dwarfovich.AddCppClass
             foreach (var error in errors)
             {
                 ShowSettingErrorMessage(error);
+            }
+
+            var monitorSelection = Package.GetGlobalService(typeof(SVsShellMonitorSelection))
+    as IVsMonitorSelection;
+
+            monitorSelection.GetCurrentSelection(
+                out IntPtr hierarchyPtr,
+                out uint itemid,
+                out IVsMultiItemSelect multiSelect,
+                out IntPtr selectionContainer);
+
+            var hierarchy = Marshal.GetObjectForIUnknown(hierarchyPtr) as IVsHierarchy;
+            Logger.Log($"-------");
+            Logger.Log($"itemid = {itemid}");
+            Logger.Log($"hierarchy = {hierarchy}");
+            hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out object name);
+            hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_SaveName, out object saveName);
+            hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_ExtObject, out object extObject);
+
+            Logger.Log($"Name: {name}");
+            Logger.Log($"SaveName: {saveName}");
+            Logger.Log($"ExtObject: {extObject?.GetType().FullName}");
+
+            if (hierarchy == null || itemid == VSConstants.VSITEMID_NIL)
+                return;
+
+      
+            if (extObject is EnvDTE.ProjectItem projectItem)
+            {
+                Logger.Log($"ProjectItem: {projectItem.Name}");
+                var filter = projectItem?.Object as VCFilter;
+
+                if (filter != null)
+                {
+                    Logger.Log($"Filter: {filter.Name}");
+                }
             }
 
             var dialog = new AddCppClassDialog(settings);

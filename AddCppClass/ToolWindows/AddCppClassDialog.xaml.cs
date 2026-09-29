@@ -134,6 +134,39 @@ namespace Dwarfovich.AddCppClass
             settings.SetImplementationFilter(ImplementationFilter.Text);
 
             settings.autoSaveSettings = (bool)AutoSaveSettingsCheckBox.IsChecked;
+
+            string headerFilter = HeaderFilter.Text;
+            var filterTokens = headerFilter.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string headerFolder = ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text);
+            var folderTokens = headerFolder.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+            string currentFilter = filterTokens[0];
+            string currentFolder = "";
+
+            settings.filterToFolder[currentFilter] = currentFolder;
+
+            for (int i = 1; i < filterTokens.Length; ++i)
+            {
+                currentFilter += "/" + filterTokens[i];
+
+                int folderIndex = i - 1;
+
+                if (folderIndex < folderTokens.Length)
+                {
+                    if (string.IsNullOrEmpty(currentFolder))
+                        currentFolder = folderTokens[folderIndex];
+                    else
+                        currentFolder += "/" + folderTokens[folderIndex];
+                }
+
+                settings.filterToFolder[currentFilter] = currentFolder;
+            }
+
+
+            //settings.SetHeaderSubfolder(ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text));
+            //settings.filterToFolder[headerFilter] = ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text);
+
+
         }
         private void PopulateComboBox(ComboBox comboBox, List<string> values, int maxItems = 0, string spareValue = null)
         {
@@ -510,7 +543,7 @@ namespace Dwarfovich.AddCppClass
             if (checkBox is null)
             {
                 return;
-            } 
+            }
 
             ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
             SelectImplementationSubfolderButton.IsEnabled = !(bool)checkBox.IsChecked;
