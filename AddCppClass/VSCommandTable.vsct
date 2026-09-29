@@ -1,43 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <Extern href="stdidcmd.h"/>
-    <Extern href="vsshlids.h"/>
-    <Include href="KnownImageIds.vsct"/>
-    <Include href="VSGlobals.vsct"/>
+    <Extern href="stdidcmd.h" />
+    <Extern href="vsshlids.h" />
+    <Include href="KnownImageIds.vsct" />
+    <Include href="VSGlobals.vsct" />
 
     <Commands package="AddCppClass">
         <Buttons>
-            <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0100" type="Button">
+            <Button guid="AddCppClass"
+                    id="AddCppClassCommand"
+                    priority="0x0100"
+                    type="Button">
                 <Parent guid="guidSHLMainMenu" id="IDG_VS_PROJ_MISCADD" />
-                <Icon guid="icon" id="icon1" />
-                <CommandFlag>DynamicVisibility</CommandFlag>
-                <CommandFlag>DefaultInvisible</CommandFlag>
                 <Strings>
                     <ButtonText>Add C++ Class...</ButtonText>
                 </Strings>
             </Button>
-            <Button guid="AddCppClass" id="AddCppClassCommand" priority="0x0200" type="Button">
-                <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_ITEMS"/>
-                <!--<CommandFlag>IconIsMoniker</CommandFlag>-->
+
+            <Button guid="AddCppClass"
+        id="AddCppClassFolderCommand"
+        priority="0x0300"
+        type="Button">
+                <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_FOLDERNODE" />
                 <Strings>
-                    <ButtonText>Add C++ Class...</ButtonText>
+                    <ButtonText>TEST Add C++ Class</ButtonText>
                 </Strings>
             </Button>
         </Buttons>
-
-        <Bitmaps>
-            <Bitmap guid="icon" href="Resources\Command.png" usedList="icon1"/>
-        </Bitmaps>
-
     </Commands>
 
     <Symbols>
+        <GuidSymbol name="AddCppClass" value="{a21a05fe-1b28-4faa-ba1f-83394176f032}">
+            <IDSymbol name="AddCppClassCommand" value="0x0100" />
+            <IDSymbol name="AddCppClassFolderCommand" value="0x0200" />
+        </GuidSymbol>
         <GuidSymbol name="icon" value="{B8CF8B42-0F17-4E76-B925-B1608F399014}">
             <IDSymbol name="icon1" value="1" />
         </GuidSymbol>
-        <GuidSymbol name="AddCppClass" value="{a21a05fe-1b28-4faa-ba1f-83394176f032}">
-            <IDSymbol name="AddCppClassCommand" value="0x0100" />
+        <GuidSymbol name="guidAddCppClassPackageCmdSet" value="{18a22ea1-aa91-42d9-8464-3ff2a77111c4}">
+            <IDSymbol name="cmdidSolutionTreeWindowCommand" value="256" />
+        </GuidSymbol>
+        <GuidSymbol name="guidImages" value="{d149b411-cba1-449c-80fe-07494bc1dab4}">
+            <IDSymbol name="bmpPic1" value="1" />
+            <IDSymbol name="bmpPic2" value="2" />
+            <IDSymbol name="bmpPicSearch" value="3" />
+            <IDSymbol name="bmpPicX" value="4" />
+            <IDSymbol name="bmpPicArrows" value="5" />
+            <IDSymbol name="bmpPicStrikethrough" value="6" />
         </GuidSymbol>
     </Symbols>
 </CommandTable>

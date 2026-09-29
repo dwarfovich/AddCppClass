@@ -1,13 +1,16 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿using AddCppClass;
+//using SolutionTreeWindow;
+using EnvDTE;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Packaging;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using AddCppClass;
-using EnvDTE;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -499,6 +502,23 @@ namespace Dwarfovich.AddCppClass
             Close();
         }
 
+        private void TestButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            //var errorMessage = "Test button clicked";
+            //bool closeDialog = VS.MessageBox.Show("Info", errorMessage, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL) == VSConstants.MessageBoxResult.IDCANCEL;
+
+            var window = new SolutionTreeDialog();
+
+            if (window.ShowDialog() == true)
+            {
+                //var selectedItem = window.SelectedItem;
+
+                // работа с результатом
+            }
+        }
+
         public bool ShouldSaveSettingsToFile()
         {
             return settings.autoSaveSettings;
@@ -510,7 +530,7 @@ namespace Dwarfovich.AddCppClass
             if (checkBox is null)
             {
                 return;
-            } 
+            }
 
             ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
             SelectImplementationSubfolderButton.IsEnabled = !(bool)checkBox.IsChecked;
