@@ -100,12 +100,12 @@
         <ComboBox Grid.Column="3" Name="ImplementationFilter" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="8" Grid.ColumnSpan="2"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.Column="3" Grid.ColumnSpan="2">
-            <CheckBox Content="Use dedicated header folder" Name="UseDedicatedHeaderFolder" Checked="OnAnyFilterCheckBoxChanged" Unchecked="OnAnyFilterCheckBoxChanged" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Use dedicated header folder" Name="UseDedicatedHeaderFolder" Checked="OnUseHeaderRootCheckBoxChecked" Unchecked="OnUseHeaderRootCheckBoxChecked" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
         <ComboBox Grid.Column="3" Name="DedicatedHeaderFolder" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="10" Grid.ColumnSpan="2"/>
         <StackPanel Orientation="Horizontal" Grid.Row="11" Grid.Column="3" Grid.ColumnSpan="2">
-            <CheckBox Content="Use dedicated implementation folder" Name="UseDedicatedImplementationFolder" Checked="OnAnyFilterCheckBoxChanged" Unchecked="OnAnyFilterCheckBoxChanged" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Use dedicated implementation folder" Name="UseDedicatedImplementationFolder" Checked="OnUseCppRootCheckBoxChecked" Unchecked="OnUseCppRootCheckBoxChecked" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
         <ComboBox Grid.Column="3" Name="DedicatedImplementationFolder" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="12" Grid.ColumnSpan="2"/>

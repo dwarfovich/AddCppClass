@@ -84,6 +84,7 @@ namespace Dwarfovich.AddCppClass
 
             return project.CodeModel.CodeTypeFromFullName(fullName) != null;
         }
+
         static private void ConformStringList(ref Settings settings, string settingName, Func<string, bool> validateFunction, ref List<SettingError> errors)
         {
             SettingError settingErrors = new();

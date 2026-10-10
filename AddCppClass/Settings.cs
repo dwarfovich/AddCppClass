@@ -62,8 +62,8 @@ namespace Dwarfovich.AddCppClass
         public StringListSetting _implementationSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
         public StringListSetting _headerFilters = new();
         public StringListSetting _implementationFilters = new();
-        public StringListSetting _dedicatedHeaderSubfolder = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
-        public StringListSetting _dedicatedCppSubfolder = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+        //public StringListSetting _headerRoot = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+        //public StringListSetting _cppRoot = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
 
         public static readonly string defaultHeaderExtension = ".h";
         public static readonly string defaultAltHeaderExtension = ".hpp";
@@ -137,6 +137,10 @@ namespace Dwarfovich.AddCppClass
         public int maxRecentImplementationFilters { get; set; } = 10;
         public List<string> recentImplementationFilters { get; set; } = new List<string> { };
         public bool storeValuesUnconditiaonally { get; set; } = false;
+        public bool useHeaderRoot { get; set; } = false;
+        public bool useCppRoot { get; set; } = false;
+        public string _headerRoot = "";
+        public string _cppRoot = "";
 
         [JsonProperty]
         public Dictionary<string, string> filterToFolder { get; set; } = new Dictionary<string, string> { };

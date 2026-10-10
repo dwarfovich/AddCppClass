@@ -101,6 +101,11 @@ namespace Dwarfovich.AddCppClass
             UseSubfolderAsFilterCheckBox.IsChecked = settings.useSubfoldersAsFilters;
             UseSingleFilterCheckBox.IsChecked = settings.useSingleFilter;
 
+            UseDedicatedHeaderFolder.IsChecked = settings.useHeaderRoot;
+            UseDedicatedImplementationFolder.IsChecked = settings.useCppRoot;
+            DedicatedHeaderFolder.Text = settings._headerRoot;
+            DedicatedImplementationFolder.Text = settings._cppRoot;
+           
             AutoSaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
         }
 
@@ -133,41 +138,49 @@ namespace Dwarfovich.AddCppClass
             settings.SetHeaderFilter(HeaderFilter.Text);
             settings.SetImplementationFilter(ImplementationFilter.Text);
 
-            settings.autoSaveSettings = (bool)AutoSaveSettingsCheckBox.IsChecked;
-
             string headerFilter = HeaderFilter.Text;
             var filterTokens = headerFilter.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             string headerFolder = ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text);
             var folderTokens = headerFolder.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-            string currentFilter = filterTokens[0];
-            string currentFolder = "";
-
-            settings.filterToFolder[currentFilter] = currentFolder;
-
-            for (int i = 1; i < filterTokens.Length; ++i)
+            if (filterTokens.Length > 0)
             {
-                currentFilter += "/" + filterTokens[i];
-
-                int folderIndex = i - 1;
-
-                if (folderIndex < folderTokens.Length)
-                {
-                    if (string.IsNullOrEmpty(currentFolder))
-                        currentFolder = folderTokens[folderIndex];
-                    else
-                        currentFolder += "/" + folderTokens[folderIndex];
-                }
+                string currentFilter = filterTokens[0];
+                string currentFolder = "";
 
                 settings.filterToFolder[currentFilter] = currentFolder;
+
+                for (int i = 1; i < filterTokens.Length; ++i)
+                {
+                    currentFilter += "/" + filterTokens[i];
+
+                    int folderIndex = i - 1;
+
+                    if (folderIndex < folderTokens.Length)
+                    {
+                        if (string.IsNullOrEmpty(currentFolder))
+                            currentFolder = folderTokens[folderIndex];
+                        else
+                            currentFolder += "/" + folderTokens[folderIndex];
+                    }
+
+                    settings.filterToFolder[currentFilter] = currentFolder;
+                }
             }
 
-
-            //settings.SetHeaderSubfolder(ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text));
-            //settings.filterToFolder[headerFilter] = ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text);
-
-
+            settings.useHeaderRoot = (bool)UseDedicatedHeaderFolder.IsChecked;
+            settings.useCppRoot = (bool)UseDedicatedImplementationFolder.IsChecked;
+            if (settings.useHeaderRoot)
+            {
+                settings._headerRoot = DedicatedHeaderFolder.Text; // TODO: conform folder
+            }
+            if (settings.useCppRoot)
+            {
+                settings._cppRoot = DedicatedImplementationFolder.Text; // TODO: conform folder
+            }
+            settings.autoSaveSettings = (bool)AutoSaveSettingsCheckBox.IsChecked;
         }
+
         private void PopulateComboBox(ComboBox comboBox, List<string> values, int maxItems = 0, string spareValue = null)
         {
             comboBox.Items.Clear();
@@ -656,6 +669,28 @@ namespace Dwarfovich.AddCppClass
                 RemoveError(ErrorType.InvalidImplementationFilter);
             }
             updatingFilterCheckBoxes = false;
+        }
+
+        private void OnUseHeaderRootCheckBoxChecked(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox is null)
+            {
+                throw new ArgumentNullException(nameof(checkBox));
+            }
+
+            DedicatedHeaderFolder.IsEnabled = checkBox.IsEnabled;
+        }
+
+        private void OnUseCppRootCheckBoxChecked(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox is null)
+            {
+                throw new ArgumentNullException(nameof(checkBox));
+            }
+
+            DedicatedImplementationFolder.IsEnabled = checkBox.IsEnabled;
         }
 
         private void ValidateImplementationFilterIfNeeded()
