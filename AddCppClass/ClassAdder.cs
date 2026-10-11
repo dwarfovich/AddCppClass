@@ -3,14 +3,15 @@ using Community.VisualStudio.Toolkit;
 using Dwarfovich.AddCppClass.Utils;
 using EnvDTE;
 using EnvDTE80;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.VCProjectEngine;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Dwarfovich.AddCppClass
 {
@@ -296,6 +297,88 @@ namespace Dwarfovich.AddCppClass
             return (headerPath, cppPath);
         }
 
+        private static (int, VCFilter) FindLastSuitableFilter(EnvDTE.Project project, string[] filterTokens)
+        {
+            int currentTokenIndex = 0;
+            VCProject vcProject = project.Object as VCProject;
+            VCFilter currentFilter = ((IVCCollection)vcProject.Filters).Cast<VCFilter>().FirstOrDefault(f => f.Name == filterTokens[0]);
+            if (currentFilter != null)
+            {
+                ++currentTokenIndex;
+                for (; currentTokenIndex < filterTokens.Length; ++currentTokenIndex)
+                {
+                    var nextFilter = ((IVCCollection)vcProject.Filters).Cast<VCFilter>().FirstOrDefault(f => f.Name == filterTokens[currentTokenIndex]);
+                    if (nextFilter == null)
+                    {
+                        return (currentTokenIndex, currentFilter);
+                    }
+                    else
+                    {
+                        currentFilter = nextFilter;
+                    }
+                }
+            }
+            else
+            {
+                return (-1, currentFilter);
+            }
+            return (currentTokenIndex, currentFilter);
+        }
+
+        private static VCFilter CreateFilterForTokens(
+            EnvDTE.Project project,
+            string[] tokens,
+            int currentIndex,
+            VCFilter filter)
+        {
+            if (tokens == null || tokens.Length == 0)
+            {
+                return null;
+            }
+
+            VCProject vcProject = project.Object as VCProject;
+            if (vcProject == null)
+            {
+                throw new InvalidOperationException(
+                    "The project is not a VCProject.");
+            }
+
+            if (currentIndex == -1)
+            {
+                filter = vcProject.AddFilter(tokens[0]) as VCFilter;
+
+                //filter = ((IVCCollection)vcProject.Filters)
+                //    .Cast<VCFilter>()
+                //    .FirstOrDefault(f => f.Name == tokens[0]);
+
+                if (filter == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to find filter '{tokens[0]}'.");
+                }
+
+                currentIndex = 0;
+                Logger.Log("Created filter: " + filter.CanonicalName);
+            }
+
+            for (int i = currentIndex + 1; i < tokens.Length; ++i)
+            {
+                filter = filter.AddFilter(tokens[i]) as VCFilter;
+
+                if (filter == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to find filter '{tokens[i]}'.");
+                }
+
+                Logger.Log("Created filter: " + filter.CanonicalName);
+            }
+
+            Logger.Log("For tokens: " + string.Join(", ", tokens));
+
+            return filter;
+        }
+
         public static void AddFileToFilter(EnvDTE.Project project, string filePath, string filter)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -306,41 +389,21 @@ namespace Dwarfovich.AddCppClass
                 throw new Exception("Failed to convert EnvDTE.Project to VCProject");
             }
 
-            Regex r;
-            //r.Match()
-            //filter = "Filter1";
-            //var tokens = ClassFacilities.TokenizeFilter(filter);
-            //if (tokens.Length == 0)
-            //{
-            //    return;
-            //}
-            //VS.MessageBox.Show("Warning", "Ok", OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
-            //VCFilter targetFilter;
-            //var filters = vcProject.Filters as System.Collections.IEnumerable;
-            //for (int i = 0; i < tokens.Length; i++)
-            //{
-            //    targetFilter = filters.Cast<VCFilter>().FirstOrDefault(x => x.Name == tokens[i]);
-            //    if (targetFilter == null)
-            //    {
-            //        break;
-            //    }
-            //}
+            Logger.Log("Filter: " + filter);
 
-            //VCProject p = Utils.Solution.CurrentProject().Object as VCProject;
-            //string str = @"`~!@#$%^&*()<>,.{}[]:""";
-            //var filters = p.Filters as System.Collections.IEnumerable;
-            //string m = "";
-            //foreach (VCFilter f in filters.Cast<VCFilter>())
-            //{
-            //    if (f.Name == str)
-            //    {
-            //        //VS.MessageBox.Show("Warning", "Found! " + str, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
-            //    }
-            //    m += f.CanonicalName + "\n";
-            //}
-            //VS.MessageBox.Show("Warning", m, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
-            return;
+            var tokens = ClassFacilities.TokenizeFilter(filter);
+            var (tokenIndex, lastFilter) = FindLastSuitableFilter(project, tokens);
+            var finalFilter = CreateFilterForTokens(project, tokens, tokenIndex, lastFilter);
+            if (finalFilter != null)
+            {
+                finalFilter.AddFile(filePath);
+            }
+            else
+            {
+                throw new Exception("Failed to create filter for file at " + filePath);
+            }
         }
+
         public static void AddClass(Settings settings)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -375,16 +438,8 @@ namespace Dwarfovich.AddCppClass
                 }
             }
 
-            //project.DTE.ExecuteCommand("File.SaveAll");
-
-            //if (settings.createFilters)
-            //{
-            //    CreateFilters(project, settings);
-            //}
-
-            //project.DTE.ExecuteCommand("Project.UnloadProject");
-            //project.DTE.ExecuteCommand("Project.ReloadProject");
-            //project.DTE.ItemOperations.OpenFile(headerPath);
+            project.DTE.ExecuteCommand("File.SaveAll");
+            project.DTE.ItemOperations.OpenFile(headerPath);
         }
     }
 }

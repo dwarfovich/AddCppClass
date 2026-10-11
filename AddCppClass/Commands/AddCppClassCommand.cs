@@ -148,31 +148,31 @@ namespace Dwarfovich.AddCppClass
                 out IntPtr selectionContainer);
 
             var hierarchy = Marshal.GetObjectForIUnknown(hierarchyPtr) as IVsHierarchy;
-            Logger.Log($"-------");
-            Logger.Log($"itemid = {itemid}");
-            Logger.Log($"hierarchy = {hierarchy}");
+            //Logger.Log($"-------");
+            //Logger.Log($"itemid = {itemid}");
+            //Logger.Log($"hierarchy = {hierarchy}");
             hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out object name);
             hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_SaveName, out object saveName);
             hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_ExtObject, out object extObject);
 
-            Logger.Log($"Name: {name}");
-            Logger.Log($"SaveName: {saveName}");
-            Logger.Log($"ExtObject: {extObject?.GetType().FullName}");
+            //Logger.Log($"Name: {name}");
+            //Logger.Log($"SaveName: {saveName}");
+            //Logger.Log($"ExtObject: {extObject?.GetType().FullName}");
 
             if (hierarchy == null || itemid == VSConstants.VSITEMID_NIL)
                 return;
 
 
-            if (extObject is EnvDTE.ProjectItem projectItem)
-            {
-                Logger.Log($"ProjectItem: {projectItem.Name}");
-                var filter = projectItem?.Object as VCFilter;
+            //if (extObject is EnvDTE.ProjectItem projectItem)
+            //{
+            //    Logger.Log($"ProjectItem: {projectItem.Name}");
+            //    var filter = projectItem?.Object as VCFilter;
 
-                if (filter != null)
-                {
-                    Logger.Log($"Filter: {filter.Name}");
-                }
-            }
+            //    if (filter != null)
+            //    {
+            //        Logger.Log($"Filter: {filter.Name}");
+            //    }
+            //}
 
             var dialog = new AddCppClassDialog(settings);
             dialog.HasMinimizeButton = false;
