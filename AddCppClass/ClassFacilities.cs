@@ -8,17 +8,18 @@ namespace Dwarfovich.AddCppClass
     {
         private string filename = "";
 
-        public (string header, string implementation) GenerateFilenamesForChangedExtension(Settings classSettings)
+        public (string headerFilename, string cppFilename) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
             return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
         }
 
-        public (string header, string implementation) GenerateFilenames(Settings classSettings)
+        public (string headerFilename, string cppFilename) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
             return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
         }
+
         public string GenerateCamelCaseFilename(Settings classSettings)
         {
             return classSettings.className;
@@ -45,15 +46,17 @@ namespace Dwarfovich.AddCppClass
             }
             return filename;
         }
+
         public string GenerateLowerCaseFilename(Settings classSettings)
         {
             return classSettings.className.ToLower();
         }
+
         public string GenerateFilename(Settings classSettings)
         {
             switch (classSettings.filenameStyle)
             {
-                case FilenameStyle.CamelCase:
+                case FilenameStyle.PascalCase:
                     return GenerateCamelCaseFilename(classSettings);
                 case FilenameStyle.SnakeCase:
                     return GenerateSnakeCaseFilename(classSettings);
@@ -249,10 +252,12 @@ namespace Dwarfovich.AddCppClass
                     && IsValidFilename(path.Substring(pos + 1));
             }
         }
+
         public static bool IsValidExtension(string extension)
         {
             return Settings.fileExtensionRegex.IsMatch(extension);
         }
+
         public static string[] TokenizeFilter(string filter)
         {
             try

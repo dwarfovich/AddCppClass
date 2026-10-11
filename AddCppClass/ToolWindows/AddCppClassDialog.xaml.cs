@@ -54,7 +54,7 @@ namespace Dwarfovich.AddCppClass
 
             switch (settings.filenameStyle)
             {
-                case FilenameStyle.CamelCase: CamelCaseNameStyle.IsChecked = true; break;
+                case FilenameStyle.PascalCase: CamelCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
                 default: CamelCaseNameStyle.IsChecked = true; break;
@@ -216,7 +216,7 @@ namespace Dwarfovich.AddCppClass
         {
             if (button.Content.ToString() == "CamelCase")
             {
-                settings.filenameStyle = FilenameStyle.CamelCase;
+                settings.filenameStyle = FilenameStyle.PascalCase;
             }
             else if (button.Content.ToString() == "snake__case")
             {

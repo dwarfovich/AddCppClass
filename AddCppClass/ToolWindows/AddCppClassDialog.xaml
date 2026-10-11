@@ -72,18 +72,18 @@
         </StackPanel>
         <TextBox Name="HeaderFilename" TextChanged="HeaderFilenameChangedEventHandler" Grid.Column="1" Grid.Row="7" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="TextBox"/>
         <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="1">
-            <Label Grid.Column="1" Content="Implementation" Padding="0" VerticalContentAlignment="Center"/>
+            <Label Grid.Column="1" Content="Source" Padding="0" VerticalContentAlignment="Center"/>
             <CheckBox Name="HasImplementationFileCheckBox" Content="Create .cpp file" Checked="HasImplementationFileCheckChanged" Unchecked="HasImplementationFileCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
         <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="9" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2">
-            <Label Content="Header subfolder" VerticalContentAlignment="Center" Padding="0"/>
+            <Label Content="Headers subfolder" VerticalContentAlignment="Center" Padding="0"/>
             <CheckBox Name="UseSingleSubfolderCheckBox" Content="Use single subfolder" Checked="UseSingleSubfolderCheckChanged" Unchecked="UseSingleSubfolderCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="3,0,0,0"/>
             <Image MouseLeftButtonDown="UseSingleFolderInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
         <ComboBox Grid.Column="3" Grid.Row="1" Name="HeaderSubfolderCombo" TextBoxBase.TextChanged="HeaderSubfolderChangedEventHandler" IsEditable="True" Grid.ColumnSpan="2"/>
-        <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Implementation subfolder" Grid.Row="2" VerticalContentAlignment="Center" Padding="0"/>
+        <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Sources subfolder" Grid.Row="2" VerticalContentAlignment="Center" Padding="0"/>
         <ComboBox Grid.Column="3" Name="ImplementationSubfolderCombo" TextBoxBase.TextChanged="ImplementationSubfolderChangedEventHandler" IsEditable="True" Grid.Row="3" Grid.ColumnSpan="2"/>
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2">
             <CheckBox Content="Create filters" Name="CreateFiltersCheckBox" Checked="OnAnyFilterCheckBoxChanged" Unchecked="OnAnyFilterCheckBoxChanged" VerticalContentAlignment="Center"/>
@@ -96,7 +96,7 @@
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
         <ComboBox Grid.Column="3" Name="HeaderFilter" TextBoxBase.TextChanged="HeaderFilterChangedEventHandler" IsEditable="True" Grid.Row="6" Grid.ColumnSpan="2"/>
-        <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Implementation filter" Grid.Row="7" VerticalContentAlignment="Center" Padding="0"/>
+        <Label Grid.Column="3" Grid.ColumnSpan="2" Content="Sources filter" Grid.Row="7" VerticalContentAlignment="Center" Padding="0"/>
         <ComboBox Grid.Column="3" Name="ImplementationFilter" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="8" Grid.ColumnSpan="2"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.Column="3" Grid.ColumnSpan="2">
@@ -105,7 +105,7 @@
         </StackPanel>
         <TextBox Grid.Column="3" Name="HeaderRoot" TextBox.TextChanged="HeaderRootChanged" Grid.Row="10" Grid.ColumnSpan="2"/>
         <StackPanel Orientation="Horizontal" Grid.Row="11" Grid.Column="3" Grid.ColumnSpan="2">
-            <CheckBox Content="Use cpp root folder" Name="UseCppRoot" Checked="OnUseCppRootCheckBoxChecked" Unchecked="OnUseCppRootCheckBoxChecked" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Use sources root folder" Name="UseCppRoot" Checked="OnUseCppRootCheckBoxChecked" Unchecked="OnUseCppRootCheckBoxChecked" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
         <TextBox Grid.Column="3" Name="CppRoot" TextBox.TextChanged="CppRootChanged" Grid.Row="12" Grid.ColumnSpan="2"/>

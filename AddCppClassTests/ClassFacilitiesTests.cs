@@ -54,7 +54,7 @@ namespace Dwarfovich.AddCppClass.Tests
         {
             ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 
-            Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.CamelCase, headerExtension: ".hpp");
+            Settings classSettings = new AddCppClass.Settings(className: "", style: FilenameStyle.PascalCase, headerExtension: ".hpp");
             Assert.AreEqual(classSettings.className, classGenerator.GenerateFilename(classSettings));
             classSettings.className = "1";
             Assert.AreEqual(classSettings.className, classGenerator.GenerateFilename(classSettings));

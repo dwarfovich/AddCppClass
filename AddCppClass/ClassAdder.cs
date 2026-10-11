@@ -45,20 +45,21 @@ namespace Dwarfovich.AddCppClass
         {
             return settings.headerFilename.ToUpper().Replace('.', '_');
         }
+
         private static void PopulateHeaderFile(FileStream fileStream, Settings settings)
         {
             using (var writer = new StreamWriter(fileStream))
             {
-                string ifndefGuardFilenameToken = "";
+                string includeGuardFilenameToken = "";
                 if (settings.includeGuardStyle == IncludeGuard.PragmaOnce)
                 {
                     writer.WriteLine("#pragma once");
                 }
                 else
                 {
-                    ifndefGuardFilenameToken = GenerateIfndefGuardFilenameToken(settings);
-                    writer.WriteLine("#ifndef " + ifndefGuardFilenameToken);
-                    writer.WriteLine("#define " + ifndefGuardFilenameToken);
+                    includeGuardFilenameToken = GenerateIfndefGuardFilenameToken(settings);
+                    writer.WriteLine("#ifndef " + includeGuardFilenameToken);
+                    writer.WriteLine("#define " + includeGuardFilenameToken);
                 }
                 writer.Write(Environment.NewLine);
 
@@ -88,12 +89,12 @@ namespace Dwarfovich.AddCppClass
                 if (settings.includeGuardStyle == IncludeGuard.Ifndef)
                 {
                     writer.Write(Environment.NewLine);
-                    writer.WriteLine("#endif // " + ifndefGuardFilenameToken);
+                    writer.WriteLine("#endif // " + includeGuardFilenameToken);
                 }
             }
         }
 
-        private static void PopulateImplementationFile(FileStream fileStream, Settings settings)
+        private static void PopulateCppFile(FileStream fileStream, Settings settings)
         {
             using (var writer = new StreamWriter(fileStream))
             {
@@ -128,16 +129,16 @@ namespace Dwarfovich.AddCppClass
             return path;
         }
 
-        public static string CreateImplementationFile(EnvDTE.Project project, Settings settings, string projectPath)
+        public static string CreateCppFile(EnvDTE.Project project, Settings settings, string projectPath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             string path = settings.useSingleSubfolder ? System.IO.Path.Combine(projectPath, settings.HeaderSubfolder())
-                                                      : System.IO.Path.Combine(projectPath, settings.ImplementationSubfolder());
+                                                      : System.IO.Path.Combine(projectPath, settings.CppSubfolder());
             Directory.CreateDirectory(path);
             path = System.IO.Path.Combine(path, settings.implementationFilename);
             var fileStream = File.Create(path);
-            PopulateImplementationFile(fileStream, settings);
+            PopulateCppFile(fileStream, settings);
             fileStream.Close();
             //ProjectItems projectItems = project.ProjectItems;
             //projectItems.AddFromFile(path);
@@ -251,7 +252,7 @@ namespace Dwarfovich.AddCppClass
             {
                 string implementationSubfolder = settings.useSingleSubfolder
                                            ? headerSubfolder
-                                           : Utils.Path.ToWindowsStylePath(settings.ImplementationSubfolder());
+                                           : Utils.Path.ToWindowsStylePath(settings.CppSubfolder());
                 if (!string.IsNullOrEmpty(implementationSubfolder))
                 {
                     if (!settings.useSingleSubfolder)
@@ -291,7 +292,7 @@ namespace Dwarfovich.AddCppClass
             string cppPath = "";
             if (settings.hasImplementationFile)
             {
-                cppPath = CreateImplementationFile(project, settings, projectPath);
+                cppPath = CreateCppFile(project, settings, projectPath);
             }
 
             return (headerPath, cppPath);

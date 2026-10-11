@@ -8,7 +8,7 @@ namespace Dwarfovich.AddCppClass
 {
     public enum FilenameStyle
     {
-        CamelCase,
+        PascalCase,
         SnakeCase,
         LowerCase
     };
@@ -108,7 +108,7 @@ namespace Dwarfovich.AddCppClass
         public int maxRecentNamespaces { get; set; } = 10;
         public List<string> recentNamespaces { get; set; } = new List<string> { };
         [JsonConverter(typeof(StringEnumConverter))]
-        public FilenameStyle filenameStyle { get; set; } = FilenameStyle.CamelCase;
+        public FilenameStyle filenameStyle { get; set; } = FilenameStyle.PascalCase;
         public int maxRecentHeaderExtensions { get; set; } = 10;
         public List<string> recentHeaderExtensions { get; set; } = new List<string>
         { defaultHeaderExtension, defaultAltHeaderExtension };
@@ -145,34 +145,44 @@ namespace Dwarfovich.AddCppClass
         [JsonProperty]
         public Dictionary<string, string> filterToFolder { get; set; } = new Dictionary<string, string> { };
 
-        public bool ShouldSerializestoreValuesUnconditiaonally() { return storeValuesUnconditiaonally = true; }
+        public bool ShouldSerializestoreValuesUnconditiaonally()
+        {
+            return storeValuesUnconditiaonally = true;
+        }
+
         public string Namespace()
         {
             return recentNamespaces.FirstOrValue("");
         }
+
         public void SetNamespace(string ns)
         {
             recentNamespaces.SetFrontValue(ns, maxRecentNamespaces);
         }
+
         public string HeaderExtension()
         {
             return recentHeaderExtensions.FirstOrValue(defaultHeaderExtension);
         }
+
         public void SetHeaderExtension(string extension)
         {
             recentHeaderExtensions.SetFrontValue(extension, maxRecentHeaderExtensions);
         }
+
         public string HeaderSubfolder()
         {
             return recentHeaderSubfolders.FirstOrValue("");
         }
+
         public void SetHeaderSubfolder(string subfolder)
         {
             recentHeaderSubfolders.SetFrontValue(subfolder, maxRecentHeaderSubfolders);
         }
-        public string ImplementationSubfolder()
+
+        public string CppSubfolder()
         {
-            if(storeValuesUnconditiaonally || !useSingleSubfolder)
+            if (storeValuesUnconditiaonally || !useSingleSubfolder)
             {
                 return recentImplementationSubfolders.FirstOrValue("");
             }
@@ -181,6 +191,7 @@ namespace Dwarfovich.AddCppClass
                 return recentHeaderSubfolders.FirstOrValue("");
             }
         }
+
         public void SetImplementationSubfolder(string subfolder)
         {
             if (storeValuesUnconditiaonally || !useSingleSubfolder)
@@ -188,6 +199,7 @@ namespace Dwarfovich.AddCppClass
                 recentImplementationSubfolders.SetFrontValue(subfolder, maxRecentImplementationSubfolders);
             }
         }
+
         public string HeaderFilter()
         {
             if (createFilters)
@@ -204,6 +216,7 @@ namespace Dwarfovich.AddCppClass
 
             return "";
         }
+
         public void SetHeaderFilter(string filter)
         {
             if (storeValuesUnconditiaonally || (createFilters && !useSubfoldersAsFilters))
@@ -211,6 +224,7 @@ namespace Dwarfovich.AddCppClass
                 recentHeaderFilters.SetFrontValue(filter, maxRecentHeaderFilters);
             }
         }
+
         public string ImplementationFilter()
         {
             if (createFilters)
@@ -223,7 +237,7 @@ namespace Dwarfovich.AddCppClass
                 {
                     if (useSubfoldersAsFilters)
                     {
-                        return useSingleFilter ? HeaderSubfolder() : ImplementationSubfolder();
+                        return useSingleFilter ? HeaderSubfolder() : CppSubfolder();
                     }
                     else
                     {
@@ -234,10 +248,12 @@ namespace Dwarfovich.AddCppClass
 
             return "";
         }
+
         private bool ShouldStoreImplementationFilter()
         {
             return storeValuesUnconditiaonally || (createFilters && !useSubfoldersAsFilters && !useSingleFilter);
         }
+
         public void SetImplementationFilter(string filter)
         {
             if (ShouldStoreImplementationFilter())
