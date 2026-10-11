@@ -52,6 +52,11 @@ namespace Dwarfovich.AddCppClass
             return classSettings.className.Replace("_", "").ToLower();
         }
 
+        public string GenerateCustomFilename(Settings classSettings)
+        {
+            return classSettings.className;
+        }
+
         public string GenerateFilename(Settings classSettings)
         {
             switch (classSettings.filenameStyle)
@@ -62,6 +67,7 @@ namespace Dwarfovich.AddCppClass
                     return GenerateSnakeCaseFilename(classSettings);
                 case FilenameStyle.LowerCase:
                     return GenerateLowerCaseFilename(classSettings);
+                case FilenameStyle.Custom: return GenerateCustomFilename(classSettings);
                 default: throw new NotImplementedException();
             }
 

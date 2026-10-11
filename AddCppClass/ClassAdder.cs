@@ -136,7 +136,7 @@ namespace Dwarfovich.AddCppClass
             string path = settings.useSingleSubfolder ? System.IO.Path.Combine(projectPath, settings.HeaderSubfolder())
                                                       : System.IO.Path.Combine(projectPath, settings.CppSubfolder());
             Directory.CreateDirectory(path);
-            path = System.IO.Path.Combine(path, settings.implementationFilename);
+            path = System.IO.Path.Combine(path, settings.cppFilename);
             var fileStream = File.Create(path);
             PopulateCppFile(fileStream, settings);
             fileStream.Close();
@@ -231,7 +231,7 @@ namespace Dwarfovich.AddCppClass
         }
         private static void ReplaceFilterPathForImplementationFile(XDocument doc, XNamespace ns, Settings settings, string newFilterPath)
         {
-            ReplaceFileFilter(doc, ns, settings.implementationFilename, newFilterPath, "ClCompile");
+            ReplaceFileFilter(doc, ns, settings.cppFilename, newFilterPath, "ClCompile");
         }
 
         private static void CreateFilters(EnvDTE.Project project, Settings settings)

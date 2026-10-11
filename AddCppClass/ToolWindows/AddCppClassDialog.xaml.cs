@@ -18,8 +18,8 @@ namespace Dwarfovich.AddCppClass
         private ClassFacilities classFacilities = new();
         private ClassSettingsErrorsCollection errors = new();
         private readonly string title = "Add C++ class";
-        private readonly string defaultclassName = "MyClass";
-        private readonly string errorMessageBeginning = "Error message: ";
+        private readonly string defaultClassName = "MyClass";
+        private readonly string errorMessageBeginning = "Error: ";
 
         private bool headerFilterValidated = false;
         private bool implementationFilterValidated = false;
@@ -43,7 +43,7 @@ namespace Dwarfovich.AddCppClass
             HeaderFilter.IsEnabledChanged += new(HeaderFilterEnabledChanged);
             ImplementationFilter.IsEnabledChanged += new(ImplementationFilterEnabledChanged);
             Title = title;
-            classNameTextBox.Text = defaultclassName;
+            classNameTextBox.Text = defaultClassName;
         }
 
         private void LoadSettings(Settings settings)
@@ -57,6 +57,7 @@ namespace Dwarfovich.AddCppClass
                 case FilenameStyle.PascalCase: PascalCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
+                case FilenameStyle.Custom: CustomNameStyle.IsChecked = true; break;
                 default: PascalCaseNameStyle.IsChecked = true; break;
             }
 
@@ -107,7 +108,7 @@ namespace Dwarfovich.AddCppClass
             CppRoot.IsEnabled = (bool)UseCppRoot.IsChecked;
             HeaderRoot.Text = settings.headerRoot;
             CppRoot.Text = settings.cppRoot;
-           
+
             AutoSaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
         }
 
@@ -121,7 +122,7 @@ namespace Dwarfovich.AddCppClass
             settings.SetImplementationSubfolder(ClassFacilities.ConformSubfolder(ImplementationSubfolderCombo.Text));
             settings.headerFilename = HeaderFilename.Text;
             settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
-            settings.implementationFilename = ImplementationFilename.Text;
+            settings.cppFilename = ImplementationFilename.Text;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
             settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
             if (settings.includePrecompiledHeader)
@@ -208,7 +209,7 @@ namespace Dwarfovich.AddCppClass
             }
             if (ImplementationFilename is not null)
             {
-                ImplementationFilename.Text = settings.implementationFilename;
+                ImplementationFilename.Text = settings.cppFilename;
             }
         }
 
@@ -222,9 +223,13 @@ namespace Dwarfovich.AddCppClass
             {
                 settings.filenameStyle = FilenameStyle.SnakeCase;
             }
-            else
+            else if (button.Content.ToString() == "lowercase")
             {
                 settings.filenameStyle = FilenameStyle.LowerCase;
+            }
+            else
+            {
+                settings.filenameStyle = FilenameStyle.Custom;
             }
         }
 
@@ -246,7 +251,7 @@ namespace Dwarfovich.AddCppClass
             if (button != null && (bool)button.IsChecked)
             {
                 SaveFilenameStyleSettings(button);
-                (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
+                (settings.headerFilename, settings.cppFilename) = classFacilities.GenerateFilenames(settings);
                 UpdateFilenameTextBoxes();
             }
         }
@@ -292,27 +297,27 @@ namespace Dwarfovich.AddCppClass
                 throw new InvalidCastException("Sender should be a TextBox");
             }
 
-            if (textBox != null)
+            if (ClassFacilities.IsValidClassName(textBox.Text))
             {
-                if (ClassFacilities.IsValidClassName(textBox.Text))
+                settings.className = textBox.Text;
+                if (settings.filenameStyle != FilenameStyle.Custom)
                 {
-                    settings.className = textBox.Text;
-                    (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenames(settings);
+                    (settings.headerFilename, settings.cppFilename) = classFacilities.GenerateFilenames(settings);
                     UpdateFilenameTextBoxes();
-                    RemoveError(ErrorType.InvalidClassName);
-                    if (ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text))
-                    {
-                        AddError(ErrorType.ClassExists);
-                    }
-                    else
-                    {
-                        RemoveError(ErrorType.ClassExists);
-                    }
+                }
+                RemoveError(ErrorType.InvalidClassName);
+                if (ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text))
+                {
+                    AddError(ErrorType.ClassExists);
                 }
                 else
                 {
-                    AddError(ErrorType.InvalidClassName);
+                    RemoveError(ErrorType.ClassExists);
                 }
+            }
+            else
+            {
+                AddError(ErrorType.InvalidClassName);
             }
         }
 
@@ -410,7 +415,7 @@ namespace Dwarfovich.AddCppClass
             {
                 RemoveError(ErrorType.InvalidHeaderExtension);
                 settings.SetHeaderExtension(comboBox.Text);
-                (settings.headerFilename, settings.implementationFilename) = classFacilities.GenerateFilenamesForChangedExtension(settings);
+                (settings.headerFilename, settings.cppFilename) = classFacilities.GenerateFilenamesForChangedExtension(settings);
                 UpdateFilenameTextBoxes();
             }
             else
@@ -429,6 +434,10 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidFilename(textBox.Text))
             {
+                if(settings.filenameStyle == FilenameStyle.Custom)
+                {
+                    settings.headerFilename = textBox.Text;
+                }
                 RemoveError(ErrorType.InvalidHeaderFilename);
             }
             else
@@ -437,7 +446,7 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        private void ImplementationFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
+        private void CppFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
             if (textBox is null)
@@ -447,6 +456,10 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidFilename(textBox.Text))
             {
+                if (settings.filenameStyle == FilenameStyle.Custom)
+                {
+                    settings.cppFilename = textBox.Text;
+                }
                 RemoveError(ErrorType.InvalidImplementationFilename);
             }
             else
@@ -537,7 +550,7 @@ namespace Dwarfovich.AddCppClass
             }
             catch (Exception ex)
             {
-                var errorMessage = "Oops! An error occured while adding class, error message: " + ex.Message + ". Please fix the error and commit it to AddCppClass project on GitHub)";
+                var errorMessage = "Oops! An error occured while adding class, error message: " + ex.Message + ". Please fix the error and commit to AddCppClass project on GitHub)";
                 bool closeDialog = VS.MessageBox.Show("Error", errorMessage, OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL) == VSConstants.MessageBoxResult.IDCANCEL;
                 if (closeDialog)
                 {

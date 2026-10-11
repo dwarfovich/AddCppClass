@@ -75,7 +75,7 @@
             <Label Grid.Column="1" Content="Source" Padding="0" VerticalContentAlignment="Center"/>
             <CheckBox Name="HasImplementationFileCheckBox" Content="Create .cpp file" Checked="HasImplementationFileCheckChanged" Unchecked="HasImplementationFileCheckChanged" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
-        <TextBox x:Name="ImplementationFilename" TextChanged="ImplementationFilenameChangedEventHandler" Grid.Column="1" Grid.Row="9" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="ImplementationFilename" TextChanged="CppFilenameChangedEventHandler" Grid.Column="1" Grid.Row="9" TextWrapping="Wrap" Text="TextBox" VerticalContentAlignment="Center"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2">
             <Label Content="Headers subfolder" VerticalContentAlignment="Center" Padding="0"/>
@@ -153,7 +153,7 @@
                      GroupName="filenameStyleGroup"
                      Checked="FilenameStyleRadioButtonChecked"/>
                     <RadioButton Content="custom"
-  Name="Custom"
+  Name="CustomNameStyle"
   GroupName="filenameStyleGroup"
   Checked="FilenameStyleRadioButtonChecked"/>
                 </StackPanel>

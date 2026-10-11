@@ -10,13 +10,14 @@ namespace Dwarfovich.AddCppClass
     {
         PascalCase,
         SnakeCase,
-        LowerCase
+        LowerCase,
+        Custom
     };
 
     public enum IncludeGuard
     {
         PragmaOnce,
-        Ifndef
+        Ifndef, // TODO: add IfndefGuid style
     };
 
     public class StringListSetting
@@ -117,7 +118,7 @@ namespace Dwarfovich.AddCppClass
         [JsonIgnore]
         public string headerFilename { get; set; } = "";
         [JsonIgnore]
-        public string implementationFilename { get; set; } = "";
+        public string cppFilename { get; set; } = "";
         public bool hasImplementationFile { get; set; } = true;
         public bool useSingleSubfolder { get; set; } = true;
         public int maxRecentHeaderSubfolders { get; set; } = 10;
@@ -136,7 +137,7 @@ namespace Dwarfovich.AddCppClass
         public List<string> recentHeaderFilters { get; set; } = new List<string> { };
         public int maxRecentImplementationFilters { get; set; } = 10;
         public List<string> recentImplementationFilters { get; set; } = new List<string> { };
-        public bool storeValuesUnconditiaonally { get; set; } = false;
+        public bool storeValuesUnconditionally { get; set; } = false;
         public bool useHeaderRoot { get; set; } = false;
         public bool useCppRoot { get; set; } = false;
         public string headerRoot = "";
@@ -145,9 +146,9 @@ namespace Dwarfovich.AddCppClass
         [JsonProperty]
         public Dictionary<string, string> filterToFolder { get; set; } = new Dictionary<string, string> { };
 
-        public bool ShouldSerializestoreValuesUnconditiaonally()
+        public bool ShouldSerializestoreValuesUnconditionally()
         {
-            return storeValuesUnconditiaonally = true;
+            return storeValuesUnconditionally = true;
         }
 
         public string Namespace()
@@ -182,7 +183,7 @@ namespace Dwarfovich.AddCppClass
 
         public string CppSubfolder()
         {
-            if (storeValuesUnconditiaonally || !useSingleSubfolder)
+            if (storeValuesUnconditionally || !useSingleSubfolder)
             {
                 return recentImplementationSubfolders.FirstOrValue("");
             }
@@ -194,7 +195,7 @@ namespace Dwarfovich.AddCppClass
 
         public void SetImplementationSubfolder(string subfolder)
         {
-            if (storeValuesUnconditiaonally || !useSingleSubfolder)
+            if (storeValuesUnconditionally || !useSingleSubfolder)
             {
                 recentImplementationSubfolders.SetFrontValue(subfolder, maxRecentImplementationSubfolders);
             }
@@ -204,7 +205,7 @@ namespace Dwarfovich.AddCppClass
         {
             if (createFilters)
             {
-                if (storeValuesUnconditiaonally)
+                if (storeValuesUnconditionally)
                 {
                     return recentHeaderFilters.FirstOrValue("");
                 }
@@ -219,7 +220,7 @@ namespace Dwarfovich.AddCppClass
 
         public void SetHeaderFilter(string filter)
         {
-            if (storeValuesUnconditiaonally || (createFilters && !useSubfoldersAsFilters))
+            if (storeValuesUnconditionally || (createFilters && !useSubfoldersAsFilters))
             {
                 recentHeaderFilters.SetFrontValue(filter, maxRecentHeaderFilters);
             }
@@ -229,7 +230,7 @@ namespace Dwarfovich.AddCppClass
         {
             if (createFilters)
             {
-                if (storeValuesUnconditiaonally)
+                if (storeValuesUnconditionally)
                 {
                     return recentImplementationFilters.FirstOrValue("");
                 }
@@ -251,7 +252,7 @@ namespace Dwarfovich.AddCppClass
 
         private bool ShouldStoreImplementationFilter()
         {
-            return storeValuesUnconditiaonally || (createFilters && !useSubfoldersAsFilters && !useSingleFilter);
+            return storeValuesUnconditionally || (createFilters && !useSubfoldersAsFilters && !useSingleFilter);
         }
 
         public void SetImplementationFilter(string filter)
