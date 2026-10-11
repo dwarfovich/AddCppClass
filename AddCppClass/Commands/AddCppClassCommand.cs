@@ -89,7 +89,7 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-                string json = JsonConvert.SerializeObject(settings);
+                string json = JsonConvert.SerializeObject(settings, Formatting.Indented);
                 File.WriteAllText(settingsPath, json);
             }
         }

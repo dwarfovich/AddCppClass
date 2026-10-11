@@ -54,10 +54,10 @@ namespace Dwarfovich.AddCppClass
 
             switch (settings.filenameStyle)
             {
-                case FilenameStyle.PascalCase: CamelCaseNameStyle.IsChecked = true; break;
+                case FilenameStyle.PascalCase: PascalCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.SnakeCase: SnakeCaseNameStyle.IsChecked = true; break;
                 case FilenameStyle.LowerCase: LowerCaseNameStyle.IsChecked = true; break;
-                default: CamelCaseNameStyle.IsChecked = true; break;
+                default: PascalCaseNameStyle.IsChecked = true; break;
             }
 
             PopulateComboBox(NamespaceCombo, settings.recentNamespaces, settings.maxRecentNamespaces);
@@ -214,7 +214,7 @@ namespace Dwarfovich.AddCppClass
 
         private void SaveFilenameStyleSettings(RadioButton button)
         {
-            if (button.Content.ToString() == "CamelCase")
+            if (button.Content.ToString() == "PascalCase")
             {
                 settings.filenameStyle = FilenameStyle.PascalCase;
             }
@@ -263,11 +263,12 @@ namespace Dwarfovich.AddCppClass
 
         private void SetErrorMessage(string message)
         {
-            if (ErrorMessage != null)
+            if (ErrorMessageLabel != null)
             {
-                ErrorMessage.Content = errorMessageBeginning + message;
+                ErrorMessageLabel.Text = errorMessageBeginning + message;
             }
         }
+
         private void AddError(ErrorType type)
         {
             bool added = errors.AddError(type);
@@ -280,6 +281,7 @@ namespace Dwarfovich.AddCppClass
                 }
             }
         }
+
         private void ClassNameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -368,6 +370,7 @@ namespace Dwarfovich.AddCppClass
 
             UpdateFilters();
         }
+
         private void ImplementationSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             ComboBox comboBox = sender as ComboBox;
@@ -415,6 +418,7 @@ namespace Dwarfovich.AddCppClass
                 AddError(ErrorType.InvalidHeaderExtension);
             }
         }
+
         private void HeaderFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
@@ -432,6 +436,7 @@ namespace Dwarfovich.AddCppClass
                 AddError(ErrorType.InvalidHeaderFilename);
             }
         }
+
         private void ImplementationFilenameChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             TextBox textBox = sender as TextBox;
@@ -465,6 +470,7 @@ namespace Dwarfovich.AddCppClass
                 }
             }
         }
+
         private bool CheckFiles()
         {
             ThreadHelper.ThrowIfNotOnUIThread();

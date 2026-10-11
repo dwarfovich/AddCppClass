@@ -32,6 +32,7 @@ namespace Dwarfovich.AddCppClass
         {
             Values.SetFrontValue(value, MaxValues);
         }
+
         public SettingError Validate()
         {
             Values.ShrinkToSize(MaxValues);
@@ -52,6 +53,7 @@ namespace Dwarfovich.AddCppClass
             return errors;
         }
     }
+
     public class Settings
     {
         public StringListSetting _namespaces = new() { ValidateFunction = ClassFacilities.IsValidNamespace };
@@ -62,8 +64,6 @@ namespace Dwarfovich.AddCppClass
         public StringListSetting _implementationSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
         public StringListSetting _headerFilters = new();
         public StringListSetting _implementationFilters = new();
-        //public StringListSetting _headerRoot = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
-        //public StringListSetting _cppRoot = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
 
         public static readonly string defaultHeaderExtension = ".h";
         public static readonly string defaultAltHeaderExtension = ".hpp";

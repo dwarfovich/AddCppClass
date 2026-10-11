@@ -50,7 +50,7 @@ namespace Dwarfovich.AddCppClass.Tests
         }
 
         [TestMethod()]
-        public void GenerateCamelCaseFilenameTestValidness()
+        public void GeneratePascalCaseFilenameTestValidness()
         {
             ClassFacilities classGenerator = new AddCppClass.ClassFacilities();
 

@@ -20,7 +20,7 @@ namespace Dwarfovich.AddCppClass
             return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
         }
 
-        public string GenerateCamelCaseFilename(Settings classSettings)
+        public string GeneratePascalCaseFilename(Settings classSettings)
         {
             return classSettings.className;
         }
@@ -49,7 +49,7 @@ namespace Dwarfovich.AddCppClass
 
         public string GenerateLowerCaseFilename(Settings classSettings)
         {
-            return classSettings.className.ToLower();
+            return classSettings.className.Replace("_", "").ToLower();
         }
 
         public string GenerateFilename(Settings classSettings)
@@ -57,7 +57,7 @@ namespace Dwarfovich.AddCppClass
             switch (classSettings.filenameStyle)
             {
                 case FilenameStyle.PascalCase:
-                    return GenerateCamelCaseFilename(classSettings);
+                    return GeneratePascalCaseFilename(classSettings);
                 case FilenameStyle.SnakeCase:
                     return GenerateSnakeCaseFilename(classSettings);
                 case FilenameStyle.LowerCase:
