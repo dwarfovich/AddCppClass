@@ -100,15 +100,15 @@
         <ComboBox Grid.Column="3" Name="ImplementationFilter" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="8" Grid.ColumnSpan="2"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.Column="3" Grid.ColumnSpan="2">
-            <CheckBox Content="Use dedicated header folder" Name="UseDedicatedHeaderFolder" Checked="OnUseHeaderRootCheckBoxChecked" Unchecked="OnUseHeaderRootCheckBoxChecked" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Use header root folder" Name="UseHeaderRoot" Checked="OnUseHeaderRootCheckBoxChecked" Unchecked="OnUseHeaderRootCheckBoxChecked" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
-        <ComboBox Grid.Column="3" Name="DedicatedHeaderFolder" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="10" Grid.ColumnSpan="2"/>
+        <TextBox Grid.Column="3" Name="HeaderRoot" TextBox.TextChanged="HeaderRootChanged" Grid.Row="10" Grid.ColumnSpan="2"/>
         <StackPanel Orientation="Horizontal" Grid.Row="11" Grid.Column="3" Grid.ColumnSpan="2">
-            <CheckBox Content="Use dedicated implementation folder" Name="UseDedicatedImplementationFolder" Checked="OnUseCppRootCheckBoxChecked" Unchecked="OnUseCppRootCheckBoxChecked" VerticalContentAlignment="Center"/>
+            <CheckBox Content="Use cpp root folder" Name="UseCppRoot" Checked="OnUseCppRootCheckBoxChecked" Unchecked="OnUseCppRootCheckBoxChecked" VerticalContentAlignment="Center"/>
             <Image MouseLeftButtonDown="CreateFiltersInfoButtonDown" RenderOptions.BitmapScalingMode="Fant" Source="pack://application:,,,/AddCppClass;component/Resources/QuestionMarkIcon.png" Width="12" Height="12" Margin="3"/>
         </StackPanel>
-        <ComboBox Grid.Column="3" Name="DedicatedImplementationFolder" TextBoxBase.TextChanged="ImplementationFilterChangedEventHandler" IsEditable="True" Grid.Row="12" Grid.ColumnSpan="2"/>
+        <TextBox Grid.Column="3" Name="CppRoot" TextBox.TextChanged="CppRootChanged" Grid.Row="12" Grid.ColumnSpan="2"/>
         
         <StackPanel Orientation="Vertical" Grid.Row="13" Grid.Column="4" Grid.RowSpan="3" VerticalAlignment="Top" Margin="0,20,0,0">
             <StackPanel Orientation="Horizontal" >
@@ -155,8 +155,8 @@
 
         <Button Name="SelectHeaderSubfolderButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="1" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
         <Button Name="SelectImplementationSubfolderButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="3" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
-        <Button Name="SelectDedicatedHeaderFolderButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="10" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
-        <Button Name="SelectDedicatedImplementationFolderButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="12" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
+        <Button Name="SelectHeaderRootButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="10" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
+        <Button Name="SelectCppRootButton" Click="SelectSubfolderButtonClicked" Content="Select" Grid.Row="12" Grid.Column="5" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"/>
 
     </Grid>
 </platform:DialogWindow>

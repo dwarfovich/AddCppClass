@@ -101,10 +101,12 @@ namespace Dwarfovich.AddCppClass
             UseSubfolderAsFilterCheckBox.IsChecked = settings.useSubfoldersAsFilters;
             UseSingleFilterCheckBox.IsChecked = settings.useSingleFilter;
 
-            UseDedicatedHeaderFolder.IsChecked = settings.useHeaderRoot;
-            UseDedicatedImplementationFolder.IsChecked = settings.useCppRoot;
-            DedicatedHeaderFolder.Text = settings._headerRoot;
-            DedicatedImplementationFolder.Text = settings._cppRoot;
+            UseHeaderRoot.IsChecked = settings.useHeaderRoot;
+            UseCppRoot.IsChecked = settings.useCppRoot;
+            HeaderRoot.IsEnabled = (bool)UseHeaderRoot.IsChecked;
+            CppRoot.IsEnabled = (bool)UseCppRoot.IsChecked;
+            HeaderRoot.Text = settings.headerRoot;
+            CppRoot.Text = settings.cppRoot;
            
             AutoSaveSettingsCheckBox.IsChecked = settings.autoSaveSettings;
         }
@@ -168,15 +170,15 @@ namespace Dwarfovich.AddCppClass
                 }
             }
 
-            settings.useHeaderRoot = (bool)UseDedicatedHeaderFolder.IsChecked;
-            settings.useCppRoot = (bool)UseDedicatedImplementationFolder.IsChecked;
+            settings.useHeaderRoot = (bool)UseHeaderRoot.IsChecked;
+            settings.useCppRoot = (bool)UseCppRoot.IsChecked;
             if (settings.useHeaderRoot)
             {
-                settings._headerRoot = DedicatedHeaderFolder.Text; // TODO: conform folder
+                settings.headerRoot = HeaderRoot.Text; // TODO: conform folder
             }
             if (settings.useCppRoot)
             {
-                settings._cppRoot = DedicatedImplementationFolder.Text; // TODO: conform folder
+                settings.cppRoot = CppRoot.Text; // TODO: conform folder
             }
             settings.autoSaveSettings = (bool)AutoSaveSettingsCheckBox.IsChecked;
         }
@@ -679,7 +681,7 @@ namespace Dwarfovich.AddCppClass
                 throw new ArgumentNullException(nameof(checkBox));
             }
 
-            DedicatedHeaderFolder.IsEnabled = checkBox.IsEnabled;
+            HeaderRoot.IsEnabled = (bool)checkBox.IsChecked;
         }
 
         private void OnUseCppRootCheckBoxChecked(object sender, EventArgs e)
@@ -690,7 +692,29 @@ namespace Dwarfovich.AddCppClass
                 throw new ArgumentNullException(nameof(checkBox));
             }
 
-            DedicatedImplementationFolder.IsEnabled = checkBox.IsEnabled;
+            CppRoot.IsEnabled = (bool)checkBox.IsChecked;
+        }
+
+        private void HeaderRootChanged(object sender, EventArgs e)
+        {
+            //CheckBox checkBox = sender as CheckBox;
+            //if (checkBox is null)
+            //{
+            //    throw new ArgumentNullException(nameof(checkBox));
+            //}
+
+            //DedicatedHeaderFolder.IsEnabled = checkBox.IsEnabled;
+        }
+
+        private void CppRootChanged(object sender, EventArgs e)
+        {
+            //CheckBox checkBox = sender as CheckBox;
+            //if (checkBox is null)
+            //{
+            //    throw new ArgumentNullException(nameof(checkBox));
+            //}
+
+            //DedicatedHeaderFolder.IsEnabled = checkBox.IsEnabled;
         }
 
         private void ValidateImplementationFilterIfNeeded()

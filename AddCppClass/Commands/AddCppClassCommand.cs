@@ -162,7 +162,7 @@ namespace Dwarfovich.AddCppClass
             if (hierarchy == null || itemid == VSConstants.VSITEMID_NIL)
                 return;
 
-      
+
             if (extObject is EnvDTE.ProjectItem projectItem)
             {
                 Logger.Log($"ProjectItem: {projectItem.Name}");

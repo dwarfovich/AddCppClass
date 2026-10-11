@@ -139,8 +139,8 @@ namespace Dwarfovich.AddCppClass
         public bool storeValuesUnconditiaonally { get; set; } = false;
         public bool useHeaderRoot { get; set; } = false;
         public bool useCppRoot { get; set; } = false;
-        public string _headerRoot = "";
-        public string _cppRoot = "";
+        public string headerRoot = "";
+        public string cppRoot = "";
 
         [JsonProperty]
         public Dictionary<string, string> filterToFolder { get; set; } = new Dictionary<string, string> { };

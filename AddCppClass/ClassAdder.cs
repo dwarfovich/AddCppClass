@@ -17,6 +17,7 @@ namespace Dwarfovich.AddCppClass
     public class ClassAdder
     {
         private static readonly DTE2 dte = AddCppClassPackage.dte;
+
         private static XDocument CreateFilterXmlDocument()
         {
             XDocument doc = new XDocument(new XDeclaration("1.0", "utf-8", null));
@@ -26,6 +27,7 @@ namespace Dwarfovich.AddCppClass
 
             return doc;
         }
+
         private static XDocument OpenFilterXmlDocument(string filterFilePath)
         {
             if (File.Exists(filterFilePath))
@@ -113,7 +115,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string path = System.IO.Path.Combine(projectPath, settings.HeaderSubfolder());
+            string path = System.IO.Path.Combine(projectPath, settings.useHeaderRoot ? settings.headerRoot : string.Empty, settings.HeaderSubfolder());
             Directory.CreateDirectory(path);
             path = System.IO.Path.Combine(path, settings.headerFilename);
             var fileStream = File.Create(path);
@@ -342,7 +344,7 @@ namespace Dwarfovich.AddCppClass
         public static void AddClass(Settings settings)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            
+
             var project = Utils.Solution.CurrentProject();
             (var headerPath, var cppPath) = CreateClassFiles(project, settings);
             var exceptions = new List<Exception>();
