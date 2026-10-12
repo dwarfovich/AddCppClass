@@ -13,12 +13,12 @@ namespace Dwarfovich.AddCppClass
         InvalidNamespace,
         InvalidPrecompiledHeader,
         InvalidHeaderFilename,
-        InvalidImplementationFilename,
+        InvalidCppFilename,
         InvalidHeaderExtension,
         InvalidHeaderSubfolder,
-        InvalidImplementationSubfolder,
+        InvalidCppSubfolder,
         InvalidHeaderFilter,
-        InvalidImplementationFilter
+        InvalidCppFilter
     };
 
     public class ClassSettingsErrorsCollection
@@ -30,12 +30,12 @@ namespace Dwarfovich.AddCppClass
             {ErrorType.InvalidNamespace, "Invalid namespace"},
             {ErrorType.InvalidPrecompiledHeader, "Invalid precompiled header"},
             {ErrorType.InvalidHeaderFilename, "Invalid header filename"},
-            {ErrorType.InvalidImplementationFilename, "Invalid implementation filename"},
+            {ErrorType.InvalidCppFilename, "Invalid source filename"},
             {ErrorType.InvalidHeaderExtension, "Invalid header extension"},
             {ErrorType.InvalidHeaderSubfolder, "Invalid header subfolder"},
-            {ErrorType.InvalidImplementationSubfolder, "Invalid implementation subfolder"},
+            {ErrorType.InvalidCppSubfolder, "Invalid source subfolder"},
             {ErrorType.InvalidHeaderFilter, "Invalid header filter"},
-            {ErrorType.InvalidImplementationFilter, "Invalid implementation filter"}
+            {ErrorType.InvalidCppFilter, "Invalid source filter"}
             };
 
         private List<ErrorType> errors = new();

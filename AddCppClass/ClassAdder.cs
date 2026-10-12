@@ -237,7 +237,7 @@ namespace Dwarfovich.AddCppClass
         {
             ReplaceFileFilter(doc, ns, settings.headerFilename, newFilterPath, "ClInclude");
         }
-        private static void ReplaceFilterPathForImplementationFile(XDocument doc, XNamespace ns, Settings settings, string newFilterPath)
+        private static void ReplaceFilterPathForCppFile(XDocument doc, XNamespace ns, Settings settings, string newFilterPath)
         {
             ReplaceFileFilter(doc, ns, settings.cppFilename, newFilterPath, "ClCompile");
         }
@@ -256,18 +256,18 @@ namespace Dwarfovich.AddCppClass
                 ReplaceFilterPathForHeaderFile(doc, ns, settings, headerSubfolder);
             }
 
-            if (settings.hasImplementationFile)
+            if (settings.createCppFile)
             {
-                string implementationSubfolder = settings.useSingleSubfolder
+                string cppSubfolder = settings.useSingleSubfolder
                                            ? headerSubfolder
                                            : Utils.Path.ToWindowsStylePath(settings.CppSubfolder());
-                if (!string.IsNullOrEmpty(implementationSubfolder))
+                if (!string.IsNullOrEmpty(cppSubfolder))
                 {
                     if (!settings.useSingleSubfolder)
                     {
-                        AddFilterPathItem(doc, ns, implementationSubfolder);
+                        AddFilterPathItem(doc, ns, cppSubfolder);
                     }
-                    ReplaceFilterPathForImplementationFile(doc, ns, settings, implementationSubfolder);
+                    ReplaceFilterPathForCppFile(doc, ns, settings, cppSubfolder);
                 }
             }
 
@@ -298,7 +298,7 @@ namespace Dwarfovich.AddCppClass
             string projectPath = new FileInfo(project.FullName).DirectoryName;
             string headerPath = CreateHeaderFile(project, settings, projectPath);
             string cppPath = "";
-            if (settings.hasImplementationFile)
+            if (settings.createCppFile)
             {
                 cppPath = CreateCppFile(project, settings, projectPath);
             }
@@ -432,7 +432,7 @@ namespace Dwarfovich.AddCppClass
             {
                 try
                 {
-                    AddFileToFilter(project, cppPath, settings.ImplementationFilter());
+                    AddFileToFilter(project, cppPath, settings.CppFilter());
                 }
                 catch (Exception ex2)
                 {

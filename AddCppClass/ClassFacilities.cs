@@ -10,14 +10,14 @@ namespace Dwarfovich.AddCppClass
 
         public (string headerFilename, string cppFilename) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
-            return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
+            return (filename + classSettings.HeaderExtension(), filename + classSettings.cppExtension);
         }
 
         public (string headerFilename, string cppFilename) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
-            return (filename + classSettings.HeaderExtension(), filename + classSettings.implementationExtension);
+            return (filename + classSettings.HeaderExtension(), filename + classSettings.cppExtension);
         }
 
         public string GeneratePascalCaseFilename(Settings classSettings)
@@ -138,7 +138,7 @@ namespace Dwarfovich.AddCppClass
             ConformStringList(ref settings, nameof(Settings.recentNamespaces), IsValidNamespace, ref errors);
             ConformStringList(ref settings, nameof(Settings.recentHeaderExtensions), IsValidExtension, ref errors);
             ConformStringList(ref settings, nameof(Settings.recentHeaderSubfolders), IsValidSubfolder, ref errors);
-            ConformStringList(ref settings, nameof(Settings.recentImplementationSubfolders), IsValidSubfolder, ref errors);
+            ConformStringList(ref settings, nameof(Settings.recentCppSubfolders), IsValidSubfolder, ref errors);
             ConformPrecompiledHeaderPath(ref settings, nameof(Settings.precompiledHeader), IsValidPrecompiledHeaderPath, ref errors);
 
             return errors;

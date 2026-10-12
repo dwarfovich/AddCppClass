@@ -19,10 +19,9 @@ namespace Dwarfovich.AddCppClass
         private ClassSettingsErrorsCollection errors = new();
         private readonly string title = "Add C++ class";
         private readonly string defaultClassName = "MyClass";
-        private readonly string errorMessageBeginning = "Error: ";
 
         private bool headerFilterValidated = false;
-        private bool implementationFilterValidated = false;
+        private bool cppFilterValidated = false;
         private bool updatingFilterCheckBoxes = false;
 
         public AddCppClassDialog()
@@ -41,7 +40,7 @@ namespace Dwarfovich.AddCppClass
         {
             InitializeComponent();
             HeaderFilter.IsEnabledChanged += new(HeaderFilterEnabledChanged);
-            ImplementationFilter.IsEnabledChanged += new(ImplementationFilterEnabledChanged);
+            CppFilter.IsEnabledChanged += new(CppFilterEnabledChanged);
             Title = title;
             classNameTextBox.Text = defaultClassName;
         }
@@ -69,15 +68,15 @@ namespace Dwarfovich.AddCppClass
             PopulateComboBox(HeaderExtensionCombo, settings.recentHeaderExtensions, settings.maxRecentHeaderExtensions, ".h");
 
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
-            HasImplementationFileCheckBox.IsChecked = settings.hasImplementationFile;
+            CreateCppFileCheckBox.IsChecked = settings.createCppFile;
 
             PopulateComboBox(HeaderSubfolderCombo, settings.recentHeaderSubfolders, settings.maxRecentHeaderSubfolders);
-            PopulateComboBox(ImplementationSubfolderCombo, settings.recentImplementationSubfolders, settings.maxRecentImplementationSubfolders);
+            PopulateComboBox(CppSubfolderCombo, settings.recentCppSubfolders, settings.maxRecentCppSubfolders);
             UseSingleSubfolderCheckBox.IsChecked = settings.useSingleSubfolder;
             if (settings.useSingleSubfolder)
             {
-                ImplementationSubfolderCombo.SelectedItem = HeaderSubfolderCombo.Text;
-                ImplementationSubfolderCombo.IsEnabled = false;
+                CppSubfolderCombo.SelectedItem = HeaderSubfolderCombo.Text;
+                CppSubfolderCombo.IsEnabled = false;
             }
 
             IncludePrecompiledHeaderCheckBox.IsChecked = settings.includePrecompiledHeader;
@@ -106,7 +105,7 @@ namespace Dwarfovich.AddCppClass
             }
 
             PopulateComboBox(HeaderFilter, settings.recentHeaderFilters, settings.maxRecentHeaderFilters);
-            PopulateComboBox(ImplementationFilter, settings.recentImplementationFilters, settings.maxRecentImplementationFilters);
+            PopulateComboBox(CppFilter, settings.recentCppFilters, settings.maxRecentCppFilters);
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             UseSubfolderAsFilterCheckBox.IsChecked = settings.useSubfoldersAsFilters;
             UseSingleFilterCheckBox.IsChecked = settings.useSingleFilter;
@@ -128,10 +127,10 @@ namespace Dwarfovich.AddCppClass
 
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
             settings.SetHeaderSubfolder(ClassFacilities.ConformSubfolder(HeaderSubfolderCombo.Text));
-            settings.SetImplementationSubfolder(ClassFacilities.ConformSubfolder(ImplementationSubfolderCombo.Text));
+            settings.SetCppSubfolder(ClassFacilities.ConformSubfolder(CppSubfolderCombo.Text));
             settings.headerFilename = HeaderFilename.Text;
-            settings.hasImplementationFile = (bool)HasImplementationFileCheckBox.IsChecked;
-            settings.cppFilename = ImplementationFilename.Text;
+            settings.createCppFile = (bool)CreateCppFileCheckBox.IsChecked;
+            settings.cppFilename = CppFilename.Text;
             settings.createFilters = (bool)CreateFiltersCheckBox.IsChecked;
             settings.includePrecompiledHeader = (bool)IncludePrecompiledHeaderCheckBox.IsChecked;
             if (settings.includePrecompiledHeader)
@@ -148,7 +147,7 @@ namespace Dwarfovich.AddCppClass
             settings.useSubfoldersAsFilters = (bool)UseSubfolderAsFilterCheckBox.IsChecked;
             settings.useSingleFilter = (bool)UseSingleFilterCheckBox.IsChecked;
             settings.SetHeaderFilter(HeaderFilter.Text);
-            settings.SetImplementationFilter(ImplementationFilter.Text);
+            settings.SetCppFilter(CppFilter.Text);
 
             string headerFilter = HeaderFilter.Text;
             var filterTokens = headerFilter.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -216,9 +215,9 @@ namespace Dwarfovich.AddCppClass
             {
                 HeaderFilename.Text = settings.headerFilename;
             }
-            if (ImplementationFilename is not null)
+            if (CppFilename is not null)
             {
-                ImplementationFilename.Text = settings.cppFilename;
+                CppFilename.Text = settings.cppFilename;
             }
         }
 
@@ -285,9 +284,9 @@ namespace Dwarfovich.AddCppClass
 
         private void SetErrorMessage(string message)
         {
-            if (ErrorMessageLabel != null)
+            if (ErrorMessage != null)
             {
-                ErrorMessageLabel.Text = errorMessageBeginning + message;
+                ErrorMessage.Text = message;
             }
         }
 
@@ -382,7 +381,7 @@ namespace Dwarfovich.AddCppClass
                 RemoveError(ErrorType.InvalidHeaderSubfolder);
                 if ((bool)UseSingleSubfolderCheckBox.IsChecked)
                 {
-                    ImplementationSubfolderCombo.Text = comboBox.Text;
+                    CppSubfolderCombo.Text = comboBox.Text;
                 }
             }
             else
@@ -393,7 +392,7 @@ namespace Dwarfovich.AddCppClass
             UpdateFilters();
         }
 
-        private void ImplementationSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
+        private void CppSubfolderChangedEventHandler(object sender, TextChangedEventArgs args)
         {
             ComboBox comboBox = sender as ComboBox;
             if (comboBox is null)
@@ -403,21 +402,21 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidSubfolder(comboBox.Text))
             {
-                RemoveError(ErrorType.InvalidImplementationSubfolder);
+                RemoveError(ErrorType.InvalidCppSubfolder);
             }
             else
             {
-                AddError(ErrorType.InvalidImplementationSubfolder);
+                AddError(ErrorType.InvalidCppSubfolder);
             }
 
             if ((bool)CreateFiltersCheckBox.IsChecked && (bool)UseSubfolderAsFilterCheckBox.IsChecked)
             {
                 if (!(bool)UseSingleFilterCheckBox.IsChecked)
                 {
-                    ImplementationFilter.Text = comboBox.Text;
+                    CppFilter.Text = comboBox.Text;
                 }
             }
-            UpdateImplementationFilter();
+            UpdateCppFilter();
         }
 
         private void HeaderExtensionChangedEventHandler(object sender, TextChangedEventArgs args)
@@ -477,11 +476,11 @@ namespace Dwarfovich.AddCppClass
                 {
                     settings.cppFilename = textBox.Text;
                 }
-                RemoveError(ErrorType.InvalidImplementationFilename);
+                RemoveError(ErrorType.InvalidCppFilename);
             }
             else
             {
-                AddError(ErrorType.InvalidImplementationFilename);
+                AddError(ErrorType.InvalidCppFilename);
             }
         }
 
@@ -514,10 +513,10 @@ namespace Dwarfovich.AddCppClass
             {
                 message += "Header file already exists.";
             }
-            string implementationPath = System.IO.Path.Combine(projectPath, ImplementationSubfolderCombo.Text, ImplementationFilename.Text);
-            if (File.Exists(implementationPath))
+            string cppPath = System.IO.Path.Combine(projectPath, CppSubfolderCombo.Text, CppFilename.Text);
+            if (File.Exists(cppPath))
             {
-                message += "\nImplementation file already exists.";
+                message += "\nSource file already exists.";
             }
             bool filesOk = true;
             if (message != "")
@@ -596,27 +595,27 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            ImplementationSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
-            SelectImplementationSubfolderButton.IsEnabled = !(bool)checkBox.IsChecked;
+            CppSubfolderCombo.IsEnabled = !(bool)checkBox.IsChecked;
+            SelectCppSubfolderButton.IsEnabled = !(bool)checkBox.IsChecked;
             if ((bool)checkBox.IsChecked)
             {
                 RemoveError(ErrorType.InvalidHeaderSubfolder);
-                ImplementationSubfolderCombo.Text = HeaderSubfolderCombo.Text;
+                CppSubfolderCombo.Text = HeaderSubfolderCombo.Text;
             }
             else
             {
-                if (ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                if (ClassFacilities.IsValidSubfolder(CppSubfolderCombo.Text))
                 {
-                    RemoveError(ErrorType.InvalidImplementationSubfolder);
+                    RemoveError(ErrorType.InvalidCppSubfolder);
                 }
                 else
                 {
-                    AddError(ErrorType.InvalidImplementationSubfolder);
+                    AddError(ErrorType.InvalidCppSubfolder);
                 }
             }
         }
 
-        private void HasImplementationFileCheckChanged(object sender, EventArgs e)
+        private void CreateCppFileCheckChanged(object sender, EventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
             if (checkBox is null)
@@ -624,24 +623,24 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
-            ImplementationFilename.IsEnabled = (bool)checkBox.IsChecked;
-            ImplementationSubfolderCombo.IsEnabled = (bool)checkBox.IsChecked;
+            CppFilename.IsEnabled = (bool)checkBox.IsChecked;
+            CppSubfolderCombo.IsEnabled = (bool)checkBox.IsChecked;
 
             if ((bool)checkBox.IsChecked)
             {
-                if (!ClassFacilities.IsValidFilename(ImplementationFilename.Text))
+                if (!ClassFacilities.IsValidFilename(CppFilename.Text))
                 {
-                    AddError(ErrorType.InvalidImplementationFilename);
+                    AddError(ErrorType.InvalidCppFilename);
                 }
-                if (!ClassFacilities.IsValidSubfolder(ImplementationSubfolderCombo.Text))
+                if (!ClassFacilities.IsValidSubfolder(CppSubfolderCombo.Text))
                 {
-                    AddError(ErrorType.InvalidImplementationSubfolder);
+                    AddError(ErrorType.InvalidCppSubfolder);
                 }
             }
             else
             {
-                RemoveError(ErrorType.InvalidImplementationFilename);
-                RemoveError(ErrorType.InvalidImplementationSubfolder);
+                RemoveError(ErrorType.InvalidCppFilename);
+                RemoveError(ErrorType.InvalidCppSubfolder);
             }
 
         }
@@ -679,10 +678,10 @@ namespace Dwarfovich.AddCppClass
             UpdateFilters();
         }
 
-        private void ImplementationFilterEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void CppFilterEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            implementationFilterValidated = false;
-            UpdateImplementationFilter();
+            cppFilterValidated = false;
+            UpdateCppFilter();
         }
         private void OnAnyFilterCheckBoxChanged(object sender, EventArgs e)
         {
@@ -695,7 +694,7 @@ namespace Dwarfovich.AddCppClass
             UseSubfolderAsFilterCheckBox.IsEnabled = createFilters;
             UseSingleFilterCheckBox.IsEnabled = createFilters;
             HeaderFilter.IsEnabled = createFilters && !(bool)UseSubfolderAsFilterCheckBox.IsChecked;
-            ImplementationFilter.IsEnabled = createFilters && !(bool)UseSubfolderAsFilterCheckBox.IsChecked
+            CppFilter.IsEnabled = createFilters && !(bool)UseSubfolderAsFilterCheckBox.IsChecked
                                                        && !(bool)UseSingleFilterCheckBox.IsChecked;
             if (createFilters)
             {
@@ -704,7 +703,7 @@ namespace Dwarfovich.AddCppClass
             else
             {
                 RemoveError(ErrorType.InvalidHeaderFilter);
-                RemoveError(ErrorType.InvalidImplementationFilter);
+                RemoveError(ErrorType.InvalidCppFilter);
             }
             updatingFilterCheckBoxes = false;
         }
@@ -753,22 +752,22 @@ namespace Dwarfovich.AddCppClass
             //DedicatedHeaderFolder.IsEnabled = checkBox.IsEnabled;
         }
 
-        private void ValidateImplementationFilterIfNeeded()
+        private void ValidateCppFilterIfNeeded()
         {
-            if (implementationFilterValidated)
+            if (cppFilterValidated)
             {
                 return;
             }
 
-            //if (ClassFacilities.IsValidFilter(ImplementationFilter.Text))
+            //if (ClassFacilities.IsValidFilter(CppFilter.Text))
             //{
-            //    RemoveError(ErrorType.InvalidImplementationFilter);
+            //    RemoveError(ErrorType.InvalidCppFilter);
             //}
             //else
             //{
-            //    AddError(ErrorType.InvalidImplementationFilter);
+            //    AddError(ErrorType.InvalidCppFilter);
             //}
-            implementationFilterValidated = true;
+            cppFilterValidated = true;
         }
         private void ValidateHeaderFilterIfNeeded()
         {
@@ -786,7 +785,7 @@ namespace Dwarfovich.AddCppClass
             //}
             headerFilterValidated = true;
         }
-        private void UpdateImplementationFilter()
+        private void UpdateCppFilter()
         {
             if (!(bool)CreateFiltersCheckBox.IsChecked)
             {
@@ -794,13 +793,13 @@ namespace Dwarfovich.AddCppClass
             }
             if ((bool)UseSingleFilterCheckBox.IsChecked)
             {
-                ImplementationFilter.Text = HeaderFilter.Text;
+                CppFilter.Text = HeaderFilter.Text;
             }
             else if ((bool)UseSubfolderAsFilterCheckBox.IsChecked)
             {
-                ImplementationFilter.Text = ImplementationSubfolderCombo.Text;
+                CppFilter.Text = CppSubfolderCombo.Text;
             }
-            ValidateImplementationFilterIfNeeded();
+            ValidateCppFilterIfNeeded();
         }
         private void UpdateFilters()
         {
@@ -813,20 +812,20 @@ namespace Dwarfovich.AddCppClass
                 HeaderFilter.Text = HeaderSubfolderCombo.Text;
             }
             ValidateHeaderFilterIfNeeded();
-            UpdateImplementationFilter();
+            UpdateCppFilter();
         }
 
         private void HeaderFilterChangedEventHandler(object sender, EventArgs e)
         {
             headerFilterValidated = false;
             ValidateHeaderFilterIfNeeded();
-            UpdateImplementationFilter();
+            UpdateCppFilter();
         }
 
-        private void ImplementationFilterChangedEventHandler(object sender, EventArgs e)
+        private void CppFilterChangedEventHandler(object sender, EventArgs e)
         {
-            implementationFilterValidated = false;
-            ValidateImplementationFilterIfNeeded();
+            cppFilterValidated = false;
+            ValidateCppFilterIfNeeded();
         }
 
         private void SelectSubfolderButtonClicked(object sender, RoutedEventArgs e)
@@ -863,7 +862,7 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-                ImplementationSubfolderCombo.Text = ClassFacilities.ConformSubfolder(path);
+                CppSubfolderCombo.Text = ClassFacilities.ConformSubfolder(path);
             }
         }
         private void ShowInfoMessage(string caption, string text)
@@ -873,7 +872,7 @@ namespace Dwarfovich.AddCppClass
 
         private void UseSingleFolderInfoButtonDown(object sender, EventArgs e)
         {
-            ShowInfoMessage("Use single subfolder", "If this checkbox is checked implementation file would be created in the same folder as header file");
+            ShowInfoMessage("Use single subfolder", "If this checkbox is checked source file would be created in the same folder as header file");
         }
 
         private void CreateFiltersInfoButtonDown(object sender, EventArgs e)

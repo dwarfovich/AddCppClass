@@ -62,11 +62,11 @@ namespace Dwarfovich.AddCppClass
         public StringListSetting _namespaces = new() { ValidateFunction = ClassFacilities.IsValidNamespace };
         public StringListSetting _precompiledHeaders = new() { ValidateFunction = ClassFacilities.IsValidPrecompiledHeaderPath };
         public StringListSetting _headerExtensions = new() { ValidateFunction = ClassFacilities.IsValidExtension, Values = { defaultHeaderExtension, defaultAltHeaderExtension } };
-        public StringListSetting _implementationExtensions = new() { ValidateFunction = ClassFacilities.IsValidExtension, Values = { defaultCppExtension } };
+        public StringListSetting _cppExtensions = new() { ValidateFunction = ClassFacilities.IsValidExtension, Values = { defaultCppExtension } };
         public StringListSetting _headerSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
-        public StringListSetting _implementationSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
+        public StringListSetting _cppSubfolders = new() { ValidateFunction = ClassFacilities.IsValidSubfolder, ConformFunction = ClassFacilities.ConformSubfolder };
         public StringListSetting _headerFilters = new();
-        public StringListSetting _implementationFilters = new();
+        public StringListSetting _cppFilters = new();
 
         public static readonly string defaultHeaderExtension = ".h";
         public static readonly string defaultAltHeaderExtension = ".hpp";
@@ -116,17 +116,17 @@ namespace Dwarfovich.AddCppClass
         public List<string> recentHeaderExtensions { get; set; } = new List<string>
         { defaultHeaderExtension, defaultAltHeaderExtension };
         [JsonIgnore]
-        public string implementationExtension { get { return ".cpp"; } }
+        public string cppExtension { get { return ".cpp"; } }
         [JsonIgnore]
         public string headerFilename { get; set; } = "";
         [JsonIgnore]
         public string cppFilename { get; set; } = "";
-        public bool hasImplementationFile { get; set; } = true;
+        public bool createCppFile { get; set; } = true;
         public bool useSingleSubfolder { get; set; } = true;
         public int maxRecentHeaderSubfolders { get; set; } = 10;
         public List<string> recentHeaderSubfolders { get; set; } = new List<string> { };
-        public int maxRecentImplementationSubfolders { get; set; } = 10;
-        public List<string> recentImplementationSubfolders { get; set; } = new List<string> { };
+        public int maxRecentCppSubfolders { get; set; } = 10;
+        public List<string> recentCppSubfolders { get; set; } = new List<string> { };
         public bool autoSaveSettings { get; set; } = true;
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = "pch.h";
@@ -137,8 +137,8 @@ namespace Dwarfovich.AddCppClass
         public bool useSingleFilter { get; set; } = true;
         public int maxRecentHeaderFilters { get; set; } = 10;
         public List<string> recentHeaderFilters { get; set; } = new List<string> { };
-        public int maxRecentImplementationFilters { get; set; } = 10;
-        public List<string> recentImplementationFilters { get; set; } = new List<string> { };
+        public int maxRecentCppFilters { get; set; } = 10;
+        public List<string> recentCppFilters { get; set; } = new List<string> { };
         public bool storeValuesUnconditionally { get; set; } = false;
         public bool useHeaderRoot { get; set; } = false;
         public bool useCppRoot { get; set; } = false;
@@ -187,7 +187,7 @@ namespace Dwarfovich.AddCppClass
         {
             if (storeValuesUnconditionally || !useSingleSubfolder)
             {
-                return recentImplementationSubfolders.FirstOrValue("");
+                return recentCppSubfolders.FirstOrValue("");
             }
             else
             {
@@ -195,11 +195,11 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        public void SetImplementationSubfolder(string subfolder)
+        public void SetCppSubfolder(string subfolder)
         {
             if (storeValuesUnconditionally || !useSingleSubfolder)
             {
-                recentImplementationSubfolders.SetFrontValue(subfolder, maxRecentImplementationSubfolders);
+                recentCppSubfolders.SetFrontValue(subfolder, maxRecentCppSubfolders);
             }
         }
 
@@ -228,13 +228,13 @@ namespace Dwarfovich.AddCppClass
             }
         }
 
-        public string ImplementationFilter()
+        public string CppFilter()
         {
             if (createFilters)
             {
                 if (storeValuesUnconditionally)
                 {
-                    return recentImplementationFilters.FirstOrValue("");
+                    return recentCppFilters.FirstOrValue("");
                 }
                 else
                 {
@@ -244,7 +244,7 @@ namespace Dwarfovich.AddCppClass
                     }
                     else
                     {
-                        return useSingleFilter ? HeaderFilter() : recentImplementationFilters.FirstOrValue("");
+                        return useSingleFilter ? HeaderFilter() : recentCppFilters.FirstOrValue("");
                     }
                 }
             }
@@ -252,16 +252,16 @@ namespace Dwarfovich.AddCppClass
             return "";
         }
 
-        private bool ShouldStoreImplementationFilter()
+        private bool ShouldStoreCppFilter()
         {
             return storeValuesUnconditionally || (createFilters && !useSubfoldersAsFilters && !useSingleFilter);
         }
 
-        public void SetImplementationFilter(string filter)
+        public void SetCppFilter(string filter)
         {
-            if (ShouldStoreImplementationFilter())
+            if (ShouldStoreCppFilter())
             {
-                recentImplementationFilters.SetFrontValue(filter, maxRecentImplementationFilters);
+                recentCppFilters.SetFrontValue(filter, maxRecentCppFilters);
             }
         }
     }
