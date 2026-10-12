@@ -45,7 +45,7 @@ namespace Dwarfovich.AddCppClass
             HeaderFilter.IsEnabledChanged += new(HeaderFilterEnabledChanged);
             CppFilter.IsEnabledChanged += new(CppFilterEnabledChanged);
             Title = title;
-            classNameTextBox.Text = defaultClassName;
+            ClassNameTextBox.Text = defaultClassName;
         }
 
         private void LoadSettings(Settings settings)
@@ -64,11 +64,12 @@ namespace Dwarfovich.AddCppClass
             }
 
             PopulateComboBox(NamespaceCombo, settings.recentNamespaces, settings.maxRecentNamespaces);
-            if (ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text))
+            if (ClassFacilities.ClassExists(NamespaceCombo.Text, ClassNameTextBox.Text))
             {
                 AddError(ErrorType.ClassExists);
             }
             PopulateComboBox(HeaderExtensionCombo, settings.recentHeaderExtensions, settings.maxRecentHeaderExtensions, ".h");
+            PopulateComboBox(CppExtensionCombo, settings.recentCppExtensions, settings.maxRecentHeaderExtensions, ".cpp");
 
             CreateFiltersCheckBox.IsChecked = settings.createFilters;
             CreateCppFileCheckBox.IsChecked = settings.createCppFile;
@@ -125,7 +126,7 @@ namespace Dwarfovich.AddCppClass
 
         private void SaveSettings()
         {
-            settings.className = classNameTextBox.Text;
+            settings.className = ClassNameTextBox.Text;
             settings.SetNamespace(NamespaceCombo.Text);
 
             settings.useSingleSubfolder = (bool)UseSingleSubfolderCheckBox.IsChecked;
@@ -325,7 +326,7 @@ namespace Dwarfovich.AddCppClass
                     UpdateFilenameTextBoxes();
                 }
                 RemoveError(ErrorType.InvalidClassName);
-                if (ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text))
+                if (ClassFacilities.ClassExists(NamespaceCombo.Text, ClassNameTextBox.Text))
                 {
                     AddError(ErrorType.ClassExists);
                 }
@@ -355,7 +356,7 @@ namespace Dwarfovich.AddCppClass
                 if (ClassFacilities.IsValidNamespace(textBox.Text))
                 {
                     RemoveError(ErrorType.InvalidNamespace);
-                    if (ClassFacilities.ClassExists(textBox.Text, classNameTextBox.Text))
+                    if (ClassFacilities.ClassExists(textBox.Text, ClassNameTextBox.Text))
                     {
                         AddError(ErrorType.ClassExists);
                     }
@@ -549,7 +550,7 @@ namespace Dwarfovich.AddCppClass
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            bool classExists = ClassFacilities.ClassExists(NamespaceCombo.Text, classNameTextBox.Text);
+            bool classExists = ClassFacilities.ClassExists(NamespaceCombo.Text, ClassNameTextBox.Text);
             if (classExists)
             {
                 VS.MessageBox.Show("Error", "Class already exists", OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK);
@@ -886,7 +887,7 @@ namespace Dwarfovich.AddCppClass
 
             bool isHeader = (button.Name == "SelectHeaderSubfolderButton");
             string path = Utils.Solution.CurrentProjectPath();
-            if(isHeader && (bool)UseHeaderRoot.IsChecked)
+            if (isHeader && (bool)UseHeaderRoot.IsChecked)
             {
                 path = Path.Combine(path, HeaderRoot.Text);
             }

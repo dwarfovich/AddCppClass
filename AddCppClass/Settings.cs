@@ -115,8 +115,9 @@ namespace Dwarfovich.AddCppClass
         public int maxRecentHeaderExtensions { get; set; } = 10;
         public List<string> recentHeaderExtensions { get; set; } = new List<string>
         { defaultHeaderExtension, defaultAltHeaderExtension };
-        [JsonIgnore]
-        public string cppExtension { get { return ".cpp"; } }
+        public int maxRecentCppExtensions { get; set; } = 10;
+        public List<string> recentCppExtensions { get; set; } = new List<string>
+        { defaultCppExtension};
         [JsonIgnore]
         public string headerFilename { get; set; } = "";
         [JsonIgnore]
@@ -166,6 +167,11 @@ namespace Dwarfovich.AddCppClass
         public string HeaderExtension()
         {
             return recentHeaderExtensions.FirstOrValue(defaultHeaderExtension);
+        }
+
+        public string CppExtension()
+        {
+            return recentCppExtensions.FirstOrValue(defaultCppExtension);
         }
 
         public void SetHeaderExtension(string extension)

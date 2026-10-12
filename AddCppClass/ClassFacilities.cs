@@ -10,14 +10,14 @@ namespace Dwarfovich.AddCppClass
 
         public (string headerFilename, string cppFilename) GenerateFilenamesForChangedExtension(Settings classSettings)
         {
-            return (filename + classSettings.HeaderExtension(), filename + classSettings.cppExtension);
+            return (filename + classSettings.HeaderExtension(), filename + classSettings.CppExtension());
         }
 
         public (string headerFilename, string cppFilename) GenerateFilenames(Settings classSettings)
         {
             filename = GenerateFilename(classSettings);
 
-            return (filename + classSettings.HeaderExtension(), filename + classSettings.cppExtension);
+            return (filename + classSettings.HeaderExtension(), filename + classSettings.CppExtension());
         }
 
         public string GeneratePascalCaseFilename(Settings classSettings)
