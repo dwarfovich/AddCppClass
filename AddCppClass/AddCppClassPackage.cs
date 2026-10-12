@@ -20,6 +20,7 @@ namespace AddCppClass
     public sealed class AddCppClassPackage : AsyncPackage
     {
         public static DTE2 dte;
+
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -29,7 +30,6 @@ namespace AddCppClass
 
             Logger.Initialize(this, Vsix.Name);
             Logger.Log("Hello, logger");
-            Logger.DumpSolution();
         }
     }
 }

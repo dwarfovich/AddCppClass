@@ -1,19 +1,25 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿using Dwarfovich.AddCppClass;
+using EnvDTE;
+using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.VCProjectEngine;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Windows;
 using System.Windows.Controls;
-using AddCppClass;
-using EnvDTE;
+using System.Xml.Linq;
 
 namespace Dwarfovich.AddCppClass
 {
     public partial class AddCppClassDialog : DialogWindow
     {
         public Settings settings { get; private set; } = new();
+
+        private readonly VCFilter selectedInitialFilter;
 
         private ClassFacilities classFacilities = new();
         private ClassSettingsErrorsCollection errors = new();
@@ -24,14 +30,11 @@ namespace Dwarfovich.AddCppClass
         private bool cppFilterValidated = false;
         private bool updatingFilterCheckBoxes = false;
 
-        public AddCppClassDialog()
-        {
-            InitializeGui();
-        }
-
-        public AddCppClassDialog(Settings settings)
+        public AddCppClassDialog(Settings settings, VCFilter selectedFilter)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            selectedInitialFilter = selectedFilter;
             InitializeGui();
             LoadSettings(settings);
         }
@@ -828,6 +831,49 @@ namespace Dwarfovich.AddCppClass
             ValidateCppFilterIfNeeded();
         }
 
+        private string FormPathToHeaderSubfolderSelection()
+        {
+            var path = Utils.Solution.CurrentProjectPath();
+            if ((bool)UseHeaderRoot.IsChecked)
+            {
+                path = Path.Combine(path, HeaderRoot.Text);
+            }
+            if (!Directory.Exists(path))
+            {
+                return Utils.Solution.CurrentProjectPath();
+            }
+
+            path = Path.Combine(path, HeaderSubfolderCombo.Text);
+            if (!Directory.Exists(path))
+            {
+                return Utils.Solution.CurrentProjectPath();
+            }
+
+            return path;
+        }
+
+        private string FormPathToCppSubfolderSelection()
+        {
+            var path = Utils.Solution.CurrentProjectPath();
+
+            if ((bool)UseCppRoot.IsChecked)
+            {
+                path = Path.Combine(path, CppRoot.Text);
+            }
+            if (!Directory.Exists(path))
+            {
+                return Utils.Solution.CurrentProjectPath();
+            }
+
+            path = Path.Combine(path, CppSubfolderCombo.Text);
+            if (!Directory.Exists(path))
+            {
+                return Utils.Solution.CurrentProjectPath();
+            }
+
+            return path;
+        }
+
         private void SelectSubfolderButtonClicked(object sender, RoutedEventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -838,8 +884,19 @@ namespace Dwarfovich.AddCppClass
                 return;
             }
 
+            bool isHeader = (button.Name == "SelectHeaderSubfolderButton");
             string path = Utils.Solution.CurrentProjectPath();
+            if(isHeader && (bool)UseHeaderRoot.IsChecked)
+            {
+                path = Path.Combine(path, HeaderRoot.Text);
+            }
+            else if ((bool)UseCppRoot.IsChecked)
+            {
+                path = Path.Combine(path, CppRoot.Text);
+            }
+
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = isHeader ? FormPathToHeaderSubfolderSelection() : FormPathToCppSubfolderSelection();
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             {
@@ -855,7 +912,7 @@ namespace Dwarfovich.AddCppClass
                 VS.MessageBox.Show("Warning", "Couldn't determine subfolder. Please ensure you are not leaving project folder", OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
                 return;
             }
-            bool isHeader = (button.Name == "SelectHeaderSubfolderButton");
+
             if (isHeader)
             {
                 HeaderSubfolderCombo.Text = ClassFacilities.ConformSubfolder(path);
@@ -865,24 +922,50 @@ namespace Dwarfovich.AddCppClass
                 CppSubfolderCombo.Text = ClassFacilities.ConformSubfolder(path);
             }
         }
-        private void ShowInfoMessage(string caption, string text)
+
+        private void selectHeaderRootButtonClicked(object sender, EventArgs e)
         {
-            _ = VS.MessageBox.Show(caption, text, OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+            string path = Utils.Solution.CurrentProjectPath();
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = path;
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            if (dialog.FileName.StartsWith(path))
+            {
+                path = dialog.FileName.Substring(path.Length + 1);
+                HeaderRoot.Text = ClassFacilities.ConformSubfolder(path);
+            }
+            else
+            {
+                VS.MessageBox.Show("Warning", "Couldn't determine subfolder. Please ensure you are not leaving project folder", OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+            }
         }
 
-        private void UseSingleFolderInfoButtonDown(object sender, EventArgs e)
+        private void selectCppRootButtonClicked(object sender, EventArgs e)
         {
-            ShowInfoMessage("Use single subfolder", "If this checkbox is checked source file would be created in the same folder as header file");
-        }
+            string path = Utils.Solution.CurrentProjectPath();
 
-        private void CreateFiltersInfoButtonDown(object sender, EventArgs e)
-        {
-            ShowInfoMessage("Create filters", "If this checkbox is checked filters with corresponding files would be added to the project. For example, file with path \"MyFolder/header.h\" will added to filter \"MyFolder\".");
-        }
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = path;
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
 
-        private void HeaderExtensionInfoButtonDown(object sender, EventArgs e)
-        {
-            ShowInfoMessage("Header extension", "A file extension for the header. Should be started with the dot '.'.");
+            if (dialog.FileName.StartsWith(path))
+            {
+                path = dialog.FileName.Substring(path.Length + 1);
+                CppRoot.Text = ClassFacilities.ConformSubfolder(path);
+            }
+            else
+            {
+                VS.MessageBox.Show("Warning", "Couldn't determine subfolder. Please ensure you are not leaving project folder", OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
+            }
         }
     }
 }

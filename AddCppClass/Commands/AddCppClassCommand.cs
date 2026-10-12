@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.VCProjectEngine;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,7 +23,7 @@ namespace Dwarfovich.AddCppClass
     {
         public static readonly Guid CommandSet = new Guid(PackageGuids.AddCppClassString);
 
-        private static readonly string extensionConfigFile = "AddCppClass.config.json";
+        private static readonly string pluginConfigFile = "AddCppClass.config.json";
 
         public static AddCppClassCommand Instance
         {
@@ -48,7 +49,7 @@ namespace Dwarfovich.AddCppClass
             }
             else
             {
-                return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, extensionConfigFile);
+                return Path.Combine(new FileInfo(activeProject.FullName).DirectoryName, pluginConfigFile);
             }
         }
 
@@ -115,22 +116,6 @@ namespace Dwarfovich.AddCppClass
                 throw new Exception("Failed to convert EnvDTE.Project to VCProject");
             }
 
-            Logger.Log("Hello, Execute()");
-            string m = "";
-            var filters = vcProject.Filters as System.Collections.IEnumerable;
-            foreach (var filter in filters.Cast<VCFilter>())
-            {
-                m += filter.CanonicalName + "\n";// + filter.Filters + "\n";
-            }
-            //VS.MessageBox.Show("Warning", m, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK);
-
-            //string filter = @"filter1\\filter2";
-            //VCFilter f = vcProject.AddFilter(filter) as VCFilter;
-
-            //f.AddFile(filePath);
-
-            //return;
-
             var settings = GetSettings();
             var errors = ClassFacilities.ConformSettings(ref settings);
             foreach (var error in errors)
@@ -138,43 +123,34 @@ namespace Dwarfovich.AddCppClass
                 ShowSettingErrorMessage(error);
             }
 
-            var monitorSelection = Package.GetGlobalService(typeof(SVsShellMonitorSelection))
-    as IVsMonitorSelection;
-
+            var monitorSelection = Package.GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
             monitorSelection.GetCurrentSelection(
                 out IntPtr hierarchyPtr,
-                out uint itemid,
+                out uint itemId,
                 out IVsMultiItemSelect multiSelect,
                 out IntPtr selectionContainer);
-
             var hierarchy = Marshal.GetObjectForIUnknown(hierarchyPtr) as IVsHierarchy;
-            //Logger.Log($"-------");
-            //Logger.Log($"itemid = {itemid}");
-            //Logger.Log($"hierarchy = {hierarchy}");
-            hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out object name);
-            hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_SaveName, out object saveName);
-            hierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_ExtObject, out object extObject);
-
-            //Logger.Log($"Name: {name}");
-            //Logger.Log($"SaveName: {saveName}");
-            //Logger.Log($"ExtObject: {extObject?.GetType().FullName}");
-
-            if (hierarchy == null || itemid == VSConstants.VSITEMID_NIL)
+            if (hierarchy == null || itemId == VSConstants.VSITEMID_NIL)
+            {
+                Logger.Log("Selected error: Failed get hierarchy");
                 return;
+            }
+
+            var status = hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_ExtObject, out object extObject);
+            if (ErrorHandler.Failed(status) || extObject == null)
+            {
+                Logger.Log("Selected error: Failed get property");
+                return;
+            }
+
+            if (extObject is not EnvDTE.ProjectItem projectItem)
+            {
+                return;
+            }
+            var initialFilter = ((IVCCollection)vcProject.Filters).Cast<VCFilter>().FirstOrDefault(f => f.Name == projectItem.Name);
 
 
-            //if (extObject is EnvDTE.ProjectItem projectItem)
-            //{
-            //    Logger.Log($"ProjectItem: {projectItem.Name}");
-            //    var filter = projectItem?.Object as VCFilter;
-
-            //    if (filter != null)
-            //    {
-            //        Logger.Log($"Filter: {filter.Name}");
-            //    }
-            //}
-
-            var dialog = new AddCppClassDialog(settings);
+            var dialog = new AddCppClassDialog(settings, initialFilter);
             dialog.HasMinimizeButton = false;
             dialog.HasMaximizeButton = false;
             bool result = (bool)dialog.ShowModal();
@@ -183,6 +159,7 @@ namespace Dwarfovich.AddCppClass
                 SaveSettingsToFile(dialog.settings);
             }
         }
+
         private void OnBeforeQueryStatus(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
