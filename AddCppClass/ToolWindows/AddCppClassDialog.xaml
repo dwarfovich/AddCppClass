@@ -31,9 +31,11 @@
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
-            <RowDefinition Height="85"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12"/>
@@ -117,7 +119,7 @@
         </StackPanel>
         <TextBox Grid.Column="1" Name="PrecompiledHeader" Text="pch.h" TextChanged="PrecompiledHeaderFilenameChangedEventHandler" Grid.Row="5" TextWrapping="Wrap"/>
 
-        <Grid Grid.Column="1" Grid.Row="10" Grid.RowSpan="4">
+        <Grid Grid.Column="1" Grid.Row="10" Grid.RowSpan="7">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
@@ -125,11 +127,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                
             </Grid.RowDefinitions>
 
             <GroupBox Header="Filename style"
@@ -168,6 +166,7 @@
                     <RadioButton Content="#pragma once" Name="PragmaOnceGuardStyle" Tag="PragmaOnce" Grid.Row="5" GroupName="IncludeGuardStyleGroup" IsChecked="True" VerticalContentAlignment="Center"/>
                     <RadioButton Content="#ifndef ClassName" Name="IfndefGuardStyle" Tag="Ifndef" Grid.Row="6" GroupName="IncludeGuardStyleGroup" IsChecked="False" VerticalContentAlignment="Center"/>
                     <RadioButton Content="#ifndef ClassName__Guid" Name="IfndefGuidGuardStyle" Tag="IfndefGuid" Grid.Row="6" GroupName="IncludeGuardStyleGroup" IsChecked="False" VerticalContentAlignment="Center"/>
+                    <RadioButton Content="None" Name="NoneGuardStyle" Tag="IfndefGuid" Grid.Row="6" GroupName="IncludeGuardStyleGroup" IsChecked="False" VerticalContentAlignment="Center"/>
                 </StackPanel>
             </GroupBox>
             

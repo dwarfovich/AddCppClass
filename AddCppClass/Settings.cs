@@ -14,10 +14,12 @@ namespace Dwarfovich.AddCppClass
         Custom
     };
 
-    public enum IncludeGuard
+    public enum IncludeGuardStyle
     {
         PragmaOnce,
-        Ifndef, // TODO: add IfndefGuid style
+        Ifndef,
+        IfndefGuid,
+        None
     };
 
     public class StringListSetting
@@ -129,7 +131,7 @@ namespace Dwarfovich.AddCppClass
         public bool includePrecompiledHeader { get; set; } = false;
         public string precompiledHeader { get; set; } = "pch.h";
         [JsonConverter(typeof(StringEnumConverter))]
-        public IncludeGuard includeGuardStyle { get; set; } = IncludeGuard.PragmaOnce;
+        public IncludeGuardStyle includeGuardStyle { get; set; } = IncludeGuardStyle.PragmaOnce;
         public bool createFilters { get; set; } = true;
         public bool useSubfoldersAsFilters { get; set; } = true;
         public bool useSingleFilter { get; set; } = true;

@@ -43,19 +43,27 @@ namespace Dwarfovich.AddCppClass
 
         private static string GenerateIfndefGuardFilenameToken(Settings settings)
         {
-            return settings.headerFilename.ToUpper().Replace('.', '_');
+            var token = settings.headerFilename.ToUpper().Replace('.', '_');
+            if (settings.includeGuardStyle == IncludeGuardStyle.IfndefGuid)
+            {
+                token += '_';
+                token += Guid.NewGuid().ToString().Replace('-', '_').ToUpper();
+            }
+
+            return token;
         }
+
 
         private static void PopulateHeaderFile(FileStream fileStream, Settings settings)
         {
             using (var writer = new StreamWriter(fileStream))
             {
                 string includeGuardFilenameToken = "";
-                if (settings.includeGuardStyle == IncludeGuard.PragmaOnce)
+                if (settings.includeGuardStyle == IncludeGuardStyle.PragmaOnce)
                 {
                     writer.WriteLine("#pragma once");
                 }
-                else
+                else if (settings.includeGuardStyle == IncludeGuardStyle.Ifndef || settings.includeGuardStyle == IncludeGuardStyle.IfndefGuid)
                 {
                     includeGuardFilenameToken = GenerateIfndefGuardFilenameToken(settings);
                     writer.WriteLine("#ifndef " + includeGuardFilenameToken);
@@ -86,7 +94,7 @@ namespace Dwarfovich.AddCppClass
                 {
                     writer.WriteLine("} // namespace " + tokens[i]);
                 }
-                if (settings.includeGuardStyle == IncludeGuard.Ifndef)
+                if (settings.includeGuardStyle == IncludeGuardStyle.Ifndef || settings.includeGuardStyle == IncludeGuardStyle.IfndefGuid)
                 {
                     writer.Write(Environment.NewLine);
                     writer.WriteLine("#endif // " + includeGuardFilenameToken);

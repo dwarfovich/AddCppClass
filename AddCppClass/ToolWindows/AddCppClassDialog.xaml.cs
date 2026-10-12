@@ -87,13 +87,22 @@ namespace Dwarfovich.AddCppClass
             {
                 PrecompiledHeader.IsEnabled = false;
             }
-            if (settings.includeGuardStyle == IncludeGuard.PragmaOnce)
+
+            if (settings.includeGuardStyle == IncludeGuardStyle.PragmaOnce)
             {
                 PragmaOnceGuardStyle.IsChecked = true;
             }
-            else
+            else if (settings.includeGuardStyle == IncludeGuardStyle.Ifndef)
             {
                 IfndefGuardStyle.IsChecked = true;
+            }
+            else if (settings.includeGuardStyle == IncludeGuardStyle.IfndefGuid)
+            {
+                IfndefGuidGuardStyle.IsChecked = true;
+            }
+            else
+            {
+                NoneGuardStyle.IsChecked = true;
             }
 
             PopulateComboBox(HeaderFilter, settings.recentHeaderFilters, settings.maxRecentHeaderFilters);
@@ -237,11 +246,19 @@ namespace Dwarfovich.AddCppClass
         {
             if ((bool)PragmaOnceGuardStyle.IsChecked)
             {
-                settings.includeGuardStyle = IncludeGuard.PragmaOnce;
+                settings.includeGuardStyle = IncludeGuardStyle.PragmaOnce;
             }
-            else
+            else if ((bool)IfndefGuardStyle.IsChecked)
             {
-                settings.includeGuardStyle = IncludeGuard.Ifndef;
+                settings.includeGuardStyle = IncludeGuardStyle.Ifndef;
+            }
+            else if ((bool)IfndefGuidGuardStyle.IsChecked)
+            {
+                settings.includeGuardStyle = IncludeGuardStyle.IfndefGuid;
+            }
+            else if ((bool)NoneGuardStyle.IsChecked)
+            {
+                settings.includeGuardStyle = IncludeGuardStyle.None;
             }
         }
 
@@ -434,7 +451,7 @@ namespace Dwarfovich.AddCppClass
 
             if (ClassFacilities.IsValidFilename(textBox.Text))
             {
-                if(settings.filenameStyle == FilenameStyle.Custom)
+                if (settings.filenameStyle == FilenameStyle.Custom)
                 {
                     settings.headerFilename = textBox.Text;
                 }
